@@ -7,11 +7,13 @@ class Board:
     def __init__(self):
         self.width = BOARD_WIDTH
         self.data = [[0 for i in range(self.width)] for j in range(self.width)]
-
+        
 
     def new_pos(self,row,col,**kwargs):
         self.data[row][col] = 1
 
+    def mark_annotate(self,**kwargs):
+        pass
 
     def init_pos(self,player,row,col):
         _row =  (self.width-1)*player +  -1*row if player else row
@@ -53,23 +55,39 @@ class Piece:
 
 class Pawn(Piece):
     
-    def __init__(self,init_col):
-        self.pos = (2,init_col)
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
         self.en_passant_vulnerable = False
         
 
 class King(Piece):
     
-    def __init__(self):
-        self.pos = (1,5)
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
+        self.typ = 'King'
         self.king_can_castle = True
 
 
 class Rook(Piece):
     
-    def __init__(self,init_col,):
-        self.pos = (1,init_col)
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
         self.rook_can_castle = True
+
+class Knight(Piece):
+    
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
+
+class Bishop(Piece):
+    
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
+
+class Queen(Piece):
+    
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
 
 #class Bishop(Piece):   
 #class Queen(Piece):
@@ -77,22 +95,55 @@ class Rook(Piece):
 board = Board()
 board.print_board()
 
-
+pieces = []
 
 #Place Pieces
 for _player in (True,False):
-
     for _row in [0,1]:  # 0=BACK, 1=FRONT-PAWNS
-        
         for _col in range(board.width):
 
             _pos = board.init_pos(_player,_row,_col)
+
+            if _row == 1:
+                
+                piece = Pawn(b_white = _player, pos = _pos  )
             
-            piece = Piece(b_white = _player, pos = _pos  )
+            else:
+                
+                if _col == 0 or _col == 7:
+                    piece = Rook(b_white = _player, pos = _pos  )
+                
+                elif _col == 1 or _col == 6:
+                    piece = Knight(b_white = _player, pos = _pos  )
+                
+                elif _col == 2 or _col == 5:
+                    piece = Bishop(b_white = _player, pos = _pos  )
+                
+                else:
+                    if _col == 3:
+                        piece = Queen(b_white = _player, pos = _pos  )
+                
+                    if _col == 4:
+                        piece = King(b_white = _player, pos = _pos  )
+
+            try:
+                pieces.append(piece)
+            except:
+                print _player, _row, _col
             
             board.new_pos(row = _pos[0] ,col = _pos[1] )            
 
 board.print_board()
+
+for p in pieces:
+    print str(p.white) + " " + str(p.__class__.__name__) + " " + str(p.pos)
+
+
+
+pawn = Pawn(True,(1,1))
+print pawn.pos
+print pawn.en_passant_vulnerable
+print pawn.__class__.__name__
 
 #POS = (1,1)
 #piece = Piece(b_white = True, pos = POS )
