@@ -1,0 +1,4 @@
+Edge cases:
+
+    pawn, en passant
+    castling
