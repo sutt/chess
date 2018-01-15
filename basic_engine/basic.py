@@ -6,13 +6,17 @@ class Board:
     
     def __init__(self):
         self.width = BOARD_WIDTH
-        #self.data = [[0] * self.width] * self.width
-        self.data = []
         self.data = [[0 for i in range(self.width)] for j in range(self.width)]
 
 
     def new_pos(self,row,col,**kwargs):
         self.data[row][col] = 1
+
+
+    def init_pos(self,player,row,col):
+        _row =  (self.width-1)*player +  -1*row if player else row
+        _col = col
+        return _row, _col
 
     def get_diagonals(self,pos, spaces = 7):
         """order them by closest to furthest,
@@ -73,11 +77,27 @@ class Rook(Piece):
 board = Board()
 board.print_board()
 
-POS = (1,1)
-piece = Piece(b_white = True, pos = POS )
-board.new_pos(row = POS[0] ,col = POS[1] )
+
+
+#Place Pieces
+for _player in (True,False):
+
+    for _row in [0,1]:  # 0=BACK, 1=FRONT-PAWNS
+        
+        for _col in range(board.width):
+
+            _pos = board.init_pos(_player,_row,_col)
+            
+            piece = Piece(b_white = _player, pos = _pos  )
+            
+            board.new_pos(row = _pos[0] ,col = _pos[1] )            
 
 board.print_board()
+
+#POS = (1,1)
+#piece = Piece(b_white = True, pos = POS )
+#board.new_pos(row = POS[0] ,col = POS[1] )
+#board.print_board()
 
 
 
