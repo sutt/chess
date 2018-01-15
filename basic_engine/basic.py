@@ -1,4 +1,4 @@
-import sys
+import sys, copy
 
 BOARD_WIDTH = 8
 
@@ -6,10 +6,13 @@ class Board:
     
     def __init__(self):
         self.width = BOARD_WIDTH
-        self.data = [[0] * self.width] * self.width
+        #self.data = [[0] * self.width] * self.width
+        self.data = []
+        self.data = [[0 for i in range(self.width)] for j in range(self.width)]
+
 
     def new_pos(self,row,col,**kwargs):
-        self.data[row,col] = 1
+        self.data[row][col] = 1
 
     def get_diagonals(self,pos, spaces = 7):
         """order them by closest to furthest,
@@ -33,7 +36,7 @@ class Board:
 
 class Piece:
 
-    def __init__(self,b_white, pos, ):
+    def __init__(self,b_white, pos, **kwargs):
         self.white = b_white
         self.alive = True
         self.pos = pos
@@ -69,6 +72,19 @@ class Rook(Piece):
 
 board = Board()
 board.print_board()
-    
+
+POS = (1,1)
+piece = Piece(b_white = True, pos = POS )
+board.new_pos(row = POS[0] ,col = POS[1] )
+
+board.print_board()
+
+
+
+
+
+
+
+
 
     

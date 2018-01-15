@@ -2,3 +2,7 @@ Edge cases:
 
     pawn, en passant
     castling
+
+Generic ObjectOriented Game Enigne
+
+figure out inheritance of a king(piece)
