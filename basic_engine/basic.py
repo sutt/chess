@@ -32,10 +32,9 @@ class Board:
         return _row, _col
 
     def get_diagonals(self,pos, spaces = 7):
-        """order them by closest to furthest,
-           so that you can filter based on blockers"""
-        
-        pos1,pos2,pos3,pos4 = [],[],[],[]
+        """ordered closest to furthest"""
+
+        pos1,pos2,pos3,pos4 = [],[],[],[]   #1=NW 2=NE 3=SW 4=SE
 
         for i in range(1,self.width):
             _pos1 = (pos[0] + i, pos[1] - i)
@@ -46,10 +45,10 @@ class Board:
                 pos2.append(_pos2)
             _pos3 = (pos[0] - i, pos[1] - i)
             if all(map(lambda v: (self.width - 1) >= v >= 0, _pos3)):
-                pos1.append(_pos3)
-            _pos3 = (pos[0] - i, pos[1] + i)
-            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos3)):
-                pos1.append(_pos3)
+                pos3.append(_pos3)
+            _pos4 = (pos[0] - i, pos[1] + i)
+            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos4)):
+                pos4.append(_pos4)
         
         diagonals = (pos1,pos2,pos3,pos4)
         return diagonals
