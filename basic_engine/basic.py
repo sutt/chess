@@ -7,13 +7,24 @@ class Board:
     def __init__(self):
         self.width = BOARD_WIDTH
         self.data = [[0 for i in range(self.width)] for j in range(self.width)]
-        
+        self.annotate = None
 
     def new_pos(self,row,col,**kwargs):
         self.data[row][col] = 1
 
-    def mark_annotate(self,**kwargs):
-        pass
+    def start_annotate(self,**kwargs):
+        self.annotate = copy.copy(self.data)
+
+    def start_misc(self,**kwargs):
+        self.misc = [[0 for i in range(self.width)] for j in range(self.width)]
+
+    def mark_annotate(self,piece,**kwargs):
+        _pos = piece.pos
+        _symbol = str.upper(str(piece.__class__.__name__)[0])
+        self.annotate[_pos[0]][_pos[1]] = _symbol
+
+    def mark_misc(self,pos,**kwargs):
+        self.misc[pos[0]][pos[1]] = 1
 
     def init_pos(self,player,row,col):
         _row =  (self.width-1)*player +  -1*row if player else row
@@ -23,7 +34,24 @@ class Board:
     def get_diagonals(self,pos, spaces = 7):
         """order them by closest to furthest,
            so that you can filter based on blockers"""
-        diagonals = []
+        
+        pos1,pos2,pos3,pos4 = [],[],[],[]
+
+        for i in range(1,self.width):
+            _pos1 = (pos[0] + i, pos[1] - i)
+            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos1)):
+                pos1.append(_pos1)
+            _pos2 = (pos[0] + i, pos[1] + i)
+            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos2)):
+                pos2.append(_pos2)
+            _pos3 = (pos[0] - i, pos[1] - i)
+            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos3)):
+                pos1.append(_pos3)
+            _pos3 = (pos[0] - i, pos[1] + i)
+            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos3)):
+                pos1.append(_pos3)
+        
+        diagonals = (pos1,pos2,pos3,pos4)
         return diagonals
 
     def get_ups_and_acrosses(self,pos):
@@ -32,12 +60,15 @@ class Board:
     def get_two_by_ones(self,pos):
         pass
 
-    def print_board(self):
+    def print_board(self,b_annotate = False ,b_misc = False):
+        p_data = self.data
+        if b_annotate: p_data = self.annotate
+        if b_misc: p_data = self.misc
         out = ""
-        for row in self.data:
+        for row in p_data:
             s_row = map(str,row)
             out += " ".join(s_row)
-            out += "\n"
+            out += "\n"        
         print out
 
 class Piece:
@@ -135,8 +166,13 @@ for _player in (True,False):
 
 board.print_board()
 
+# for p in pieces:
+#     print str(p.white) + " " + str(p.__class__.__name__) + " " + str(p.pos)
+
+board.start_annotate()
 for p in pieces:
-    print str(p.white) + " " + str(p.__class__.__name__) + " " + str(p.pos)
+    board.mark_annotate(p)
+board.print_board(b_annotate = True)
 
 
 
@@ -144,6 +180,20 @@ pawn = Pawn(True,(1,1))
 print pawn.pos
 print pawn.en_passant_vulnerable
 print pawn.__class__.__name__
+
+blackbishop = pieces[2]
+print str(blackbishop.__class__.__name__)  + " " + str(blackbishop.pos)
+bishop_pos = blackbishop.pos
+bishops_diags = board.get_diagonals(bishop_pos)
+print bishops_diags
+board.start_misc()
+for diags in bishops_diags:
+    for _pos in diags:
+        board.mark_misc(_pos)
+board.print_board(b_misc = True)
+
+
+
 
 #POS = (1,1)
 #piece = Piece(b_white = True, pos = POS )
