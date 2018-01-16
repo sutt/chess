@@ -26,6 +26,11 @@ class Board:
     def mark_misc(self,pos,**kwargs):
         self.misc[pos[0]][pos[1]] = 1
 
+    def mark_all_misc(self,list_list_pos,**kwargs):
+        for list_pos in list_list_pos:
+            for pos in list_pos:
+                self.misc[pos[0]][pos[1]] = 1
+
     def init_pos(self,player,row,col):
         _row =  (self.width-1)*player +  -1*row if player else row
         _col = col
@@ -54,7 +59,24 @@ class Board:
         return diagonals
 
     def get_ups_and_acrosses(self,pos):
-        pass
+        
+        _row, _col, _width = pos[0], pos[1], self.width
+        
+        pos1,pos2,pos3,pos4 = [],[],[],[]   #1=Up 2=Down 3=Right 4=Left
+
+        for i in range( _row + 1, _width ):
+            pos1.append(( i, _col))
+        for i in range( _row - 1, -1, -1 ):
+            pos2.append(( i, _col))
+        for i in range( _col + 1, _width ):
+            pos3.append(( _row, i))
+        for i in range( _col - 1 , -1, -1 ):
+            pos4.append(( _row, i))
+
+        upacross = (pos1,pos2,pos3,pos4)
+        return upacross
+
+
         
     def get_two_by_ones(self,pos):
         pass
@@ -191,8 +213,27 @@ for diags in bishops_diags:
         board.mark_misc(_pos)
 board.print_board(b_misc = True)
 
+board.start_misc()
+diags = board.get_diagonals((4,4))
+print diags
+board.mark_all_misc(diags)
+board.print_board(b_misc = True)
 
+blackrook = pieces[0]
+print str(blackrook.__class__.__name__)  + " " + str(blackrook.pos)
+rook_pos = blackrook.pos
+rook_moves = board.get_ups_and_acrosses(rook_pos)
+print rook_moves
+board.start_misc()
+board.mark_all_misc(rook_moves)
+board.print_board(b_misc = True)
 
+POS = (3,4)
+rook_moves = board.get_ups_and_acrosses(POS)
+print rook_moves
+board.start_misc()
+board.mark_all_misc(rook_moves)
+board.print_board(b_misc = True)
 
 #POS = (1,1)
 #piece = Piece(b_white = True, pos = POS )
