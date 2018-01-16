@@ -57,27 +57,19 @@ class Board:
         
         diagonals = (pos1,pos2,pos3,pos4)
         return diagonals
-
-    def get_ups_and_acrosses(self,pos):
+    
+    def get_upacross(self,pos):
         
         _row, _col, _width = pos[0], pos[1], self.width
         
-        pos1,pos2,pos3,pos4 = [],[],[],[]   #1=Up 2=Down 3=Right 4=Left
+        #1=Up 2=Down 3=Right 4=Left
+        pos1 = [ (i,_col) for i in range( _row + 1, _width, 1)]
+        pos2 = [ (i,_col) for i in range( _row - 1, -1, -1)]
+        pos3 = [ (_row,i) for i in range( _col + 1, _width)]
+        pos4 = [ (_row,i) for i in range( _col - 1, -1, -1)]
 
-        for i in range( _row + 1, _width ):
-            pos1.append(( i, _col))
-        for i in range( _row - 1, -1, -1 ):
-            pos2.append(( i, _col))
-        for i in range( _col + 1, _width ):
-            pos3.append(( _row, i))
-        for i in range( _col - 1 , -1, -1 ):
-            pos4.append(( _row, i))
+        return (pos1, pos2, pos3, pos4)
 
-        upacross = (pos1,pos2,pos3,pos4)
-        return upacross
-
-
-        
     def get_two_by_ones(self,pos):
         pass
 
@@ -222,14 +214,14 @@ board.print_board(b_misc = True)
 blackrook = pieces[0]
 print str(blackrook.__class__.__name__)  + " " + str(blackrook.pos)
 rook_pos = blackrook.pos
-rook_moves = board.get_ups_and_acrosses(rook_pos)
+rook_moves = board.get_upacross(rook_pos)
 print rook_moves
 board.start_misc()
 board.mark_all_misc(rook_moves)
 board.print_board(b_misc = True)
 
 POS = (3,4)
-rook_moves = board.get_ups_and_acrosses(POS)
+rook_moves = board.get_upacross(POS)
 print rook_moves
 board.start_misc()
 board.mark_all_misc(rook_moves)
