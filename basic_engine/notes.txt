@@ -1,8 +1,33 @@
-Edge cases:
+Goal: Generic ObjectOriented Game Enigne
 
+Edge cases:
     pawn, en passant
     castling
-
-Generic ObjectOriented Game Enigne
+    
+Other weird things: 
+    pawn-promotion
+    king must move out of check
+    king cannot move into check
+    other peices can't move in a way that puts king in check
 
 figure out inheritance of a king(piece)
+
+1/17
+
+store board position with 1=white vs 2=black
+
+two_by_ones()
+
+try filtering pieces by b_white property
+
+get_available_moves()
+    eliminate own piece blocks
+    allow opponent piece capture
+
+
+
+board should store edge cases:
+     king_can_castle, rook_can_castle, en_passant_vulnerable [0,1,,0,0]...
+
+    -> so that, piece.get_available_moves(board) is full evaulation
+       not: piece.get_available_moves(board, white's pawns, etc...)
