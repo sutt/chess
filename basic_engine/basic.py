@@ -36,27 +36,23 @@ class Board:
         _col = col
         return _row, _col
 
+
     def get_diagonals(self,pos, spaces = 7):
         """ordered closest to furthest"""
 
-        pos1,pos2,pos3,pos4 = [],[],[],[]   #1=NW 2=NE 3=SW 4=SE
-
-        for i in range(1,self.width):
-            _pos1 = (pos[0] + i, pos[1] - i)
-            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos1)):
-                pos1.append(_pos1)
-            _pos2 = (pos[0] + i, pos[1] + i)
-            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos2)):
-                pos2.append(_pos2)
-            _pos3 = (pos[0] - i, pos[1] - i)
-            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos3)):
-                pos3.append(_pos3)
-            _pos4 = (pos[0] - i, pos[1] + i)
-            if all(map(lambda v: (self.width - 1) >= v >= 0, _pos4)):
-                pos4.append(_pos4)
+        _row, _col, _width = pos[0], pos[1], self.width
         
-        diagonals = (pos1,pos2,pos3,pos4)
-        return diagonals
+        #Tricky off-by-one stuff here, since range omits final value
+        _maxup, _maxdown = _row + 1, _width - _row
+        _maxleft, _maxright = _col + 1, _width - _col
+
+        #1=NW 2=NE 3=SW 4=SE
+        pos1 = [ (_row - i, _col - i) for i in range( 1, min(_maxup, _maxleft))]
+        pos2 = [ (_row - i, _col + i) for i in range( 1, min(_maxup, _maxright))]
+        pos3 = [ (_row + i, _col - i) for i in range( 1, min(_maxdown, _maxleft))]
+        pos4 = [ (_row + i, _col + i) for i in range( 1 ,min(_maxdown, _maxright))]
+        
+        return (pos1, pos2, pos3, pos4)
     
     def get_upacross(self,pos):
         
@@ -232,7 +228,7 @@ board.print_board(b_misc = True)
 #board.new_pos(row = POS[0] ,col = POS[1] )
 #board.print_board()
 
-
+print board.width
 
 
 
