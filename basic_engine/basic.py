@@ -85,6 +85,9 @@ class Board:
 
 
     def get_two_by_ones(self,pos):
+        """ input: pos
+            returns: list of list of pos-tuples.  inner list is always of len-1.
+                     this function eliminates any "off the board" moves. """
         
         _row, _col, _width = pos[0], pos[1], self.width
         pos1 = []
@@ -135,13 +138,19 @@ class Piece:
         if self.upacross > 0:
             temp = board.get_upacross(self.pos, spaces = self.upacorss)
             temp2 = filter_by_blocking_pieces(temp, board )
-            #need to flatten temp2
-            moves.extend( temp2 )
+            moves.extend( temp2 )   #need to flatten temp2 first
+
         if self.diagonal > 0:
             temp = board.get_diagonals(self.pos, spaces = self.diagonal)
             temp2 = filter_by_blocking_pieces(temp, board )
-            #need to flatten temp2
             moves.extend( temp2)
+
+        if self.twobyone:
+            temp = board.get_two_by_ones(self.pos)
+            #note: blocking the knight your own piece on end-pos
+            temp2 = filter_by_blocking_pieces(temp, board )
+            moves.extend( temp2 )
+
 
         
         
@@ -294,6 +303,7 @@ def main():
     board.print_board(b_misc = True)
 
     POS = (3,3)
+    print 'Kngiht at: ', str(POS)
     knight_moves = board.get_two_by_ones(POS)
     print knight_moves
     board.start_misc()
@@ -301,6 +311,7 @@ def main():
     board.print_board(b_misc = True)
 
     POS = (0,7)
+    print 'Kngiht at: ', str(POS)
     knight_moves = board.get_two_by_ones(POS)
     print knight_moves
     board.start_misc()
