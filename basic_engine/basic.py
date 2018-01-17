@@ -6,17 +6,21 @@ class Board:
     
     def __init__(self):
         self.width = BOARD_WIDTH
-        #data: 0=blank, 1=piece(of any player)
         self.data = [[0 for i in range(self.width)] for j in range(self.width)]
-        #player_data: 0=blank, 1=white-piece, 2=black-piece
         self.data_by_player = [[0 for i in range(self.width)] for j in range(self.width)]
         self.annotate = None
+        self.misc = None
+
+        #Notes:
+        # data: 0=blank, 1=piece(of any player)
+        # player_data: 0=blank, 1=white-piece, 2=black-piece
+        # annotate, misc are for printing out human readable displays or testing
 
     def new_pos(self,row,col,**kwargs):
         self.data[row][col] = 1
 
     def new_player_pos(self, player, pos, **kwargs):
-        self.data_by_player[pos[0]][pos[1]] = int(player) + 1
+        self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
 
     def start_annotate(self,**kwargs):
         self.annotate = copy.copy(self.data)
