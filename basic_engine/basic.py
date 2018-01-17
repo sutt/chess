@@ -16,10 +16,11 @@ class Board:
         # player_data: 0=blank, 1=white-piece, 2=black-piece
         # annotate, misc are for printing out human readable displays or testing
 
-    def new_pos(self,row,col,**kwargs):
+    def new_pos(self,row,col):
         self.data[row][col] = 1
 
-    def new_player_pos(self, player, pos, **kwargs):
+    def new_player_pos(self, player, pos):
+        """ 2=black-piece, 1=white-piece, 0=blank """
         self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
 
     def start_annotate(self,**kwargs):
@@ -84,8 +85,19 @@ class Board:
 
 
     def get_two_by_ones(self,pos):
-        pass
+        
+        _row, _col, _width = pos[0], pos[1], self.width
+        pos1 = []
+        
+        for _r, _c in [(1,1), (1,-1), (-1,1), (-1,-1)]:
+            for _d in [(1,2),(2,1)]:
+                
+                _pos = ( _row + _r*_d[0], _col + _c*_d[1] )
 
+                if (0 <= _pos[0] < _width) and (0 <= _pos[1] < _width):
+                    pos1.extend([[_pos]])     #each one in a list
+        
+        return pos1
 
     def print_board(self,b_annotate = False ,b_misc = False
                         ,b_player_data = False):
@@ -108,10 +120,31 @@ class Piece:
         self.white = b_white
         self.alive = True
         self.pos = pos
+        # int: these set what type of moves, and how far the piece can go
+        self.upacorss = 0
+        self.diagonal = 0
+        # bool: special move type
+        self.twobyone = False
+        self.pawn_move = False
 
-    def get_available_moves(self,current_board):
+    def filter_by_blocking_pieces(a1, a2):
+        pass
+
+    def get_available_moves(self,board):
         moves = []
-        #b_blocking = False # for Knight only
+        if self.upacross > 0:
+            temp = board.get_upacross(self.pos, spaces = self.upacorss)
+            temp2 = filter_by_blocking_pieces(temp, board )
+            #need to flatten temp2
+            moves.extend( temp2 )
+        if self.diagonal > 0:
+            temp = board.get_diagonals(self.pos, spaces = self.diagonal)
+            temp2 = filter_by_blocking_pieces(temp, board )
+            #need to flatten temp2
+            moves.extend( temp2)
+
+        
+        
         #check_if_moving_causes_check()
         return moves
 
@@ -120,14 +153,16 @@ class Pawn(Piece):
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
         self.en_passant_vulnerable = False
+        self.pawn_move = True
         
 
 class King(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
-        self.typ = 'King'
         self.king_can_castle = True
+        self.upacorss = 1
+        self.diagonal = 1
 
 
 class Rook(Piece):
@@ -135,24 +170,29 @@ class Rook(Piece):
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
         self.rook_can_castle = True
+        self.upacorss = BOARD_WIDTH
 
 class Knight(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
+        self.twobyone = True
+        
 
 class Bishop(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
+        self.diagonal = BOARD_WIDTH
 
 class Queen(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
+        self.upacorss = BOARD_WIDTH
+        self.diagonal = BOARD_WIDTH
 
-#class Bishop(Piece):   
-#class Queen(Piece):
+
 
 
 def place_pieces(board,**kwargs):
@@ -251,6 +291,20 @@ def main():
     print rook_moves
     board.start_misc()
     board.mark_all_misc(rook_moves)
+    board.print_board(b_misc = True)
+
+    POS = (3,3)
+    knight_moves = board.get_two_by_ones(POS)
+    print knight_moves
+    board.start_misc()
+    board.mark_all_misc(knight_moves)
+    board.print_board(b_misc = True)
+
+    POS = (0,7)
+    knight_moves = board.get_two_by_ones(POS)
+    print knight_moves
+    board.start_misc()
+    board.mark_all_misc(knight_moves)
     board.print_board(b_misc = True)
 
     #POS = (1,1)
