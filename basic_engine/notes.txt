@@ -35,7 +35,9 @@ filter_by_blocking()
 
 king and enpassant-vulnerable-pawn are needed as enums on board
 
-
+why does the debug break in VScode on print IOError?
+    > print rook_moves
+    > IOError: [Errno 2] No such file or directory
 
 
 board should store edge cases:

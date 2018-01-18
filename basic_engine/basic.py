@@ -1,6 +1,12 @@
-import sys, copy
+import sys, copy, time
 
 BOARD_WIDTH = 8
+
+#for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
+
+def print2(data):
+    time.sleep(0.1)
+    print data
 
 class Board:
     
