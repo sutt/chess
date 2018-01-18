@@ -2,14 +2,15 @@ import sys, copy, time
 
 BOARD_WIDTH = 8
 
-#for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
 
+#for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
 def print2(data, arg1="", arg2="", arg3="",arg4=""):
     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
     try:
         print data
     except:
         pass
+
 
 class Board:
     
@@ -65,8 +66,8 @@ class Board:
         return _row, _col
 
 
-    def get_diagonals(self,pos, spaces = 7):
-        """ input: pos, [spaces (int > 0)]
+    def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
+        """ input: pos, [spaces (int > 0)] [only_direction (tuple)]
             returns: list of list of pos's, ordered closest from piece
                      starting pos to furthest"""
 
@@ -82,9 +83,12 @@ class Board:
         pos3 = [ (_row + i, _col - i) for i in range( 1, min(_maxdown, _maxleft))]
         pos4 = [ (_row + i, _col + i) for i in range( 1 ,min(_maxdown, _maxright))]
         
-        return [pos1, pos2, pos3, pos4]
+        ret = [pos1[:spaces], pos2[:spaces], pos3[:spaces], pos4[:spaces]]
+
+        return [ret[i] for i in range(len(ret)) if i in i_dir]
+
     
-    def get_upacross(self,pos):
+    def get_upacross(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
         """ input: pos, [spaces (int > 0)]
             returns: list of list of pos's, ordered closest from piece
                      starting pos to furthest"""
@@ -97,7 +101,10 @@ class Board:
         pos3 = [ (_row,i) for i in range( _col + 1, _width)]
         pos4 = [ (_row,i) for i in range( _col - 1, -1, -1)]
 
-        return [pos1, pos2, pos3, pos4]
+        ret = [pos1[:spaces], pos2[:spaces], pos3[:spaces], pos4[:spaces]]
+        
+        return [ret[i] for i in range(len(ret)) if i in i_dir]
+        
 
 
     def get_two_by_ones(self,pos):
