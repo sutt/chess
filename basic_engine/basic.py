@@ -55,7 +55,7 @@ class Board:
 
     def mark_list_misc(self,list_pos,**kwargs):
         for pos in list_pos:
-            self.misc[pos[0]][pos[1]] = 1
+            self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
             
             
 
@@ -479,6 +479,28 @@ def main():
     board2.mark_misc(POS, val = "P")
     board2.print_board(b_misc = True)
 
+    print2('opening moves available')
+    board = Board()
+    board, pieces = place_pieces(board)
+    board.print_board(b_player_data = True)
+
+    pawn_moves = []
+    knight_moves = []
+    other_moves = []
+    for p in pieces:
+        if p.__class__.__name__ == "Pawn":
+            pawn_moves.extend(p.get_available_moves(board))
+        elif p.__class__.__name__ == "Knight":
+            knight_moves.extend(p.get_available_moves(board))
+        else:
+            other_moves.extend(p.get_available_moves(board))
+
+    board.start_misc()
+    board.mark_list_misc(pawn_moves, val = 1)
+    board.mark_list_misc(knight_moves, val = 5)
+    board.mark_list_misc(other_moves, val = 4)
+    board.print_board(b_misc = True)
+    
 
     print2(board.width)
 
