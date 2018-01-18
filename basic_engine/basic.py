@@ -4,8 +4,9 @@ BOARD_WIDTH = 8
 
 #for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
 
-def print2(data):
-    time.sleep(0.1)
+def print2(data, arg1="", arg2="", arg3="",arg4=""):
+    out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
+    time.sleep(0.5)
     print data
 
 class Board:
@@ -46,11 +47,8 @@ class Board:
     def mark_all_misc(self,list_list_pos,**kwargs):
         for list_pos in list_list_pos:
             for pos in list_pos:
-                try:
-                    self.misc[pos[0]][pos[1]] = 1
-                except:
-                    print 'PROB'
-                    print pos
+                self.misc[pos[0]][pos[1]] = 1
+                
 
     def mark_list_misc(self,list_pos,**kwargs):
         for pos in list_pos:
@@ -131,7 +129,7 @@ class Board:
             s_row = map(str,row)
             out += " ".join(s_row)
             out += "\n"        
-        print out
+        print2(out)
 
 class Piece:
 
@@ -200,7 +198,7 @@ class Piece:
                 elif there == 0:
                     valid_moves.append(move)
                 else:
-                    print 'something has gone terribly wrong'
+                    print2('something has gone terribly wrong')
         
         
         if kwargs.get('check_check', False):
@@ -357,15 +355,15 @@ def main():
 
 
     pawn = Pawn(True,(1,1))
-    print pawn.pos
-    print pawn.en_passant_vulnerable
-    print pawn.__class__.__name__
+    print2(pawn.pos)
+    print2(pawn.en_passant_vulnerable)
+    print2(pawn.__class__.__name__)
 
     blackbishop = pieces[2]
-    print str(blackbishop.__class__.__name__)  + " " + str(blackbishop.pos)
+    print2(str(blackbishop.__class__.__name__)  + " " + str(blackbishop.pos))
     bishop_pos = blackbishop.pos
     bishops_diags = board.get_diagonals(bishop_pos)
-    print bishops_diags
+    print2(bishops_diags)
     board.start_misc()
     for diags in bishops_diags:
         for _pos in diags:
@@ -374,54 +372,54 @@ def main():
 
     board.start_misc()
     diags = board.get_diagonals((4,4))
-    print diags
+    print2(diags)
     board.mark_all_misc(diags)
     board.print_board(b_misc = True)
 
     blackrook = pieces[0]
-    print str(blackrook.__class__.__name__)  + " " + str(blackrook.pos)
+    print2(str(blackrook.__class__.__name__)  + " " + str(blackrook.pos))
     rook_pos = blackrook.pos
     rook_moves = board.get_upacross(rook_pos)
-    print rook_moves
+    print2(rook_moves)
     board.start_misc()
     board.mark_all_misc(rook_moves)
     board.print_board(b_misc = True)
 
     POS = (3,4)
     rook_moves = board.get_upacross(POS)
-    print rook_moves
+    print2(rook_moves)
     board.start_misc()
     board.mark_all_misc(rook_moves)
     board.print_board(b_misc = True)
 
     POS = (3,3)
-    print 'Kngiht at: ', str(POS)
+    print2('Kngiht at: ', str(POS))
     knight_moves = board.get_two_by_ones(POS)
-    print knight_moves
+    print2(knight_moves)
     board.start_misc()
     board.mark_all_misc(knight_moves)
     board.print_board(b_misc = True)
 
     POS = (0,7)
-    print 'Kngiht at: ', str(POS)
+    print2('Kngiht at: ', str(POS))
     knight_moves = board.get_two_by_ones(POS)
-    print knight_moves
+    print2(knight_moves)
     board.start_misc()
     board.mark_all_misc(knight_moves)
     board.print_board(b_misc = True)
 
 
-    print 'Unobstructed Bishop at 4,4'
+    print2('Unobstructed Bishop at 4,4')
     board2 = Board()
     bishop = Bishop(b_white = True,pos=(4,4))
     board.data_by_player[4][4] = 0
     moves = bishop.get_available_moves(board2)
-    print moves
+    print2(moves)
     board.start_misc()
     board.mark_list_misc(moves)
     board.print_board(b_misc = True)
 
-    print 'Obstructed White Bishop at 4,4 inital pieces'
+    print2('Obstructed White Bishop at 4,4 inital pieces')
     board2 = Board()
     bishop = Bishop(b_white = True,pos=(4,4))
     board2.data_by_player[4][4] = 1
@@ -432,9 +430,9 @@ def main():
     
     board2.print_board(b_player_data = True)
     
-    print 'Moves available to that bishop'
+    print2('Moves available to that bishop')
     moves = bishop.get_available_moves(board2)
-    print moves
+    print2(moves)
     board.start_misc()
     board.mark_list_misc(moves)
     board.mark_misc((4,4), val = "B")
@@ -445,7 +443,7 @@ def main():
     #board.new_pos(row = POS[0] ,col = POS[1] )
     #board.print_board()
 
-    print board.width
+    print2(board.width)
 
 
 if __name__ == "__main__":
