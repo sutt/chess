@@ -226,7 +226,7 @@ class Piece:
         
         moves = []
         if self.upacross > 0:
-            temp = board.get_upacross(self.pos, spaces = self.upacorss)
+            temp = board.get_upacross(self.pos, spaces = self.upacross)
             temp2 = self.filter_by_blocking_pieces(temp, board)
             moves.extend(temp2)     #this might over-flatten pos-tuples?
 
@@ -269,7 +269,7 @@ class King(Piece):
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
         self.king_can_castle = True
-        self.upacorss = 1
+        self.upacross = 1
         self.diagonal = 1
 
 
@@ -278,7 +278,7 @@ class Rook(Piece):
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
         self.rook_can_castle = True
-        self.upacorss = BOARD_WIDTH
+        self.upacross = BOARD_WIDTH
 
 class Knight(Piece):
     
@@ -297,7 +297,7 @@ class Queen(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
-        self.upacorss = BOARD_WIDTH
+        self.upacross = BOARD_WIDTH
         self.diagonal = BOARD_WIDTH
 
 
