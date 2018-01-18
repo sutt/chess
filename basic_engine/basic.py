@@ -95,10 +95,10 @@ class Board:
         
         _row, _col, _width = pos[0], pos[1], self.width
         
-        #1=Up 2=Down 3=Right 4=Left
-        pos1 = [ (i,_col) for i in range( _row + 1, _width, 1)]
-        pos2 = [ (i,_col) for i in range( _row - 1, -1, -1)]
-        pos3 = [ (_row,i) for i in range( _col + 1, _width)]
+        #1=Up 2=Right 3=Down 4=Left
+        pos1 = [ (i,_col) for i in range( _row - 1, -1, -1)]
+        pos2 = [ (_row,i) for i in range( _col + 1, _width)]
+        pos3 = [ (i,_col) for i in range( _row + 1, _width, 1)]
         pos4 = [ (_row,i) for i in range( _col - 1, -1, -1)]
 
         ret = [pos1[:spaces], pos2[:spaces], pos3[:spaces], pos4[:spaces]]
@@ -164,7 +164,7 @@ class Piece:
         
         if b_pawn:
             
-            for advance in moves[0]:  # advance, a list of len-1 or len-2
+            for move in moves[0]:  # advance, a list of len-1 or len-2
                 
                 there = board.data_by_player[move[0]][move[1]]
                 
@@ -173,17 +173,17 @@ class Piece:
                 if there == yours:
                     break
                 if there == 0:
-                    valid_moves.append(advance)
+                    valid_moves.append(move)
                 
-            for attacks in moves[1:]:   # a list of len-1 or len-2
-                for attack in attacks:  # attacks is a list of len-1
+            for list_move in moves[1:]:   # a list of len-1 or len-2
+                for move in list_move:  # attacks is a list of len-1
 
                     there = board.data_by_player[move[0]][move[1]]
 
                     if there ==  mine:
                         break
                     if there == yours:
-                        valid_moves.append(attack)
+                        valid_moves.append(move)
                         break
                     if there == 0:
                         break
@@ -241,15 +241,17 @@ class Piece:
             moves.extend(temp2)
 
         if self.pawn_move:
-            upwards = (1,2) if self.white else (3,4)
+            
+            upwards = ((0,),(0,1)) if self.white else ((2,),(2,3))
+            
             advances = 1
-            if self.pos == board.player_relative_pos(self.white, self.pos[0], self.pos[1]):
+            if self.pos == board.player_relative_pos(self.white, row = 1, col = self.pos[1]):
                 advances = 2
-            temp = board.get_upacross(self.pos,spaces = advances, only_up = upwards[0] )
+            temp = board.get_upacross(self.pos, spaces = advances, i_dir = upwards[0] )
             
-            temp.extend(board.get_diagonals(self.pos,spaces = 1, only_up = upwards ))
+            temp.extend(board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1] ))
             
-            #temp must be ordered with advances in position-0, attackes after it
+            #temp must be ordered with advances in position-0, attacks after it
             temp2 = self.filter_by_blocking_pieces(temp, board, b_pawn = True)
             moves.extend(temp2)
         
@@ -447,10 +449,36 @@ def main():
     board.mark_misc((4,4), val = "B")
     board.print_board(b_misc = True)
 
-    #POS = (1,1)
-    #piece = Piece(b_white = True, pos = POS )
-    #board.new_pos(row = POS[0] ,col = POS[1] )
-    #board.print_board()
+    
+    board2 = Board()
+    print2('Obstructed White Pawn at inital position col 2')
+    POS = (6,2)
+    pawn = Pawn(b_white = True,pos=POS)
+    board2.data_by_player[6][2] = 1
+    board2.print_board(b_player_data = True)
+
+    print2('Pawns available moves')
+    moves = pawn.get_available_moves(board2)
+    print2(moves)
+    board2.start_misc()
+    board2.mark_list_misc(moves)
+    board2.mark_misc(POS, val = "P")
+    board2.print_board(b_misc = True)
+
+    board2.data_by_player[5][3] = 2
+    board2.data_by_player[5][1] = 1
+    board2.data_by_player[4][2] = 2
+
+    print2("Obstructed white pawn situation:")
+    board2.print_board(b_player_data = True)
+    print2("available moves to the pawn")
+    moves = pawn.get_available_moves(board2)
+    print moves
+    board2.start_misc()
+    board2.mark_list_misc(moves)
+    board2.mark_misc(POS, val = "P")
+    board2.print_board(b_misc = True)
+
 
     print2(board.width)
 
