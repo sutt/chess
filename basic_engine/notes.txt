@@ -24,6 +24,18 @@ get_available_moves()
     eliminate own piece blocks
     allow opponent piece capture
 
+1/18
+
+spaces = X is not implemented -> king is not implemented
+pawn move is not implemented
+    upacross(spaces = 2, only_up = True)
+
+    filter_blocking can give all the available from all possible
+filter_by_blocking()
+
+king and enpassant-vulnerable-pawn are needed as enums on board
+
+
 
 
 board should store edge cases:

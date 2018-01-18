@@ -130,29 +130,105 @@ class Piece:
         self.twobyone = False
         self.pawn_move = False
 
-    def filter_by_blocking_pieces(a1, a2):
-        pass
+    def filter_by_blocking_pieces(moves, board, b_pawn = False):
+        """input: moves (list of list of pos-tuples), 
+                  board obj with current positions
+            returns: list of pos-tuples that are valid moves """
+
+        valid_moves = []
+        mine, yours = (1,2) if self.b_white else (2,1)
+        check_flag = False
+        
+        if b_pawn:
+            
+            for advance in moves[0]:  # advance, a list of len-1 or len-2
+                
+                there = board.data_by_player[move[0]][move[1]]
+                
+                if there ==  mine:
+                    break
+                if there == yours:
+                    break
+                if there == 0:
+                    valid_moves.append(advance)
+                
+            for attacks in moves[1:]:   # a list of len-1 or len-2
+                for attack in attacks:  # attacks is a list of len-1
+
+                    there = board.data_by_player[move[0]][move[1]]
+
+                    if there ==  mine:
+                        break
+                    if there == yours:
+                        valid_moves.append(attack)
+                        break
+                    if there == 0:
+                        break
+            
+            # return pawn moves
+            return valid_moves
+        
+        
+        # All non-pawn Pieces calcd here
+        # break after a move_Set meets a piece as the piece can't go further
+        for move_set in moves:
+            for move in move_set:
+                
+                there = board.data_by_player[move[0]][move[1]]
+
+                if there == mine:
+                    break
+                elif there == yours:
+                    valid_moves.append(move)
+                    break
+                elif there == 0:
+                    valid_moves.append(move)
+                else:
+                    print 'something has gone terribly wrong'
+        
+        
+        if kwargs.get('check_check', False):
+            return check_flag
+
+        return valid_moves
+
 
     def get_available_moves(self,board):
+        """input: board , and Pieces' own properties
+           returns: list of pos-tuples (or empty list)"""
+
+        #TODO: we can remove board from this function in the sense
+        #      of the current_board, as we only want "on-the-baord" moves.
+        #      This will allow us to async the board.get_movetypeX() funcs.
+        
         moves = []
         if self.upacross > 0:
             temp = board.get_upacross(self.pos, spaces = self.upacorss)
-            temp2 = filter_by_blocking_pieces(temp, board )
-            moves.extend( temp2 )   #need to flatten temp2 first
+            temp2 = filter_by_blocking_pieces(temp, board)
+            moves.extend(temp2)   #need to flatten temp2 first
 
         if self.diagonal > 0:
             temp = board.get_diagonals(self.pos, spaces = self.diagonal)
-            temp2 = filter_by_blocking_pieces(temp, board )
-            moves.extend( temp2)
+            temp2 = filter_by_blocking_pieces(temp, board)
+            moves.extend(temp2)
 
         if self.twobyone:
             temp = board.get_two_by_ones(self.pos)
-            #note: blocking the knight your own piece on end-pos
-            temp2 = filter_by_blocking_pieces(temp, board )
-            moves.extend( temp2 )
+            temp2 = filter_by_blocking_pieces(temp, board) #note: blocking the knight by your own piece on end-pos
+            moves.extend(temp2)
 
-
-        
+        if self.pawn_move:
+            upwards = (1,2) if self.white else (3,4)
+            advances = 1
+            if self.pos == board.player_relative_pos(self.white, self.pos[0], self.pos[1]):
+                advances = 2
+            temp = board.get_upacross(self.pos,spaces = advances, only_up = upwards[0] )
+            
+            temp.extend(board.get_diagonals(self.pos,spaces = 1, only_up = upwards ))
+            
+            #temp must be ordered with advances in position-0, attackes after it
+            temp2 = filter_by_blocking_pieces(temp, board, b_pawn = True)
+            moves.extend(temp2)
         
         #check_if_moving_causes_check()
         return moves
