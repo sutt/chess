@@ -35,12 +35,22 @@ class Board:
         self.annotate[_pos[0]][_pos[1]] = _symbol
 
     def mark_misc(self,pos,**kwargs):
-        self.misc[pos[0]][pos[1]] = 1
+        self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
 
     def mark_all_misc(self,list_list_pos,**kwargs):
         for list_pos in list_list_pos:
             for pos in list_pos:
-                self.misc[pos[0]][pos[1]] = 1
+                try:
+                    self.misc[pos[0]][pos[1]] = 1
+                except:
+                    print 'PROB'
+                    print pos
+
+    def mark_list_misc(self,list_pos,**kwargs):
+        for pos in list_pos:
+            self.misc[pos[0]][pos[1]] = 1
+            
+            
 
     def player_relative_pos(self,player,row,col):
         """ returns pos based on player-relative row e.g. white's "back row" is row 7"""
@@ -124,19 +134,19 @@ class Piece:
         self.alive = True
         self.pos = pos
         # int: these set what type of moves, and how far the piece can go
-        self.upacorss = 0
+        self.upacross = 0
         self.diagonal = 0
         # bool: special move type
         self.twobyone = False
         self.pawn_move = False
 
-    def filter_by_blocking_pieces(moves, board, b_pawn = False):
+    def filter_by_blocking_pieces(self,moves, board, b_pawn = False, **kwargs):
         """input: moves (list of list of pos-tuples), 
                   board obj with current positions
             returns: list of pos-tuples that are valid moves """
 
         valid_moves = []
-        mine, yours = (1,2) if self.b_white else (2,1)
+        mine, yours = (1,2) if self.white else (2,1)
         check_flag = False
         
         if b_pawn:
@@ -204,17 +214,17 @@ class Piece:
         moves = []
         if self.upacross > 0:
             temp = board.get_upacross(self.pos, spaces = self.upacorss)
-            temp2 = filter_by_blocking_pieces(temp, board)
-            moves.extend(temp2)   #need to flatten temp2 first
+            temp2 = self.filter_by_blocking_pieces(temp, board)
+            moves.extend(temp2)     #this might over-flatten pos-tuples?
 
         if self.diagonal > 0:
             temp = board.get_diagonals(self.pos, spaces = self.diagonal)
-            temp2 = filter_by_blocking_pieces(temp, board)
+            temp2 = self.filter_by_blocking_pieces(temp, board)
             moves.extend(temp2)
 
         if self.twobyone:
             temp = board.get_two_by_ones(self.pos)
-            temp2 = filter_by_blocking_pieces(temp, board) #note: blocking the knight by your own piece on end-pos
+            temp2 = self.filter_by_blocking_pieces(temp, board) #note: blocking the knight by your own piece on end-pos
             moves.extend(temp2)
 
         if self.pawn_move:
@@ -227,7 +237,7 @@ class Piece:
             temp.extend(board.get_diagonals(self.pos,spaces = 1, only_up = upwards ))
             
             #temp must be ordered with advances in position-0, attackes after it
-            temp2 = filter_by_blocking_pieces(temp, board, b_pawn = True)
+            temp2 = self.filter_by_blocking_pieces(temp, board, b_pawn = True)
             moves.extend(temp2)
         
         #check_if_moving_causes_check()
@@ -392,6 +402,36 @@ def main():
     print knight_moves
     board.start_misc()
     board.mark_all_misc(knight_moves)
+    board.print_board(b_misc = True)
+
+
+    print 'Unobstructed Bishop at 4,4'
+    board2 = Board()
+    bishop = Bishop(b_white = True,pos=(4,4))
+    board.data_by_player[4][4] = 0
+    moves = bishop.get_available_moves(board2)
+    print moves
+    board.start_misc()
+    board.mark_list_misc(moves)
+    board.print_board(b_misc = True)
+
+    print 'Obstructed White Bishop at 4,4 inital pieces'
+    board2 = Board()
+    bishop = Bishop(b_white = True,pos=(4,4))
+    board2.data_by_player[4][4] = 1
+
+    board2.data_by_player[3][5] = 1
+    board2.data_by_player[2][2] = 2
+    board2.data_by_player[6][6] = 1
+    
+    board2.print_board(b_player_data = True)
+    
+    print 'Moves available to that bishop'
+    moves = bishop.get_available_moves(board2)
+    print moves
+    board.start_misc()
+    board.mark_list_misc(moves)
+    board.mark_misc((4,4), val = "B")
     board.print_board(b_misc = True)
 
     #POS = (1,1)
