@@ -6,8 +6,10 @@ BOARD_WIDTH = 8
 
 def print2(data, arg1="", arg2="", arg3="",arg4=""):
     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
-    time.sleep(0.5)
-    print data
+    try:
+        print data
+    except:
+        pass
 
 class Board:
     
