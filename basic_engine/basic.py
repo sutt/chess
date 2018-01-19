@@ -34,7 +34,7 @@ class Board:
         self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
 
     def start_annotate(self,**kwargs):
-        self.annotate = copy.copy(self.data)
+        self.annotate = [["~" for i in range(self.width)] for j in range(self.width)]
 
     def start_misc(self,**kwargs):
         self.misc = [[0 for i in range(self.width)] for j in range(self.width)]
@@ -42,6 +42,11 @@ class Board:
     def mark_annotate(self,piece,**kwargs):
         _pos = piece.pos
         _symbol = str.upper(str(piece.__class__.__name__)[0])
+        
+        if kwargs.get('disambiguate', False): 
+            if str(piece.__class__.__name__) == "Knight":
+                _symbol = "N"
+
         self.annotate[_pos[0]][_pos[1]] = _symbol
 
     def mark_misc(self,pos,**kwargs):
@@ -154,7 +159,8 @@ class Piece:
         self.pawn_move = False
 
     def filter_by_blocking_pieces(self,moves, board, b_pawn = False, **kwargs):
-        """input: moves (list of list of pos-tuples), 
+        """input: moves (list of list of pos-tuples), each list-of-pos-tuples is 
+                        an ordered "move-set"
                   board obj with current positions
             returns: list of pos-tuples that are valid moves """
 

@@ -33,6 +33,19 @@ x  spaces = X is not implemented -> king is not implemented
    filter_blocking can give all the available from all possible
 x  filter_by_blocking()
 
+1/19
+
+
+finish implementing all piece movements
+
+make a turn-engine
+
+
+    make random moves
+
+    allow input to control a player
+
+
   
 
 king and enpassant-vulnerable-pawn are needed as enums on board
