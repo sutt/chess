@@ -68,3 +68,57 @@ board should store edge cases:
 
     -> so that, piece.get_available_moves(board) is full evaulation
        not: piece.get_available_moves(board, white's pawns, etc...)
+
+
+Takeaways:
+
+    the correct level of abstraction for the Board is 
+        piece vs. blank, 
+        white-piece vs black-piece
+        special-piece vs generic-piece. specials:
+            king
+            en-passant-vulnerable-pawn 
+        ...nothing else needs to be considered at game-logic level, only
+           further up at the stratgey-level.
+
+    
+
+    A board-move class holds dimensions of the board, the coloring and orietation, and
+    the rules for the initial piece setup.
+    Also, it holds the mathematical logic of the atomic moves:
+        upacross [distance modifier] [w/wo player-direction-orientation e.g what is "move up"]
+        diagonal [distance modifier] [w/wo player-direction-orientation]
+        two_by_one
+        
+
+    The pieces then hold the business rules for which atomic move types they can perform and
+    at what modification they can perform them, plus GameLedger modifications
+
+        in addition to the Board is a Game-Ledger which tracks
+            [king_can_castle | rook_can_castle]
+            king_in_check
+            turn_counter_while_solitary_king
+            last_two_moves_tracker (for a 3-move-repeat-stalemate)
+            pawn_advance_two can be held in the piece object
+
+    Most rules are packed into available_moves routine
+    
+    Available_Moves_Player_P <- func(Board,Pieces,GameLedger)
+        Available_Moves_i <- func(Piece_i,Board_current)
+            <- filtered(king in check) Func(Board, Pieces)
+               if GameLedger.check_flag
+                    <- filtered(move-removes-check_flag)
+
+    Then the strategy-module needs to consider the following info-blobs:
+        Game board with pieces
+        GameLedger
+        Player_turn_current
+        [turn_counter ?]
+        ... everything else is derivative?
+        
+random thought: a mechanichal chess board is valuable to new variants of the rules that need
+                inter-turn reshuffling of the pieces of display of available moves
+
+        
+
+

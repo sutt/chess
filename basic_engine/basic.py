@@ -29,6 +29,12 @@ class Board:
     def new_pos(self,row,col):
         self.data[row][col] = 1
 
+    def player_name_from_bool(self, bool_player):
+        if bool_player:
+            return 'White'
+        else:
+            return 'Black'
+
     def new_player_pos(self, player, pos):
         """ 2=black-piece, 1=white-piece, 0=blank """
         self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
@@ -46,7 +52,11 @@ class Board:
         if kwargs.get('disambiguate', False): 
             if str(piece.__class__.__name__) == "Knight":
                 _symbol = "N"
-
+        
+        if kwargs.get('b_lower_case', False):
+            if not(piece.white):
+                _symbol = str.lower(_symbol)
+        
         self.annotate[_pos[0]][_pos[1]] = _symbol
 
     def mark_misc(self,pos,**kwargs):

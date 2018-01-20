@@ -7,13 +7,15 @@ class Log:
         self.all_moves = False
         self.num_moves = False
         self.move_info = False
-        self.board_end_turn = False
+        self.board_end_turn = True
         self.kill_move = True
+        self.stop_kill_move = True
 
-def print_board_letters(board, pieces):
+def print_board_letters(board, pieces, b_lower_black = False):
+
     board.start_annotate()
     for p in pieces:
-        board.mark_annotate(p, disambiguate = True)
+        board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
     board.print_board(b_annotate = True)
 
 def main():
@@ -66,21 +68,16 @@ def main():
             
             
             #Make the Move
+            if board.data_by_player[pos1[0]][pos1[1]] != 0 and log.stop_kill_move:
+                print board.player_name_from_bool(_player), ' KILL FROM: \n'
+                print str(pos0), " to ", str(pos1)
+                ret = input("about to kill...\n")
 
             #is it a killing move?
             kill_flag = False
             if board.data_by_player[pos1[0]][pos1[1]] != 0:
                 kill_flag = True
-                killed_piece_i = filter(lambda _p: _p[1].pos == pos1, enumerate(pieces))[0][0]
-                pieces[killed_piece_i].alive = False
-                dead_pieces.append(pieces.pop(killed_piece_i))
-                
-
-            if log.kill_move and kill_flag:
-                print 'KILL FROM: \n'
-                print_board_letters(board, pieces)
-                
-
+            
             #old position removed from board
             board.data_by_player[pos0[0]][pos0[1]] = 0
 
@@ -88,13 +85,17 @@ def main():
             board.new_player_pos(_player,pos1)
             pieces[piece_i].pos = pos1
 
-            if log.kill_move and kill_flag:
-                
-                print 'Move from: ', str(pos0), " to ", str(pos1), "\n"
-                print 'KILL TO: \n'
-                print_board_letters(board, pieces)
-                print " \n DEAD PIECES: \n"
-                print dead_pieces
+            
+            if kill_flag:
+                killed_piece_i = filter(lambda _p: (_p[1].pos == pos1) and not(_p[1].white == _player), enumerate(pieces))
+                print 'KILLER_i'
+                print killed_piece_i
+                killed_piece_i = killed_piece_i[0][0]
+                pieces[killed_piece_i].alive = False
+                dead_pieces.append(pieces.pop(killed_piece_i))
+                if log.kill_move:
+                    print dead_pieces
+
 
             if log.move_info:
                 print 'Move from: ', str(pos0), " to ", str(pos1)
@@ -104,13 +105,16 @@ def main():
             #Check_for_checkmate()
 
             if log.board_end_turn:
-                print_board_letters(board, pieces)
+                print_board_letters(board, pieces, True)
             
+            if kill_flag and log.stop_kill_move:
+                input('the kill has happend...')
             if log.proc: print 'new player...'
 
             
 
         print 'new turn...'
+        # input("end turn")
 
         if i_turn == 30:
             break
