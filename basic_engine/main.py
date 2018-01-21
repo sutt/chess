@@ -9,7 +9,29 @@ class Log:
         self.move_info = False
         self.board_end_turn = True
         self.kill_move = True
-        self.stop_kill_move = True
+        self.stop_kill_move = False
+
+b_player_control = [True,False]
+
+def parse_player_input(raw, board):
+    ret = -1
+    if raw == "hint":
+        return 1, []
+    try:
+        data = raw.split('|')
+        data = [x.split(',') for x in data]
+        data = [tuple(map(int,item)) for item in data]
+        data = tuple(data)
+        if len(data) == 2 and \
+           len(data[0]) == 2 and len(data[0]) == 2 and \
+           all([ isinstance(data[i][j], int) for i in range(2) for j in range(2)]):
+            ret = 0
+        else:
+            print 'failed to validate properties of move parse output'
+    except:
+        data = []
+        print 'failure in routine to parse user input.'
+    return ret, data
 
 def print_board_letters(board, pieces, b_lower_black = False):
 
@@ -24,6 +46,7 @@ def main():
     board.print_board()
     board, pieces = place_pieces(board)
     board.print_board(b_player_data=True)
+    print_board_letters(board, pieces, True)
 
     game_going = True
     i_turn = 0
@@ -61,8 +84,28 @@ def main():
                     print "Player: ", str(_player), " has num moves: ", str(num_moves)
 
             #Select the Move
-            move_i = random.sample(range(0,num_moves),1)[0]
-            the_move = moves_player[move_i]
+            if not(b_player_control[1 - int(_player)]):
+                move_i = random.sample(range(0,num_moves),1)[0]
+                the_move = moves_player[move_i]
+            else:
+                #Input control from console
+                msg = "Type your move, " + str(board.player_name_from_bool(_player))
+                msg += ". Or type 'hint' to see list of all available moves."
+                msg += "\n"
+                while(True):
+                    raw = raw_input(msg)    #example: >1,1 | 2,2
+                    ret, the_move = parse_player_input(raw, board)
+                    if ret == 0:
+                        if the_move in moves_player:
+                            break
+                        else:
+                            print 'this move is not legal according to the game engine.'
+                    if ret == 1: 
+                        print moves_player
+                    if ret == -1:
+                        print 'could not recognize move ', str(raw), ". Try again:"
+                        
+
             pos0,pos1 = the_move[0], the_move[1]
             piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
             
@@ -72,6 +115,7 @@ def main():
                 print board.player_name_from_bool(_player), ' KILL FROM: \n'
                 print str(pos0), " to ", str(pos1)
                 ret = input("about to kill...\n")
+            
 
             #is it a killing move?
             kill_flag = False
@@ -87,9 +131,9 @@ def main():
 
             
             if kill_flag:
-                killed_piece_i = filter(lambda _p: (_p[1].pos == pos1) and not(_p[1].white == _player), enumerate(pieces))
-                print 'KILLER_i'
-                print killed_piece_i
+                killed_piece_i = filter(lambda _p: (_p[1].pos == pos1) and 
+                                                    not(_p[1].white == _player), 
+                                        enumerate(pieces))
                 killed_piece_i = killed_piece_i[0][0]
                 pieces[killed_piece_i].alive = False
                 dead_pieces.append(pieces.pop(killed_piece_i))
@@ -116,7 +160,7 @@ def main():
         print 'new turn...'
         # input("end turn")
 
-        if i_turn == 30:
+        if i_turn == 15:
             break
 
 
