@@ -38,14 +38,12 @@ def print_board_letters(board, pieces, b_lower_black = False):
     board.start_annotate()
     for p in pieces:
         board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
-    board.print_board(b_annotate = True)
+    board.print_board(b_annotate = True, b_show_grid = True)
 
 def main():
 
     board = Board()
-    board.print_board()
     board, pieces = place_pieces(board)
-    board.print_board(b_player_data=True)
     print_board_letters(board, pieces, True)
 
     game_going = True

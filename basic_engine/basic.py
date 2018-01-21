@@ -141,7 +141,7 @@ class Board:
         return pos1
 
     def print_board(self,b_annotate = False ,b_misc = False
-                        ,b_player_data = False):
+                        ,b_player_data = False, b_show_grid = False):
 
         p_data = self.data
         if b_annotate: p_data = self.annotate
@@ -149,8 +149,18 @@ class Board:
         if b_player_data: p_data = self.data_by_player
         
         out = ""
-        for row in p_data:
+        
+        if b_show_grid:
+            out += "   " + " ".join(map(lambda i: str(i), range(1,9)))
+            out += "\n"
+            out += "\n"
+            row_grid = "ABCDEFGH"
+
+        for i,row in enumerate(p_data):
             s_row = map(str,row)
+            if b_show_grid:
+                out += row_grid[i]
+                out += "  "
             out += " ".join(s_row)
             out += "\n"        
         print2(out)
