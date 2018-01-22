@@ -69,6 +69,14 @@ board should store edge cases:
     -> so that, piece.get_available_moves(board) is full evaulation
        not: piece.get_available_moves(board, white's pawns, etc...)
 
+1/22
+
+    todo:
+        en passant
+        castling
+        player move cant put his king in check
+
+        >hint should display moves helpfully
 
 Takeaways:
 

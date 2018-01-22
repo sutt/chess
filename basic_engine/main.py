@@ -133,7 +133,7 @@ def main():
                 kill_flag = True
             
             #old position removed from board
-            board.data_by_player[pos0[0]][pos0[1]] = 0
+            board.old_player_pos(pos0)
 
             #new posistion set on board in on moving_piece's pos prop
             board.new_player_pos(_player,pos1)

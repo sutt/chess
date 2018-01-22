@@ -16,8 +16,9 @@ class Board:
     
     def __init__(self):
         self.width = BOARD_WIDTH
-        self.data = [[0 for i in range(self.width)] for j in range(self.width)]
-        self.data_by_player = [[0 for i in range(self.width)] for j in range(self.width)]
+        data = [[0 for i in range(self.width)] for j in range(self.width)]
+        self.data = copy.deepcopy(data)
+        self.data_by_player = copy.deepcopy(data)
         self.annotate = None
         self.misc = None
 
@@ -38,6 +39,9 @@ class Board:
     def new_player_pos(self, player, pos):
         """ 2=black-piece, 1=white-piece, 0=blank """
         self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
+
+    def old_player_pos(self,pos):
+        self.data_by_player[pos[0]][pos[1]] = 0
 
     def start_annotate(self,**kwargs):
         self.annotate = [["~" for i in range(self.width)] for j in range(self.width)]
@@ -374,7 +378,7 @@ def place_pieces(board,**kwargs):
     return board, pieces
 
 
-def main():    
+def tests():    
 
     board = Board()
     board.print_board()
@@ -530,9 +534,15 @@ def main():
 
     print2(board.width)
 
+    board2 = Board()
+    print2('Obstructed White Pawn at inital position col 2')
+    POS = (6,2)
+    pawn = Pawn(b_white = True,pos=POS)
+    board2.data_by_player[6][2] = 1
+    board2.print_board(b_player_data = True)
 
 if __name__ == "__main__":
-    main()
+    tests()
 
 #3850
 #FGN
