@@ -39,22 +39,14 @@ x  filter_by_blocking()
 finish implementing all piece movements
 
 make a turn-engine
-
-
     x make random moves
-
     x allow input to control a player
-
-
-  
 
 king and enpassant-vulnerable-pawn are needed as enums on board
 
 Long-Term:
     calculate all get_diags get_across etc for each position into a lookup table
     can cache available moves to each piece and use in next turn
-
-
 
 
 why does the debug break in VScode on print IOError?
@@ -80,15 +72,29 @@ board should store edge cases:
         available_moves when player in check
         >hint should display moves helpfully
 
-        it will be a lot faster to model is_king_in_check 
-        without iterating across all opponents pieces possible moves 
-        which runs in O(piece-moves^2)
-        instead create a King-Hypothetical class which has all other pieces'
-        moves and see if it "can kill" an opponents piece of the class that
-        has the move type, which should be on the order of O(piece-move) 
-        little higher than Queen's O(piece-move).
-        You might also be able to cache the result, and only recalculate
-        if a certain piece "assuring" it remains in position
+    BUT: the below doesnt work becaused it has to occur for each-piece-move tuple
+        same as iterating of opponent's possible moves. Instead we need a 
+        list of positions on the board that help keep king out of check for non-king moves
+        these dont include horse moves because horse is never blocked.
+        Only when one of these pieces is proposed moved could the king be threatened.
+        Note: this only occurs when a piece MOVES AWAY, not where it moves TO.
+        This set of own-players pieces, calcd before each turn, is what hypo-king
+        helps us calculate.
+
+    it will be a lot faster to model is_king_in_check 
+    without iterating across all opponents pieces possible moves 
+    which runs in  O(piece-moves^2) or O(piece-moves * 2) (?)
+    instead create a King-Hypothetical class which has all other pieces'
+    moves and see if it "can kill" an opponents piece of the class that
+    has the move type, which should be on the order of O(piece-move) 
+    little higher than Queen's O(piece-move).
+    You might also be able to cache the result, and only recalculate
+    if a certain piece "assuring" it remains in position is moved.
+
+    you can test the bigO-time by changing BOARD_WIDTH = 9,10,11,...
+    you can test practical perf by taking random moves, or importing
+    saved chess games and running total time it takes to calc all
+    get_available_moves() using each method
 
 Takeaways:
 

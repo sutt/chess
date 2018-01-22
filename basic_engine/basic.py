@@ -211,6 +211,7 @@ class Piece:
         yours = map(lambda v: v * yours_mult, piece_enums)
         
         yours_king = -3 if self.white else 3
+        yours_enpassant_pawn = -2 if self.white else 2
         
         check_flag = False
         
@@ -232,6 +233,9 @@ class Piece:
 
                     there = board.data_by_player[move[0]][move[1]]
 
+                    upwards = -1 if self.white else 1
+                    enpassant_there = board.data_by_player[move[0] - upwards][move[1]]
+                    
                     if there in  mine:
                         break
                     if there in yours:
@@ -239,6 +243,8 @@ class Piece:
                         if there == yours_king:
                             check_flag = True
                         break
+                    if enpassant_there == yours_enpassant_pawn:
+                        valid_moves.append(move)
                     if there == 0:
                         break
             
@@ -273,8 +279,8 @@ class Piece:
 
 
     def get_available_moves(self,board, check_flag = False):
-        """input: board , and Pieces' own properties
-           returns: list of pos-tuples (or empty list)"""
+        """input: board, self - which is Pieces' own properties, check_flag as bool
+           returns: list of pos-tuples (or empty list) or a bool when check_flag=True"""
 
         #TODO: we can remove board from this function in the sense
         #      of the current_board, as we only want "on-the-baord" moves.
@@ -283,6 +289,7 @@ class Piece:
         moves = []
         if self.upacross > 0:
             temp = board.get_upacross(self.pos, spaces = self.upacross)
+            #TODO - consolidate this
             temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag)
             if check_flag:
                 if isinstance(temp2, bool) and temp2: return True
@@ -507,7 +514,7 @@ def tests():
     board2.data_by_player[4][4] = 1
 
     board2.data_by_player[3][5] = 1
-    board2.data_by_player[2][2] = 2
+    board2.data_by_player[2][2] = -1
     board2.data_by_player[6][6] = 1
     
     board2.print_board(b_player_data = True)
@@ -536,9 +543,9 @@ def tests():
     board2.mark_misc(POS, val = "P")
     board2.print_board(b_misc = True)
 
-    board2.data_by_player[5][3] = 2
+    board2.data_by_player[5][3] = -1
     board2.data_by_player[5][1] = 1
-    board2.data_by_player[4][2] = 2
+    board2.data_by_player[4][2] = -1
 
     print2("Obstructed white pawn situation:")
     board2.print_board(b_player_data = True)

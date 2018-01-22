@@ -81,12 +81,16 @@ def main():
                     
                     moves_player.extend(d_moves_p)
 
+            #TODO - Filter moves for king in check
+            
             if log.all_moves: print moves_player
 
             #Check for end-game conditions
             num_moves = len(moves_player)
             if  num_moves == 0:
                 game_going = False
+                print 'Player ', str(board.player_name_from_bool(_player)), ' has no moves available. Game over.'
+                #TODO - add checkmate detector
                 continue
             else:
                 if log.num_moves:
@@ -97,6 +101,7 @@ def main():
                 move_i = random.sample(range(0,num_moves),1)[0]
                 the_move = moves_player[move_i]
             else:
+                #TODO make this a function oneline
                 #Input control from console
                 msg = "Type your move, " + str(board.player_name_from_bool(_player))
                 msg += ". Or type 'hint' to see list of all available moves."
@@ -114,6 +119,8 @@ def main():
                     if ret == -1:
                         print 'could not recognize move ', str(raw), ". Try again:"
                         
+            
+            #TODO - check for castling_flag here, else do below
 
             pos0,pos1 = the_move[0], the_move[1]
             piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
@@ -128,6 +135,7 @@ def main():
             
 
             #is it a killing move?
+            #TODO - enpassant killing flag check
             kill_flag = False
             if board.data_by_player[pos1[0]][pos1[1]] != 0:
                 kill_flag = True
@@ -139,7 +147,10 @@ def main():
             board.new_player_pos(_player,pos1)
             pieces[piece_i].pos = pos1
 
-            
+            #clear any enpassant_vulnerable of this player, 
+            #set any_enpassant_vulnerable of this player
+
+            #TODO - enpassant killing flag check
             if kill_flag:
                 killed_piece_i = filter(lambda _p: (_p[1].pos == pos1) and 
                                                     not(_p[1].white == _player), 
