@@ -541,10 +541,81 @@ def tests():
     board2.data_by_player[6][2] = 1
     board2.print_board(b_player_data = True)
 
-if __name__ == "__main__":
-    tests()
 
-#3850
-#FGN
+
+def test_bishop_moves():
+    board = Board()
+    board, pieces = place_pieces(board)
+    blackbishop = pieces[2]
+    bishop_pos = blackbishop.pos
+    bishops_diags = board.get_diagonals(bishop_pos)
+    assert bishops_diags == [[(6, 1), (5, 0)], [(6, 3), (5, 4), (4, 5), (3, 6), (2, 7)], [], []]
+
+def test_rook_moves():
+    board = Board()
+    board, pieces = place_pieces(board)
+    blackrook = pieces[0]
+    rook_pos = blackrook.pos
+    rook_moves = board.get_upacross(rook_pos)
+    assert rook_moves == [[(6, 0), (5, 0), (4, 0), (3, 0), (2, 0), (1, 0), (0, 0)], [(7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7)], [], []]
+
+def test_rook_moves2():
+    board = Board()
+    POS = (3,4)
+    rook_moves = board.get_upacross(POS)
+    assert rook_moves == [[(2, 4), (1, 4), (0, 4)], [(3, 5), (3, 6), (3, 7)], [(4, 4), (5, 4), (6, 4), (7, 4)], [(3, 3), (3, 2), (3, 1), (3, 0)]]
+
+def test_knight_moves():
+    board = Board()
+    POS = (3,3)
+    print2('Kngiht at: ', str(POS))
+    knight_moves = board.get_two_by_ones(POS)
+    assert knight_moves == [[(4, 5)], [(5, 4)], [(4, 1)], [(5, 2)], [(2, 5)], [(1, 4)], [(2, 1)], [(1, 2)]]
+
+def test_knight_moves2():
+    board = Board()
+    POS = (0,7)
+    print2('Kngiht at: ', str(POS))
+    knight_moves = board.get_two_by_ones(POS)
+    assert knight_moves == [[(1, 5)], [(2, 6)]]
+
+def test_unobstructed1():
+    board2 = Board()
+    bishop = Bishop(b_white = True,pos=(4,4))
+    moves = bishop.get_available_moves(board2)
+    assert moves == [(3, 3), (2, 2), (1, 1), (0, 0), (3, 5), (2, 6), (1, 7), (5, 3), (6, 2), (7, 1), (5, 5), (6, 6), (7, 7)]
+
+def test_obstructed():
+    board2 = Board()
+    bishop = Bishop(b_white = True,pos=(4,4))
+    board2.data_by_player[4][4] = 1
+    board2.data_by_player[3][5] = 1
+    board2.data_by_player[2][2] = 2
+    board2.data_by_player[6][6] = 1
+    moves = bishop.get_available_moves(board2)
+    assert moves == [(3, 3), (2, 2), (5, 3), (6, 2), (7, 1), (5, 5)]
+
+def test_unobstruct_pawn():
+    board2 = Board()
+    POS = (6,2)
+    pawn = Pawn(b_white = True,pos=POS)
+    board2.data_by_player[6][2] = 1
+    moves = pawn.get_available_moves(board2)
+    assert moves == [(5, 2), (4, 2)]
+
+def test_obstruct_pawn():
+    board2 = Board()
+    POS = (6,2)
+    pawn = Pawn(b_white = True,pos=POS)
+    board2.data_by_player[5][3] = 2
+    board2.data_by_player[5][1] = 1
+    board2.data_by_player[4][2] = 2
+    moves = pawn.get_available_moves(board2)
+    assert moves == [(5, 2), (5, 3)]
+
+if __name__ == "__main__":
+   tests()
+
+# run > pytest -v basic.py
 
     
