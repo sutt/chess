@@ -41,9 +41,9 @@ finish implementing all piece movements
 make a turn-engine
 
 
-    make random moves
+    x make random moves
 
-    allow input to control a player
+    x allow input to control a player
 
 
   
@@ -75,8 +75,20 @@ board should store edge cases:
         en passant
         castling
         player move cant put his king in check
-
+        
+        promotion
+        available_moves when player in check
         >hint should display moves helpfully
+
+        it will be a lot faster to model is_king_in_check 
+        without iterating across all opponents pieces possible moves 
+        which runs in O(piece-moves^2)
+        instead create a King-Hypothetical class which has all other pieces'
+        moves and see if it "can kill" an opponents piece of the class that
+        has the move type, which should be on the order of O(piece-move) 
+        little higher than Queen's O(piece-move).
+        You might also be able to cache the result, and only recalculate
+        if a certain piece "assuring" it remains in position
 
 Takeaways:
 

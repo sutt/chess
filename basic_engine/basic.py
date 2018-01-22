@@ -36,9 +36,16 @@ class Board:
         else:
             return 'Black'
 
-    def new_player_pos(self, player, pos):
-        """ 2=black-piece, 1=white-piece, 0=blank """
-        self.data_by_player[pos[0]][pos[1]] = 2 - int(player)
+    def new_player_pos(self, player, pos, piece):
+        """ 0=blank, 1=generic-piece, 2=en-passant-vulnerable-pawn 3=king  
+            multiplied-by: -1 for black +1 for white """
+        piece_num = 1
+        if piece.__class__.__name__ == "Pawn": piece_num = 2
+        if piece.__class__.__name__ == "King": piece_num = 3
+
+        player_mult = 1 if player else -1
+
+        self.data_by_player[pos[0]][pos[1]] = piece_num * player_mult
 
     def old_player_pos(self,pos):
         self.data_by_player[pos[0]][pos[1]] = 0
@@ -145,12 +152,15 @@ class Board:
         return pos1
 
     def print_board(self,b_annotate = False ,b_misc = False
-                        ,b_player_data = False, b_show_grid = False):
+                        ,b_player_data = False, b_show_grid = False
+                        ,b_abs = False):
 
         p_data = self.data
         if b_annotate: p_data = self.annotate
         if b_misc: p_data = self.misc
-        if b_player_data: p_data = self.data_by_player
+        if b_player_data: 
+            p_data = self.data_by_player
+            b_abs = True
         
         out = ""
         
@@ -161,7 +171,10 @@ class Board:
             row_grid = "ABCDEFGH"
 
         for i,row in enumerate(p_data):
-            s_row = map(str,row)
+            if b_abs:
+                s_row = map(lambda int_i: str(abs(int_i)),row)
+            else:
+                s_row = map(lambda int_i: str(int_i),row)
             if b_show_grid:
                 out += row_grid[i]
                 out += "  "
@@ -189,7 +202,16 @@ class Piece:
             returns: list of pos-tuples that are valid moves """
 
         valid_moves = []
-        mine, yours = (1,2) if self.white else (2,1)
+        
+        piece_enums = [1,2,3]
+        mine_mult = 1 if self.white else -1
+        yours_mult = -1 if self.white else 1
+        
+        mine = map(lambda v: v * mine_mult, piece_enums)
+        yours = map(lambda v: v * yours_mult, piece_enums)
+        
+        yours_king = -3 if self.white else 3
+        
         check_flag = False
         
         if b_pawn:
@@ -198,9 +220,9 @@ class Piece:
                 
                 there = board.data_by_player[move[0]][move[1]]
                 
-                if there ==  mine:
+                if there in  mine:
                     break
-                if there == yours:
+                if there in yours:
                     break
                 if there == 0:
                     valid_moves.append(move)
@@ -210,10 +232,12 @@ class Piece:
 
                     there = board.data_by_player[move[0]][move[1]]
 
-                    if there ==  mine:
+                    if there in  mine:
                         break
-                    if there == yours:
+                    if there in yours:
                         valid_moves.append(move)
+                        if there == yours_king:
+                            check_flag = True
                         break
                     if there == 0:
                         break
@@ -229,10 +253,12 @@ class Piece:
                 
                 there = board.data_by_player[move[0]][move[1]]
 
-                if there == mine:
+                if there in mine:
                     break
-                elif there == yours:
+                elif there in yours:
                     valid_moves.append(move)
+                    if there == yours_king:
+                        check_flag = True
                     break
                 elif there == 0:
                     valid_moves.append(move)
@@ -373,7 +399,7 @@ def place_pieces(board,**kwargs):
                 pieces.append(piece)
                 
                 board.new_pos(row = _pos[0] ,col = _pos[1] )
-                board.new_player_pos( player = _player, pos = _pos)            
+                board.new_player_pos( player = _player, pos = _pos, piece = piece)            
     
     return board, pieces
 
@@ -590,7 +616,7 @@ def test_obstructed():
     bishop = Bishop(b_white = True,pos=(4,4))
     board2.data_by_player[4][4] = 1
     board2.data_by_player[3][5] = 1
-    board2.data_by_player[2][2] = 2
+    board2.data_by_player[2][2] = -1
     board2.data_by_player[6][6] = 1
     moves = bishop.get_available_moves(board2)
     assert moves == [(3, 3), (2, 2), (5, 3), (6, 2), (7, 1), (5, 5)]
@@ -607,9 +633,9 @@ def test_obstruct_pawn():
     board2 = Board()
     POS = (6,2)
     pawn = Pawn(b_white = True,pos=POS)
-    board2.data_by_player[5][3] = 2
+    board2.data_by_player[5][3] = -1
     board2.data_by_player[5][1] = 1
-    board2.data_by_player[4][2] = 2
+    board2.data_by_player[4][2] = -1
     moves = pawn.get_available_moves(board2)
     assert moves == [(5, 2), (5, 3)]
 
