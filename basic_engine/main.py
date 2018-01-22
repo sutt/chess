@@ -1,5 +1,6 @@
 import sys, random, time
 from basic import *
+from utils import *
 
 class Log:
     def __init__(self,**kwargs):
@@ -10,24 +11,34 @@ class Log:
         self.board_end_turn = True
         self.kill_move = True
         self.stop_kill_move = False
+        self.moves_log = []
 
 b_player_control = [True,False]
 
-def parse_player_input(raw, board):
+def parse_player_input(raw, board, input_type = 'alphanum'):
     ret = -1
     if raw == "hint":
         return 1, []
     try:
-        data = raw.split('|')
-        data = [x.split(',') for x in data]
-        data = [tuple(map(int,item)) for item in data]
-        data = tuple(data)
-        if len(data) == 2 and \
-           len(data[0]) == 2 and len(data[0]) == 2 and \
-           all([ isinstance(data[i][j], int) for i in range(2) for j in range(2)]):
-            ret = 0
-        else:
-            print 'failed to validate properties of move parse output'
+        if input_type == 'numeric':
+            data = raw.split('|')
+            data = [x.split(',') for x in data]
+            data = [tuple(map(int,item)) for item in data]
+            data = tuple(data)
+            if len(data) == 2 and \
+            len(data[0]) == 2 and len(data[0]) == 2 and \
+            all([ isinstance(data[i][j], int) for i in range(2) for j in range(2)]):
+                ret = 0
+            else:
+                print 'failed to validate properties of move parse output'
+        elif input_type == 'alphanum':
+            print 'here'
+            out = alphamove_to_posmove(raw)
+            if out == -1:
+                return -1,[]
+            else:
+                ret = 0
+                data = out
     except:
         data = []
         print 'failure in routine to parse user input.'
@@ -107,6 +118,7 @@ def main():
             pos0,pos1 = the_move[0], the_move[1]
             piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
             
+            log.moves_log.append(the_move)
             
             #Make the Move
             if board.data_by_player[pos1[0]][pos1[1]] != 0 and log.stop_kill_move:
