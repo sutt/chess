@@ -514,7 +514,7 @@ def tests():
     board2.data_by_player[4][4] = 1
 
     board2.data_by_player[3][5] = 1
-    board2.data_by_player[2][2] = -1
+    board2.data_by_player[2][2] = -2
     board2.data_by_player[6][6] = 1
     
     board2.print_board(b_player_data = True)
@@ -543,9 +543,9 @@ def tests():
     board2.mark_misc(POS, val = "P")
     board2.print_board(b_misc = True)
 
-    board2.data_by_player[5][3] = -1
+    board2.data_by_player[5][3] = -2
     board2.data_by_player[5][1] = 1
-    board2.data_by_player[4][2] = -1
+    board2.data_by_player[4][2] = -2
 
     print2("Obstructed white pawn situation:")
     board2.print_board(b_player_data = True)
