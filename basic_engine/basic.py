@@ -266,13 +266,13 @@ class Piece:
                     print2('something has gone terribly wrong')
         
         
-        if kwargs.get('check_check', False):
+        if kwargs.get('check_flag', False):
             return check_flag
 
         return valid_moves
 
 
-    def get_available_moves(self,board):
+    def get_available_moves(self,board, check_flag = False):
         """input: board , and Pieces' own properties
            returns: list of pos-tuples (or empty list)"""
 
@@ -283,18 +283,27 @@ class Piece:
         moves = []
         if self.upacross > 0:
             temp = board.get_upacross(self.pos, spaces = self.upacross)
-            temp2 = self.filter_by_blocking_pieces(temp, board)
-            moves.extend(temp2)     #this might over-flatten pos-tuples?
+            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag)
+            if check_flag:
+                if isinstance(temp2, bool) and temp2: return True
+            else:
+                moves.extend(temp2)     #this might over-flatten pos-tuples?
 
         if self.diagonal > 0:
             temp = board.get_diagonals(self.pos, spaces = self.diagonal)
-            temp2 = self.filter_by_blocking_pieces(temp, board)
-            moves.extend(temp2)
+            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag)
+            if check_flag:
+                if isinstance(temp2, bool) and temp2: return True
+            else:
+                moves.extend(temp2)
 
         if self.twobyone:
             temp = board.get_two_by_ones(self.pos)
-            temp2 = self.filter_by_blocking_pieces(temp, board) #note: blocking the knight by your own piece on end-pos
-            moves.extend(temp2)
+            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag) #note: blocking the knight by your own piece on end-pos
+            if check_flag:
+                if isinstance(temp2, bool) and temp2: return True
+            else:
+                moves.extend(temp2)
 
         if self.pawn_move:
             
@@ -308,10 +317,16 @@ class Piece:
             temp.extend(board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1] ))
             
             #temp must be ordered with advances in position-0, attacks after it
-            temp2 = self.filter_by_blocking_pieces(temp, board, b_pawn = True)
-            moves.extend(temp2)
+            temp2 = self.filter_by_blocking_pieces(temp, board, b_pawn = True, check_flag = check_flag)
+            if check_flag:
+                if isinstance(temp2, bool) and temp2: return True
+            else:
+                moves.extend(temp2)
         
         #check_if_moving_causes_check()
+        if check_flag:
+            return False
+
         return moves
 
 class Pawn(Piece):
@@ -639,8 +654,21 @@ def test_obstruct_pawn():
     moves = pawn.get_available_moves(board2)
     assert moves == [(5, 2), (5, 3)]
 
+def test_checkflag():
+    board2 = Board()
+    POS = (0,0)
+    bishop = Bishop(b_white = True,pos=POS)
+    board2.data_by_player[7][7] = 3 #white king
+    b_check = bishop.get_available_moves(board2, check_flag = True)
+    assert b_check == False
+    board2.data_by_player[6][6] = -3 #black king
+    b_check = bishop.get_available_moves(board2, check_flag = True)
+    assert b_check == True
+
+
 if __name__ == "__main__":
    tests()
+   test_checkflag()
 
 # run > pytest -v basic.py
 
