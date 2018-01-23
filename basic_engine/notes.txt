@@ -72,6 +72,13 @@ board should store edge cases:
         available_moves when player in check
         >hint should display moves helpfully
 
+1/23
+
+    need to clear en passant
+    write test for enpassant
+
+    Idea for perf analysis:
+
     BUT: the below doesnt work becaused it has to occur for each-piece-move tuple
         same as iterating of opponent's possible moves. Instead we need a 
         list of positions on the board that help keep king out of check for non-king moves

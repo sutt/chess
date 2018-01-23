@@ -101,7 +101,7 @@ def main():
             
             board.old_player_pos(pos0)
 
-            #board.clear_vulnerable()
+            board.clear_enpassant_vulnerability(_player)
 
             b_two_advances = two_advances(pos0,pos1)
             board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)

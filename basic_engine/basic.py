@@ -95,7 +95,7 @@ class Board:
         for pos in list_pos:
             self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
 
-    def clear_vulnerability(self, _player):
+    def clear_enpassant_vulnerability(self, _player):
         player_mult = 1 if _player else -1
         for i in range(BOARD_WIDTH):
             for j in range(BOARD_WIDTH):

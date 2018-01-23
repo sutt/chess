@@ -73,7 +73,7 @@ def player_control_input(board, moves_player, **kwargs):
                 if the_move == _m[0:2]:
                     return (_m[0:2], _m[2])
             else:
-                print 'this 189move is not legal according to the game engine.'
+                print 'this move is not legal according to the game engine.'
         if ret == 1: 
             print moves_player
         if ret == -1:
