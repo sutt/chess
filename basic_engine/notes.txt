@@ -75,7 +75,9 @@ board should store edge cases:
 1/23
 
     need to clear en passant
-    write test for enpassant
+    write tests for enpassant in main
+    castling
+    pretty-print available moves
 
     Idea for perf analysis:
 

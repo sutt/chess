@@ -31,11 +31,15 @@ class Board:
         self.data_by_player = copy.deepcopy(data)
         self.annotate = None
         self.misc = None
+        self.player_in_check = [False, False]
 
         #Notes:
         # data: 0=blank, 1=piece(of any player)
         # player_data: 0=blank, 1=white-piece, 2=black-piece
         # annotate, misc are for printing out human readable displays or testing
+
+    def b_in_check(self,_player):
+        return self.player_in_check[1 - int(_player)]
 
     def new_pos(self,row,col):
         self.data[row][col] = 1
@@ -169,6 +173,14 @@ class Board:
         
         return pos1
 
+    def get_castles(self,_player):
+        """ input: player (bool)
+            returns: list of list of pos(destination) tuples """
+        _row = 0 if not(_player) else BOARD_WIDTH - 1
+        pos1.append( (_row, 0) )
+        pos1.append( (_row, BOARD_WIDTH - 1) )
+        return pos1
+
     def print_board(self,b_annotate = False ,b_misc = False
                         ,b_player_data = False, b_show_grid = False
                         ,b_abs = False):
@@ -214,6 +226,14 @@ class Piece:
         # bool: special move type
         self.twobyone = False
         self.pawn_move = False
+        self.king_can_castle = False
+        self.rook_can_castle = False
+
+    def modify_castling_property(self,**kwargs):
+        if self.__class__.__name__ == "King":
+            self.king_can_castle = False
+        if self.__class__.__name__ == "Rook":
+            self.rook_can_castle = False
 
     def filter_by_blocking_pieces(self,moves, board, b_pawn = False, **kwargs):
         """input: moves (list of list of pos-tuples), each list-of-pos-tuples is 
@@ -289,7 +309,14 @@ class Piece:
                     break
                 elif there == 0:
                     valids.append(move_tuple(b_move_type, move, 'regular'))
-        
+
+        #if b_king:
+            for move_set in moves:
+                for move in move_set:
+                    there = board.data_by_player[move[0]][move[1]]
+                    if there != 0: break
+                
+            #valids.append(move_tuple(b_move_type, move, 'castling'))
         
         if kwargs.get('check_flag', False):
             return check_flag
@@ -320,6 +347,12 @@ class Piece:
             advances = 2 if home_pos == self.pos else 1
             temp.extend( board.get_upacross(self.pos, spaces = advances, i_dir = upwards[0]) )            
             temp.extend( board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1]) )
+        
+        if self.king_can_castle and not(board.b_in_check(self.white)):
+            pass
+            #if rook.rook_can_castle and if rook.alive:
+            #temp.extend( board.get_castles(self.white) )
+            
 
         temp2 = self.filter_by_blocking_pieces(temp, board
                                                 ,b_pawn = self.pawn_move

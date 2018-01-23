@@ -28,12 +28,13 @@ def main():
 
     board = Board()
     board, pieces = place_pieces(board)
-    print_board_letters(board, pieces, True)
 
     game_going = True
     i_turn = 0
     log = Log()
     dead_pieces = []
+
+    print_board_letters(board, pieces, True)
 
     while(game_going):
         
@@ -81,7 +82,6 @@ def main():
             if the_move_code == MOVE_CODE['en_passant']: b_enpassant = True
             if the_move_code == MOVE_CODE['castling']: b_castling = True
                         
-            
             #TODO - check for castling_flag here, else do below
 
             pos0,pos1 = the_move[0], the_move[1]
@@ -89,12 +89,7 @@ def main():
             
             log.moves_log.append(the_move)
             
-            #Make the Move
-            if board.data_by_player[pos1[0]][pos1[1]] != 0 and log.stop_kill_move:
-                print board.player_name_from_bool(_player), ' KILL FROM: \n'
-                print str(pos0), " to ", str(pos1)
-                ret = input("about to kill...\n")            
-            
+            # Unnec
             kill_flag = False
             if board.data_by_player[pos1[0]][pos1[1]] != 0 or b_enpassant:
                 kill_flag = True
@@ -106,6 +101,8 @@ def main():
             b_two_advances = two_advances(pos0,pos1)
             board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)
             pieces[piece_i].pos = pos1
+            pieces[piece_i].modify_castling_property()
+
 
             if kill_flag:
                 kill_pos = pos1 if not(b_enpassant) else en_passant_pos(pos1, _player)
