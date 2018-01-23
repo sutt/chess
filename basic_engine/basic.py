@@ -46,11 +46,13 @@ class Board:
         else:
             return 'Black'
 
-    def new_player_pos(self, player, pos, piece):
+    def new_player_pos(self, player, pos, piece, b_two_advances = False):
         """ 0=blank, 1=generic-piece, 2=en-passant-vulnerable-pawn 3=king  
             multiplied-by: -1 for black +1 for white """
         piece_num = 1
-        if piece.__class__.__name__ == "Pawn": piece_num = 2
+        if piece.__class__.__name__ == "Pawn": 
+            if b_two_advances:
+                piece_num = 2
         if piece.__class__.__name__ == "King": piece_num = 3
 
         player_mult = 1 if player else -1
@@ -92,9 +94,15 @@ class Board:
     def mark_list_misc(self,list_pos,**kwargs):
         for pos in list_pos:
             self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
-            
-            
 
+    def clear_vulnerability(self, _player):
+        player_mult = 1 if _player else -1
+        for i in range(BOARD_WIDTH):
+            for j in range(BOARD_WIDTH):
+                if self.data_by_player[i][j] == 2 * player_mult:
+                    self.data_by_player[i][j] = player_mult
+        #can also do this by scanning through pieces
+                
     def player_relative_pos(self,player,row,col):
         """ returns pos based on player-relative row e.g. white's "back row" is row 7"""
         _row =  (self.width-1)*player +  -1*row if player else row
