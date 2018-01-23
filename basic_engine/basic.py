@@ -2,6 +2,16 @@ import sys, copy, time
 
 BOARD_WIDTH = 8
 
+MOVE_CODE = dict()
+MOVE_CODE['regular'] = 0
+MOVE_CODE['en_passant'] = 1
+MOVE_CODE['castling'] = 2
+
+def move_tuple(b_append, move, move_type):
+    move_code = MOVE_CODE[move_type]
+    out = (move,move_code) if b_append else move
+    return out
+
 
 #for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
 def print2(data, arg1="", arg2="", arg3="",arg4=""):
@@ -182,6 +192,8 @@ class Board:
             out += "\n"        
         print2(out)
 
+
+
 class Piece:
 
     def __init__(self,b_white, pos, **kwargs):
@@ -201,7 +213,7 @@ class Piece:
                   board obj with current positions
             returns: list of pos-tuples that are valid moves """
 
-        valid_moves = []
+        valids = []
         
         piece_enums = [1,2,3]
         mine_mult = 1 if self.white else -1
@@ -212,6 +224,8 @@ class Piece:
         
         yours_king = -3 if self.white else 3
         yours_enpassant_pawn = -2 if self.white else 2
+
+        b_move_type = True if kwargs.get('move_type_flag', False) else False
         
         check_flag = False
         
@@ -226,7 +240,7 @@ class Piece:
                 if there in yours:
                     break
                 if there == 0:
-                    valid_moves.append(move)
+                    valids.append(move_tuple(b_move_type, move, 'regular'))
                 
             for list_move in moves[1:]:   # a list of len-1 or len-2
                 for move in list_move:  # attacks is a list of len-1
@@ -239,21 +253,20 @@ class Piece:
                     if there in  mine:
                         break
                     if there in yours:
-                        valid_moves.append(move)
+                        valids.append(move_tuple(b_move_type, move, 'regular'))
                         if there == yours_king:
                             check_flag = True
                         break
                     if enpassant_there == yours_enpassant_pawn:
-                        valid_moves.append(move)
+                        valids.append(move_tuple(b_move_type, move, 'en_passant'))
                     if there == 0:
                         break
             
             # return pawn moves
-            return valid_moves
+            return valids
         
         
         # All non-pawn Pieces calcd here
-        # break after a move_Set meets a piece as the piece can't go further
         for move_set in moves:
             for move in move_set:
                 
@@ -262,79 +275,56 @@ class Piece:
                 if there in mine:
                     break
                 elif there in yours:
-                    valid_moves.append(move)
+                    valids.append(move_tuple(b_move_type, move, 'regular'))
                     if there == yours_king:
                         check_flag = True
                     break
                 elif there == 0:
-                    valid_moves.append(move)
-                else:
-                    print2('something has gone terribly wrong')
+                    valids.append(move_tuple(b_move_type, move, 'regular'))
         
         
         if kwargs.get('check_flag', False):
             return check_flag
 
-        return valid_moves
+        return valids
 
 
-    def get_available_moves(self,board, check_flag = False):
-        """input: board, self - which is Pieces' own properties, check_flag as bool
-           returns: list of pos-tuples (or empty list) or a bool when check_flag=True"""
+    def get_available_moves(self,board, move_type_flag = False, check_flag = False):
+        """input: board (obj) current board
+                  move_type_flag (bool) appends MOVE_CODE to pos in temp2
+                  check_flag (bool) 
 
-        #TODO: we can remove board from this function in the sense
-        #      of the current_board, as we only want "on-the-baord" moves.
-        #      This will allow us to async the board.get_movetypeX() funcs.
+           returns: [check=F; move=F] list of pos-tuples (or empty list), or 
+                    [check=T]         bool for if opposing king-in-check, or
+                    [check=F, move=T] list of (pos-tuple, MOVE_CODE)      """
         
-        moves = []
+        temp = []
+        
         if self.upacross > 0:
-            temp = board.get_upacross(self.pos, spaces = self.upacross)
-            #TODO - consolidate this
-            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag)
-            if check_flag:
-                if isinstance(temp2, bool) and temp2: return True
-            else:
-                moves.extend(temp2)     #this might over-flatten pos-tuples?
-
+            temp.extend( board.get_upacross(self.pos, spaces = self.upacross) )
         if self.diagonal > 0:
-            temp = board.get_diagonals(self.pos, spaces = self.diagonal)
-            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag)
-            if check_flag:
-                if isinstance(temp2, bool) and temp2: return True
-            else:
-                moves.extend(temp2)
-
+            temp.extend( board.get_diagonals(self.pos, spaces = self.diagonal) )
         if self.twobyone:
-            temp = board.get_two_by_ones(self.pos)
-            temp2 = self.filter_by_blocking_pieces(temp, board, check_flag = check_flag) #note: blocking the knight by your own piece on end-pos
-            if check_flag:
-                if isinstance(temp2, bool) and temp2: return True
-            else:
-                moves.extend(temp2)
-
+            temp.extend( board.get_two_by_ones(self.pos) )
         if self.pawn_move:
-            
             upwards = ((0,),(0,1)) if self.white else ((2,),(2,3))
-            
-            advances = 1
-            if self.pos == board.player_relative_pos(self.white, row = 1, col = self.pos[1]):
-                advances = 2
-            temp = board.get_upacross(self.pos, spaces = advances, i_dir = upwards[0] )
-            
-            temp.extend(board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1] ))
-            
-            #temp must be ordered with advances in position-0, attacks after it
-            temp2 = self.filter_by_blocking_pieces(temp, board, b_pawn = True, check_flag = check_flag)
-            if check_flag:
-                if isinstance(temp2, bool) and temp2: return True
-            else:
-                moves.extend(temp2)
-        
-        #check_if_moving_causes_check()
-        if check_flag:
-            return False
+            home_pos = board.player_relative_pos(self.white, row = 1, col = self.pos[1])
+            advances = 2 if home_pos == self.pos else 1
+            temp.extend( board.get_upacross(self.pos, spaces = advances, i_dir = upwards[0]) )            
+            temp.extend( board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1]) )
 
-        return moves
+        temp2 = self.filter_by_blocking_pieces(temp, board
+                                                ,b_pawn = self.pawn_move
+                                                ,check_flag = check_flag
+                                                ,move_type_flag = move_type_flag)
+        
+        if check_flag:
+            if isinstance(temp2, bool) and temp2: 
+                return True
+            else:
+                return False
+        
+        return temp2
 
 class Pawn(Piece):
     
@@ -672,6 +662,27 @@ def test_checkflag():
     b_check = bishop.get_available_moves(board2, check_flag = True)
     assert b_check == True
 
+def test_enpassant():
+    board = Board()
+    POS = (3,2)
+    white_pawn = Pawn(b_white = True,pos=POS)
+    moves = white_pawn.get_available_moves(board)
+    assert moves == [(2,2)]
+    
+    board.data_by_player[3][1] = -2
+    moves = white_pawn.get_available_moves(board)
+    assert moves == [(2,2),(2,1)]
+
+def test_move_type_flag():
+    board = Board()
+    POS = (3,2)
+    white_pawn = Pawn(b_white = True,pos=POS)
+    moves = white_pawn.get_available_moves(board,move_type_flag = True)
+    assert moves == [((2,2),0)]
+    
+    board.data_by_player[3][1] = -2
+    moves = white_pawn.get_available_moves(board, move_type_flag = True)
+    assert moves == [((2,2),0),((2,1),1)]
 
 if __name__ == "__main__":
    tests()
