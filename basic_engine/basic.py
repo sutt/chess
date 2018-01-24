@@ -1,6 +1,7 @@
 import sys, copy, time
 
 BOARD_WIDTH = 8
+KING_COL = 3
 
 MOVE_CODE = dict()
 MOVE_CODE['regular'] = 0
@@ -32,11 +33,17 @@ class Board:
         self.annotate = None
         self.misc = None
         self.player_in_check = [False, False]
+        self.rooks_can_castle = [[True, True], [True, True]]
 
         #Notes:
         # data: 0=blank, 1=piece(of any player)
         # player_data: 0=blank, 1=white-piece, 2=black-piece
         # annotate, misc are for printing out human readable displays or testing
+        # player_in_check: ind 0=white 1=black
+        # rooks_can_castle: ind-outer 0=white, ind-inner 0=left-rook, 1=right-rook
+
+    def get_rooks_castle(self,player):
+        return self.rooks_can_castle[player][:]
 
     def b_in_check(self,_player):
         return self.player_in_check[1 - int(_player)]
@@ -173,12 +180,13 @@ class Board:
         
         return pos1
 
-    def get_castles(self,_player):
+    def get_castle_interspaces(self,player):
         """ input: player (bool)
-            returns: list of list of pos(destination) tuples """
-        _row = 0 if not(_player) else BOARD_WIDTH - 1
-        pos1.append( (_row, 0) )
-        pos1.append( (_row, BOARD_WIDTH - 1) )
+            returns: list of list of pos tuples """
+        _row = 0 if not(player) else BOARD_WIDTH - 1
+        pos1 = []
+        pos1.append( [(_row, i) for i in range(1,3)] )
+        pos1.append( [(_row, i) for i in range(4,BOARD_WIDTH - 1)] )
         return pos1
 
     def print_board(self,b_annotate = False ,b_misc = False
@@ -256,6 +264,8 @@ class Piece:
         b_move_type = True if kwargs.get('move_type_flag', False) else False
         
         check_flag = False
+
+        b_king = True if self.__class__.__name__ == "King" else False
         
         if b_pawn:
             
@@ -293,8 +303,24 @@ class Piece:
             # return pawn moves
             return valids
         
+        # Handling king castling here, check for clear back row, all other conditions satisfied
+        if b_king:
+            castling_moves = filter(lambda move_set: len(move_set) > 1, moves)
+            if len(castling_moves) > 0:
+                [moves.pop(moves.index(_x)) for _x in castling_moves]  #dont process them below
+                
+                #TODO - rewrite this tersely
+                for move_set in castling_moves:
+                    all_clear = True
+                    for move in move_set:
+                        there = board.data_by_player[move[0]][move[1]]
+                        if there != 0: 
+                            all_clear = False
+                            break
+                    if all_clear:
+                        valids.append(move_tuple(b_move_type, move, 'castling'))
         
-        # All non-pawn Pieces calcd here
+        # All non-pawn Pieces, and non-castling moves calcd here
         for move_set in moves:
             for move in move_set:
                 
@@ -310,13 +336,6 @@ class Piece:
                 elif there == 0:
                     valids.append(move_tuple(b_move_type, move, 'regular'))
 
-        #if b_king:
-            for move_set in moves:
-                for move in move_set:
-                    there = board.data_by_player[move[0]][move[1]]
-                    if there != 0: break
-                
-            #valids.append(move_tuple(b_move_type, move, 'castling'))
         
         if kwargs.get('check_flag', False):
             return check_flag
@@ -349,10 +368,12 @@ class Piece:
             temp.extend( board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1]) )
         
         if self.king_can_castle and not(board.b_in_check(self.white)):
-            pass
-            #if rook.rook_can_castle and if rook.alive:
-            #temp.extend( board.get_castles(self.white) )
-            
+            b_castle = board.get_rooks_castle(player = self.white)
+            if any(b_castle):
+                temp_castle = board.get_castle_interspaces(player = self.white)
+                temp_castle = [temp_castle[i] for i in range(2) if b_castle[i]]
+                temp.extend(temp_castle)
+
 
         temp2 = self.filter_by_blocking_pieces(temp, board
                                                 ,b_pawn = self.pawn_move
@@ -382,6 +403,8 @@ class King(Piece):
         self.king_can_castle = True
         self.upacross = 1
         self.diagonal = 1
+
+
 
 
 class Rook(Piece):
@@ -588,28 +611,40 @@ def tests():
     board2.mark_misc(POS, val = "P")
     board2.print_board(b_misc = True)
 
-    print2('opening moves available')
-    board = Board()
-    board, pieces = place_pieces(board)
-    board.print_board(b_player_data = True)
+    # print2('opening moves available')
+    # board = Board()
+    # board, pieces = place_pieces(board)
+    # board.print_board(b_player_data = True)
 
-    pawn_moves = []
-    knight_moves = []
-    other_moves = []
-    for p in pieces:
-        if p.__class__.__name__ == "Pawn":
-            pawn_moves.extend(p.get_available_moves(board))
-        elif p.__class__.__name__ == "Knight":
-            knight_moves.extend(p.get_available_moves(board))
-        else:
-            other_moves.extend(p.get_available_moves(board))
+    # pawn_moves = []
+    # knight_moves = []
+    # other_moves = []
+    # for p in pieces:
+    #     if p.__class__.__name__ == "Pawn":
+    #         pawn_moves.extend(p.get_available_moves(board))
+    #     elif p.__class__.__name__ == "Knight":
+    #         knight_moves.extend(p.get_available_moves(board))
+    #     else:
+    #         other_moves.extend(p.get_available_moves(board))
 
-    board.start_misc()
-    board.mark_list_misc(pawn_moves, val = 1)
-    board.mark_list_misc(knight_moves, val = 5)
-    board.mark_list_misc(other_moves, val = 4)
-    board.print_board(b_misc = True)
+    # board.start_misc()
+    # board.mark_list_misc(pawn_moves, val = 1)
+    # board.mark_list_misc(knight_moves, val = 5)
+    # board.mark_list_misc(other_moves, val = 4)
+    # board.print_board(b_misc = True)
     
+    board = Board()
+    out = board.get_castle_interspaces(True)
+    print 'white castling moves'
+    print out
+    out = board.get_castle_interspaces(False)
+    print 'black castling moves'
+    print out
+
+    king = King(b_white = True,pos = (7,3))
+    moves = king.get_available_moves(board, move_type_flag = True)
+    print 'white king all moves'
+    print moves
 
     print2(board.width)
 

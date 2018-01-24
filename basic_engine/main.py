@@ -42,7 +42,7 @@ def main():
 
         for _player in (True,False):
             
-            #Find all available moves
+            #Find all Moves available
             moves_player = []
             for p in pieces:
                 if p.white == _player:
@@ -67,8 +67,7 @@ def main():
                 #TODO - add checkmate detector
                 continue
             else:
-                if log.num_moves:
-                    print "Player: ", str(_player), " has num moves: ", str(num_moves)
+                if log.num_moves: print "Player: ", str(_player), " has num moves: ", str(num_moves)
 
             #Select the Move
             if not(b_player_control[1 - int(_player)]):
@@ -78,33 +77,39 @@ def main():
             else:
                 the_move, the_move_code = player_control_input(board, moves_player)
 
+            #Interpret the Move
             b_enpassant, b_castling = False, False
             if the_move_code == MOVE_CODE['en_passant']: b_enpassant = True
             if the_move_code == MOVE_CODE['castling']: b_castling = True
                         
-            #TODO - check for castling_flag here, else do below
-
             pos0,pos1 = the_move[0], the_move[1]
             piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
-            
-            log.moves_log.append(the_move)
-            
-            # Unnec
-            kill_flag = False
-            if board.data_by_player[pos1[0]][pos1[1]] != 0 or b_enpassant:
-                kill_flag = True
-            
-            board.old_player_pos(pos0)
 
+            #clear previous before the move is applied
             board.clear_enpassant_vulnerability(_player)
 
-            b_two_advances = two_advances(pos0,pos1)
-            board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)
-            pieces[piece_i].pos = pos1
+            #Apply the Move
+            if not(the_move_code == MOVE_CODE['castling']):
+
+                board.old_player_pos(pos0)
+                b_two_advances = two_advances(pos0,pos1)   #if its enpassant_vulnerable
+                board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)
+                pieces[piece_i].pos = pos1
+            
+            else:
+                # is it a left castle or a right castle, from POV of white
+                castle_absolute_left = True if (KING_COL > pos[1]) else False
+                
+                #king new pos
+                #board new king pos
+                #rook new pos
+                #board new 
+
+            #Fallout from Move
+            #TODO - rook_can_castle is now on Board properties
             pieces[piece_i].modify_castling_property()
 
-
-            if kill_flag:
+            if board.data_by_player[pos1[0]][pos1[1]] != 0 or b_enpassant:
                 kill_pos = pos1 if not(b_enpassant) else en_passant_pos(pos1, _player)
                 
                 killed_piece_i = filter(lambda _p: (_p[1].pos == kill_pos) and 
@@ -118,30 +123,23 @@ def main():
 
             #TODO - any promotions here
 
+            #Record the Move
+            log.moves_log.append(the_move)
+
+            #Print the move
             if log.move_info:
                 print 'Move from: ', str(pos0), " to ", str(pos1)
-
-            #Does this modify Castling or EnPassant Game-Ledger?
-
 
             if log.board_end_turn:
                 print_board_letters(board, pieces, True)
             
-            if kill_flag and log.stop_kill_move:
-                input('the kill has happend...')
             if log.proc: print 'new player...'
 
-        print 'new turn...'
+        if log.proc: print 'new turn...'
 
         if i_turn == 15:
             break
 
-
-
-
-    # ret = raw_input("What's your message?\n")
-    # print str(ret)
-    # print "done."
 
 if __name__ == "__main__":
     main()
