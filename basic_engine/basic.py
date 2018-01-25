@@ -1,7 +1,7 @@
 import sys, copy, time
 
 BOARD_WIDTH = 8
-KING_COL = 3
+KING_COL = 4        #based on index0
 
 MOVE_CODE = dict()
 MOVE_CODE['regular'] = 0
@@ -42,6 +42,18 @@ class Board:
         # player_in_check: ind 0=white 1=black
         # rooks_can_castle: ind-outer 0=white, ind-inner 0=left-rook, 1=right-rook
 
+    def get_rook_castle_move(self, player, left_side):
+        row = self.width - 1 if player else 0
+        col0 = 0 if left_side else self.width - 1
+        col1 = KING_COL - 1 if left_side else KING_COL + 1
+        return ((row,col0), (row,col1))
+
+    def get_king_castle_move(self, player, left_side):
+        row = self.width - 1 if player else 0
+        col0 = KING_COL
+        col1 = KING_COL - 2 if left_side else KING_COL + 2
+        return ((row,col0), (row,col1))
+    
     def get_rooks_castle(self,player):
         return self.rooks_can_castle[player][:]
 
@@ -185,8 +197,8 @@ class Board:
             returns: list of list of pos tuples """
         _row = 0 if not(player) else BOARD_WIDTH - 1
         pos1 = []
-        pos1.append( [(_row, i) for i in range(1,3)] )
-        pos1.append( [(_row, i) for i in range(4,BOARD_WIDTH - 1)] )
+        pos1.append( [(_row, i) for i in range(1,KING_COL)] )
+        pos1.append( [(_row, i) for i in range(KING_COL + 1,    BOARD_WIDTH - 1)] )
         return pos1
 
     def print_board(self,b_annotate = False ,b_misc = False
