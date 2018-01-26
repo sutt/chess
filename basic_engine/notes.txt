@@ -79,6 +79,16 @@ board should store edge cases:
     castling
     pretty-print available moves
 
+1/26
+
+    tests for castling
+    clear_castling
+    bug for calling a castle ambiguous with king step left
+    bug for both castles being available when one is False, the "any()" line is culprit?
+    tests for clear castling
+    test for main() by loading moves
+    tests for castling
+
     Idea for perf analysis:
 
     BUT: the below doesnt work becaused it has to occur for each-piece-move tuple

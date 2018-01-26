@@ -55,7 +55,7 @@ class Board:
         return ((row,col0), (row,col1))
     
     def get_rooks_castle(self,player):
-        return self.rooks_can_castle[player][:]
+        return self.rooks_can_castle[1 - int(player)][:]
 
     def b_in_check(self,_player):
         return self.player_in_check[1 - int(_player)]
@@ -667,6 +667,18 @@ def tests():
     board2.data_by_player[6][2] = 1
     board2.print_board(b_player_data = True)
 
+    #Test Castling
+    board = Board() #can_castle is init true
+    POS = (7,4)
+    white_king = King(b_white = True,pos=POS)
+    moves = white_king.get_available_moves(board,move_type_flag = True)
+    moves2 = white_king.get_available_moves(board,move_type_flag = False)
+    print moves
+
+    board.start_misc()
+    board.mark_list_misc(moves2)
+    board.mark_misc(POS, val = "K")
+    board.print_board(b_misc = True)
 
 
 def test_bishop_moves():
@@ -772,7 +784,42 @@ def test_move_type_flag():
     moves = white_pawn.get_available_moves(board, move_type_flag = True)
     assert moves == [((2,2),0),((2,1),1)]
 
+def test_castling_allowed():
+    board = Board() #can_castle is init true
+    POS = (7,4)
+    white_king = King(b_white = True,pos=POS)
+    
+    moves = white_king.get_available_moves(board,move_type_flag = True)
+    assert moves == [((7, 3), 2), ((7, 6), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+
+def test_castling_disallowed1():
+    board = Board() #can_castle is init true
+    POS = (7,4)
+    white_king = King(b_white = True,pos=POS)
+    white_king.king_can_castle = False
+
+    moves = white_king.get_available_moves(board,move_type_flag = True)
+    print moves
+    assert moves == [((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+
+def test_castling_disallowed2():
+    board = Board() #can_castle is init true
+    POS = (7,4)
+    white_king = King(b_white = True,pos=POS)
+    
+    board.rooks_can_castle[0][1] = False
+    moves = white_king.get_available_moves(board,move_type_flag = True)
+    print moves
+    assert moves == [((7, 3), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+
+    board.rooks_can_castle[0][0] = False
+    moves = white_king.get_available_moves(board,move_type_flag = True)
+    assert moves == [((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+
+
+
 if __name__ == "__main__":
+   test_castling_disallowed2()
    tests()
    test_checkflag()
 
