@@ -115,7 +115,22 @@ board should store edge cases:
     saved chess games and running total time it takes to calc all
     get_available_moves() using each method
 
+    1/27 Thoughts:
+        - it is O(n^2) if you think of piece-moves, and the most naive algo
+         - to make the board wider, you need to handle castling better with board_width param
+
 Takeaways:
+
+    1/27
+    software engineering and team-code practices become important at the point where
+    one nice abstraction no longer encapsulates the whole requirements: in this case
+    that occurs when enpassant and castling are added in. This requires enums and if/then
+    logic processing
+
+    Also, its true that available_moves, followed by end-game-conditions-check
+    is the how to write these engines.
+
+    instantiating the pieces is costly at each branch
 
     the correct level of abstraction for the Board is 
         piece vs. blank, 
