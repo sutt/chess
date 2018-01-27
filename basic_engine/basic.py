@@ -330,7 +330,9 @@ class Piece:
                             all_clear = False
                             break
                     if all_clear:
-                        valids.append(move_tuple(b_move_type, move, 'castling'))
+                        #TODO - eliminate this nasty move_set[1] hack. It allows us to
+                        #       disambiguate castling from king simply moving 1 over
+                        valids.append(move_tuple(b_move_type, move_set[1], 'castling'))
         
         # All non-pawn Pieces, and non-castling moves calcd here
         for move_set in moves:
@@ -790,7 +792,7 @@ def test_castling_allowed():
     white_king = King(b_white = True,pos=POS)
     
     moves = white_king.get_available_moves(board,move_type_flag = True)
-    assert moves == [((7, 3), 2), ((7, 6), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+    assert moves == [((7, 2), 2), ((7, 6), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
 
 def test_castling_disallowed1():
     board = Board() #can_castle is init true
@@ -810,7 +812,7 @@ def test_castling_disallowed2():
     board.rooks_can_castle[0][1] = False
     moves = white_king.get_available_moves(board,move_type_flag = True)
     print moves
-    assert moves == [((7, 3), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+    assert moves == [((7, 2), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
 
     board.rooks_can_castle[0][0] = False
     moves = white_king.get_available_moves(board,move_type_flag = True)
@@ -819,9 +821,9 @@ def test_castling_disallowed2():
 
 
 if __name__ == "__main__":
-   test_castling_disallowed2()
    tests()
-   test_checkflag()
+   #test_checkflag()
+   #test_castling_disallowed2()
 
 # run > pytest -v basic.py
 
