@@ -6,12 +6,29 @@ from basic import *
 # 8. a4 Bxb5 9. axb5 Bd6 10. Nc4 Nh5 11. e5 Kd7 12. exd6 Rg8 *
 
 def en_passant_pos(pos1, _player):
-        upwards = -1 if _player else 1
-        return (pos1[0] - upwards, pos1[1])
+    upwards = -1 if _player else 1
+    return (pos1[0] - upwards, pos1[1])
 
 def two_advances(pos0, pos1):
     return 2 == abs(pos0[0] - pos1[0])
- 
+
+def parse_instructions(s):
+    moves = []
+
+    s2 =s.split(".")
+    for _s in s2:
+        _s = _s.lstrip()
+        _s3 = _s.split(" ")
+        if len(_s3) >= 2:
+            raw = " ".join([_s3[0],_s3[1]])
+            raw = raw.rstrip()
+            moves.append(raw)
+    return moves
+
+
+    
+
+
 def alphanum_to_pos(inp):
     letter_data = 'ABCDEFGH'
     pos0 = letter_data.index(str.upper(inp[0]))
@@ -60,6 +77,16 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
         data = []
         print 'failure in routine to parse user input.'
     return ret, data
+
+
+def instruction_input(board, moves_player, instructions, i_turn):
+    ret, the_move = parse_player_input(instructions[i_turn - 1], board)
+    if ret == 0:
+        for _m in moves_player:
+            if the_move == _m[0:2]:
+                return (_m[0:2], _m[2])
+    else:
+        print 'nah'
 
 def player_control_input(board, moves_player, **kwargs):
     

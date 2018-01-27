@@ -93,7 +93,13 @@ board should store edge cases:
 
     x modfiy_castle()
     x test this out
-    
+    add tests to main 
+        add instructions in Select A Move section
+        add 
+
+    Takeaways: data_struct[player] vs data_struct[1-int(player)]
+    is a very easy mistake to make and shows why you need getter'instead
+    of modifying the property "by hand".
 
 
     Idea for perf analysis:

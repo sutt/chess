@@ -14,6 +14,8 @@ class Log:
         self.moves_log = []
 
 b_player_control = [True,False]
+#b_instruction_control = [True,True]
+b_instruction_control = [False,False]
 
 
 
@@ -24,10 +26,17 @@ def print_board_letters(board, pieces, b_lower_black = False):
         board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
     board.print_board(b_annotate = True, b_show_grid = True)
 
-def main():
+def main(**kwargs):
 
     board = Board()
     board, pieces = place_pieces(board)
+
+    instructions = []
+    s_instructions = kwargs.get('instructions',"")
+    if len(s_instructions) > 0:
+        instructions = parse_instructions(s_instructions)
+        print instructions
+        
 
     game_going = True
     i_turn = 0
@@ -38,9 +47,9 @@ def main():
 
     while(game_going):
         
-        i_turn += 1
-
         for _player in (True,False):
+            
+            i_turn += 1
             
             #Find all Moves available
             moves_player = []
@@ -70,12 +79,18 @@ def main():
                 if log.num_moves: print "Player: ", str(_player), " has num moves: ", str(num_moves)
 
             #Select the Move
-            if not(b_player_control[1 - int(_player)]):
+            if b_instruction_control[1 - int(_player)]:
+                #Predefined instructions
+                the_move, the_move_code = instruction_input(board, moves_player, instructions, i_turn)
+            elif b_player_control[1 - int(_player)]:
+                #Manual
+                the_move, the_move_code = player_control_input(board, moves_player)
+            else:
+                #Random
                 move_i = random.sample(range(0,num_moves),1)[0]
                 the_move = moves_player[move_i][0:2]
-                the_move_code = moves_player[move_i][2]
-            else:
-                the_move, the_move_code = player_control_input(board, moves_player)
+                the_move_code = moves_player[move_i][2] 
+                
 
             #Interpret the Move
             b_enpassant, b_castling = False, False
@@ -121,7 +136,6 @@ def main():
 
 
             #Fallout from Move
-            #TODO - rook_can_castle is now on Board properties
             pieces[piece_i].modify_castling_property()
             board.modify_castling_property( _player, pieces[piece_i], pos0)
 
@@ -153,11 +167,37 @@ def main():
             
             if log.proc: print 'new player...'
 
+            if any(b_instruction_control):    
+                if i_turn == len(instructions):
+                    print 'AMAZING'
+                    game_going = False
+                    return board
+
         if log.proc: print 'new turn...'
 
         if i_turn == 15:
             break
 
+        
+
+    print 'game over.'
+
 
 if __name__ == "__main__":
     main()
+
+b_instruction_control = [True,True]
+
+def test_castling_allowed():
+    
+    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
+    board = main(instructions = ss)
+    assert board.data_by_player[7][5] == 1
+    assert board.data_by_player[7][6] == 3
+
+# def test_castling_disallowed_rook():
+#     b_instruction_control = [True,True]
+#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
+#     board = main(instructions = ss)
+#     assert board.data_by_player[7][5] == 1
+#     assert board.data_by_player[7][6] == 3
