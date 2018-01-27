@@ -89,6 +89,13 @@ board should store edge cases:
     test for main() by loading moves
     tests for castling
 
+1/27
+
+    x modfiy_castle()
+    x test this out
+    
+
+
     Idea for perf analysis:
 
     BUT: the below doesnt work becaused it has to occur for each-piece-move tuple

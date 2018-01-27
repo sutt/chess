@@ -123,6 +123,8 @@ def main():
             #Fallout from Move
             #TODO - rook_can_castle is now on Board properties
             pieces[piece_i].modify_castling_property()
+            board.modify_castling_property( _player, pieces[piece_i], pos0)
+
 
             if kill_flag:
                 kill_pos = pos1 if not(b_enpassant) else en_passant_pos(pos1, _player)
@@ -141,6 +143,7 @@ def main():
             #Record the Move
             log.moves_log.append(the_move)
 
+            #TODO - make this all a one line function call
             #Print the move
             if log.move_info:
                 print 'Move from: ', str(pos0), " to ", str(pos1)

@@ -42,6 +42,21 @@ class Board:
         # player_in_check: ind 0=white 1=black
         # rooks_can_castle: ind-outer 0=white, ind-inner 0=left-rook, 1=right-rook
 
+    def modify_castling_property(self, player, piece, pos0):
+        if piece.__class__.__name__ != "Rook":
+            return 0
+        if not(any(self.rooks_can_castle[1- int(player)])):
+            return 0
+        rook_col = pos0[1]
+        rook_side = -1
+        if rook_col == 0: rook_side = 0
+        if rook_col == BOARD_WIDTH - 1: rook_side = 1
+        if rook_side == -1:
+            return 0
+        self.rooks_can_castle[1- int(player)][rook_side] = False
+        
+        
+    
     def get_rook_castle_move(self, player, left_side):
         row = self.width - 1 if player else 0
         col0 = 0 if left_side else self.width - 1
@@ -252,8 +267,8 @@ class Piece:
     def modify_castling_property(self,**kwargs):
         if self.__class__.__name__ == "King":
             self.king_can_castle = False
-        if self.__class__.__name__ == "Rook":
-            self.rook_can_castle = False
+        # if self.__class__.__name__ == "Rook":
+        #     self.rook_can_castle = False
 
     def filter_by_blocking_pieces(self,moves, board, b_pawn = False, **kwargs):
         """input: moves (list of list of pos-tuples), each list-of-pos-tuples is 
