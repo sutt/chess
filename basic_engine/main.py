@@ -82,6 +82,7 @@ def main(**kwargs):
             if b_instruction_control[1 - int(_player)]:
                 #Predefined instructions
                 the_move, the_move_code = instruction_input(board, moves_player, instructions, i_turn)
+                if the_move == -1: return i_turn
             elif b_player_control[1 - int(_player)]:
                 #Manual
                 the_move, the_move_code = player_control_input(board, moves_player)
@@ -149,8 +150,7 @@ def main(**kwargs):
                 killed_piece_i = killed_piece_i[0][0]
                 pieces[killed_piece_i].alive = False
                 dead_pieces.append(pieces.pop(killed_piece_i))
-                if log.kill_move:
-                    print dead_pieces
+                
 
             #TODO - any promotions here
 
@@ -159,6 +159,9 @@ def main(**kwargs):
 
             #TODO - make this all a one line function call
             #Print the move
+            if log.kill_move and kill_flag:
+                    print dead_pieces
+
             if log.move_info:
                 print 'Move from: ', str(pos0), " to ", str(pos1)
 
@@ -167,11 +170,14 @@ def main(**kwargs):
             
             if log.proc: print 'new player...'
 
+            
+
             if any(b_instruction_control):    
                 if i_turn == len(instructions):
-                    print 'AMAZING'
                     game_going = False
                     return board
+
+            
 
         if log.proc: print 'new turn...'
 
@@ -195,9 +201,16 @@ def test_castling_allowed():
     assert board.data_by_player[7][5] == 1
     assert board.data_by_player[7][6] == 3
 
-# def test_castling_disallowed_rook():
-#     b_instruction_control = [True,True]
-#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
-#     board = main(instructions = ss)
-#     assert board.data_by_player[7][5] == 1
-#     assert board.data_by_player[7][6] == 3
+def test_castling_disallowed_rook():
+    
+    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
+    break_turn = main(instructions = ss)
+    assert break_turn == 11
+
+def test_castling_disallowed_king():
+    
+    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
+    break_turn = main(instructions = ss)
+    assert break_turn == 11
+
+

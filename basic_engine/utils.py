@@ -85,8 +85,9 @@ def instruction_input(board, moves_player, instructions, i_turn):
         for _m in moves_player:
             if the_move == _m[0:2]:
                 return (_m[0:2], _m[2])
+        return -1,-1  # to demonstrate an error in instruction input
     else:
-        print 'nah'
+        return -1,-1  # to demonstrate an error in instruction input
 
 def player_control_input(board, moves_player, **kwargs):
     
