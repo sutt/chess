@@ -1,33 +1,15 @@
 import sys, random, time
 from basic import *
 from utils import *
-
-class Log:
-    def __init__(self,**kwargs):
-        self.proc = False
-        self.all_moves = False
-        self.num_moves = False
-        self.move_info = False
-        self.board_end_turn = True
-        self.kill_move = True
-        self.stop_kill_move = False
-        self.moves_log = []
+from GameLog import GameLog
 
 b_player_control = [True,False]
-#b_instruction_control = [True,True]
 b_instruction_control = [False,False]
 
 
+def game(**kwargs):
 
-def print_board_letters(board, pieces, b_lower_black = False):
-
-    board.start_annotate()
-    for p in pieces:
-        board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
-    board.print_board(b_annotate = True, b_show_grid = True)
-
-def main(**kwargs):
-
+    #INIT Board and pieces
     board = Board()
     board, pieces = place_pieces(board)
 
@@ -37,10 +19,9 @@ def main(**kwargs):
         instructions = parse_instructions(s_instructions)
         print instructions
         
-
     game_going = True
     i_turn = 0
-    log = Log()
+    log = GameLog()
     dead_pieces = []
 
     print_board_letters(board, pieces, True)
@@ -151,27 +132,20 @@ def main(**kwargs):
                 pieces[killed_piece_i].alive = False
                 dead_pieces.append(pieces.pop(killed_piece_i))
                 
-
             #TODO - any promotions here
 
-            #Record the Move
+            #Log / Record the Move
             log.moves_log.append(the_move)
 
-            #TODO - make this all a one line function call
-            #Print the move
-            if log.kill_move and kill_flag:
-                    print dead_pieces
+            log.print_turn(  board = board
+                            ,pieces = pieces
+                            ,dead_pieces = dead_pieces
+                            ,kill_flag = kill_flag
+                            ,pos0 = pos0
+                            ,pos1 = pos1
+                            )
 
-            if log.move_info:
-                print 'Move from: ', str(pos0), " to ", str(pos1)
-
-            if log.board_end_turn:
-                print_board_letters(board, pieces, True)
-            
-            if log.proc: print 'new player...'
-
-            
-
+            #Exit from main for predefined instructions
             if any(b_instruction_control):    
                 if i_turn == len(instructions):
                     game_going = False
@@ -190,7 +164,7 @@ def main(**kwargs):
 
 
 if __name__ == "__main__":
-    main()
+    game()
 
 b_instruction_control = [True,True]
 
@@ -212,5 +186,17 @@ def test_castling_disallowed_king():
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
     break_turn = main(instructions = ss)
     assert break_turn == 11
+
+# def test_enpassant_take():
+    
+#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
+#     break_turn = main(instructions = ss)
+#     assert break_turn == 11
+
+# def test_enpassant_disallowed():
+    
+#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
+#     break_turn = main(instructions = ss)
+#     assert break_turn == 11
 
 

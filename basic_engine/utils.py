@@ -26,7 +26,12 @@ def parse_instructions(s):
     return moves
 
 
+def print_board_letters(board, pieces, b_lower_black = False):
     
+    board.start_annotate()
+    for p in pieces:
+        board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
+    board.print_board(b_annotate = True, b_show_grid = True)    
 
 
 def alphanum_to_pos(inp):
