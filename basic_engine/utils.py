@@ -5,16 +5,27 @@ from basic import *
 # 1. e4 d5 2. d3 e5 3. Nf3 dxe4 4. dxe4 Qxd1+ 5. Kxd1 b6 6. Nxe5 Nf6 7. Bb5+ Bd7
 # 8. a4 Bxb5 9. axb5 Bd6 10. Nc4 Nh5 11. e5 Kd7 12. exd6 Rg8 *
 
+
+
+#TODO - move this to basic
 def en_passant_pos(pos1, _player):
     upwards = -1 if _player else 1
     return (pos1[0] - upwards, pos1[1])
 
+#TODO - move this to basic
 def two_advances(pos0, pos1):
     return 2 == abs(pos0[0] - pos1[0])
 
+#TODO - better please
 def parse_instructions(s):
+    """ input: s, a string 
+        return: a list of alphanum-style instructions"""
+    
     moves = []
 
+    if len(s) == 0:
+        return moves
+    
     s2 =s.split(".")
     for _s in s2:
         _s = _s.lstrip()

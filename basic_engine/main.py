@@ -3,31 +3,29 @@ from basic import *
 from utils import *
 from GameLog import GameLog
 
-b_player_control = [True,True]
+b_player_control = [True,False]
 b_instruction_control = [False,False]
 
 
-def game(**kwargs):
+def game(s_instructions = "", **kwargs):
 
     #INIT Board and pieces
     board = Board()
     board, pieces = place_pieces(board)
+    dead_pieces = []
 
-    instructions = []
-    s_instructions = kwargs.get('instructions',"")
-    if len(s_instructions) > 0:
-        instructions = parse_instructions(s_instructions)
-        print instructions
-        
+    instructions = parse_instructions(s_instructions)
+    log = GameLog()
+
     game_going = True
     i_turn = 0
-    log = GameLog()
-    dead_pieces = []
 
     print_board_letters(board, pieces, True)
 
+    #Turn Loop
     while(game_going):
         
+        #TODO this is a counter-mod, not a for-loop
         for _player in (True,False):
             
             i_turn += 1
@@ -164,26 +162,26 @@ b_instruction_control = [True,True]
 def test_castling_allowed():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
-    board = game(instructions = ss)
+    board = game(s_instructions = ss)
     assert board.data_by_player[7][5] == 1
     assert board.data_by_player[7][6] == 3
 
 def test_castling_disallowed_rook():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
-    break_turn = game(instructions = ss)
+    break_turn = game(s_instructions = ss)
     assert break_turn == 11
 
 def test_castling_disallowed_king():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-    break_turn = game(instructions = ss)
+    break_turn = game(s_instructions = ss)
     assert break_turn == 11
 
 def test_enpassant_take():
     
     ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. d2 c3"
-    board = game(instructions = ss)
+    board = game(s_instructions = ss)
     print 'IN TEST'
     board.print_board(b_player_data=True)
     assert board.data_by_player[2][2] == 1
@@ -193,7 +191,7 @@ def test_enpassant_take():
 def test_enpassant_disallowed():
     
     ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. g8 e8 6. b1 c1 7. d2 c3"
-    break_turn = game(instructions = ss)
+    break_turn = game(s_instructions = ss)
     assert break_turn == 7
 
 # if __name__ == "__main__":

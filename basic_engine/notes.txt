@@ -102,6 +102,15 @@ board should store edge cases:
     of modifying the property "by hand".
 
 
+1/28
+
+    as i realized, checkmate detector is not difficult, it is only:
+        -available_moves [where king not in check] = {} ("empty set")
+        -check_flag = True
+    -> so the real heart of the game is calc'ing is_king_in_check
+
+
+
     Idea for perf analysis:
 
     BUT: the below doesnt work becaused it has to occur for each-piece-move tuple
