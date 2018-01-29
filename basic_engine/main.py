@@ -171,20 +171,20 @@ b_instruction_control = [True,True]
 def test_castling_allowed():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
-    board = main(instructions = ss)
+    board = gmae(instructions = ss)
     assert board.data_by_player[7][5] == 1
     assert board.data_by_player[7][6] == 3
 
 def test_castling_disallowed_rook():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
-    break_turn = main(instructions = ss)
+    break_turn = game(instructions = ss)
     assert break_turn == 11
 
 def test_castling_disallowed_king():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-    break_turn = main(instructions = ss)
+    break_turn = game(instructions = ss)
     assert break_turn == 11
 
 # def test_enpassant_take():
