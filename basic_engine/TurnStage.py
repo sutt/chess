@@ -3,6 +3,9 @@ import random
 from utils import *
 from basic import *
 
+def increment_turn(player, i_turn):
+    i_turn += 1
+    return not(player), i_turn
 
 def get_available_moves(pieces, board, player):
 

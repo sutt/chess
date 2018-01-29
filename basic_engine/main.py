@@ -3,7 +3,7 @@ import sys, random, time
 from basic import *
 from utils import *
 from GameLog import GameLog
-from TurnStage import get_available_moves, check_moves, apply_move
+from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
 
 
 class Game():
@@ -32,7 +32,7 @@ class Game():
             the_move, the_move_code = instruction_input(board
                                                         ,moves
                                                         ,self.instructions
-                                                        ,self.i_turn
+                                                        ,self.i_turn    #TODO - eliminate with pop
                                                         )
         elif int(player) in self.manual_control:
             
@@ -50,61 +50,58 @@ class Game():
 
     def play(self, **kwargs):
 
-        #INIT Board and pieces
         board = Board()
         board, pieces = place_pieces(board)
+        
+        player = False  #at increment_turn it will change to True
 
-        game_going = True
         self.i_turn = 0
-
-        # print_board_letters(board, pieces, True)        #TODO - eliminate, move to manual input
-
-        #Turn Loop
+        
+        game_going = True
+        
         while(game_going):
             
-            #TODO this is a counter-mod, not a for-loop
-            for player in (True,False):
-                
-                self.i_turn += 1
-                
-                moves = get_available_moves(pieces, board, player)
+            player, self.i_turn = increment_turn(player, self.i_turn)
 
-                #TODO - Filter moves for king in check
-                #NOTE - how to get out of check? all moves filtered by king_in_check
-                #   but how to handle killing the checking piece?
+            moves = get_available_moves(pieces, board, player)
 
-                check_code = check_moves(moves, board, player)
-                
-                if check_code < 0:
-                    game.outcome = 'LOSS' # or 'STALEMATE'
+            #TODO - Filter moves for king in check
+            #NOTE - how to get out of check? all moves filtered by king_in_check
+            #   but how to handle killing the checking piece?
+
+            check_code = check_moves(moves, board, player)
+            
+            if check_code < 0:
+                game.outcome = 'LOSS' # or 'STALEMATE'
+                game_going = False
+                continue
+
+            self.log.print_turn(board, pieces, player)
+
+            #TODO - the_move should be a named tuple
+            the_move, the_move_code = self.select_move(
+                                        moves
+                                        ,player
+                                        ,board
+                                        )
+
+            #TODO - eliminate
+            #self.exit_check()
+            if the_move == -1: return self.i_turn
+
+            #Apply the Move
+            board, pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, player)
+            #TODO - out: board, pieces, in: move, board, pieces
+            
+            #TODO - turn on/off game logging
+            self.log.moves_log.append(the_move)
+
+            #TODO - eliminate
+            #self.exit_check()
+            if int(player) in self.instruction_control:
+                if self.i_turn == len(self.instructions):
                     game_going = False
-                    continue
-
-                self.log.print_turn(board, pieces, player)
-
-                #TODO - the_move should be a named tuple
-                the_move, the_move_code = self.select_move(
-                                            moves
-                                            ,player
-                                            ,board
-                                            )
-
-                #TODO - eliminate
-                if the_move == -1: return self.i_turn
-
-                #Apply the Move
-                board, pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, player)
-                #TODO - out: board, pieces, in: move, board, pieces
-                
-                #Log / Record the Move
-                self.log.moves_log.append(the_move)
-
-                #TODO - eliminate
-                #Exit from main for predefined instructions
-                if int(player) in self.instruction_control:
-                    if self.i_turn == len(self.instructions):
-                        game_going = False
-                        return board
+                    return board
 
         log.log_game()
 

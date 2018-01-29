@@ -111,9 +111,11 @@ board should store edge cases:
 
     modular idea: what if board.data was a numpy array? smaller mem and faster?
 
+
     TODO:
         refactor data_by_player
         add named_tuple for move
+        make player 0,1 not true,False
 
     Idea for perf analysis:
 
