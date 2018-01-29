@@ -10,25 +10,33 @@ class Game():
     
     def __init__(self
                 ,manual_control = () 
-                ,instruction_control = (0,1) 
+                ,instruction_control = () 
                 ,s_instructions = ""
                 ,b_log_show_opponent = False
                 ):
 
-        self.outcome = None
-        self.board = None
         self.manual_control = manual_control
         self.instructions = parse_instructions(s_instructions)
         self.instruction_control = instruction_control 
-        if len(self.instructions) == 0:
-            self.instruction_control = ()
+        if len(self.instructions) > 0:
+            self.instruction_control = (1,2)
+        
         self.i_turn = 0
+        self.b_test_exit = False
+        self.test_data = None
+        self.outcome = None
+
         self.log = GameLog(manual_control = self.manual_control
                           ,b_log_show_opponent = b_log_show_opponent 
                            )
 
 
-
+    def check_test_exit(self, **kwargs):
+        if len(self.instruction_control) > 0:
+            if self.i_turn == len(self.instructions):
+                return True
+        return False
+        
     def select_move(self, moves, player, board): 
     
         if int(player) in self.instruction_control:
@@ -57,53 +65,47 @@ class Game():
         board = Board()
         board, pieces = place_pieces(board)
         
-        player = False      #at increment_turn it will change to True
-
         self.i_turn = 0     #at increment_turn it will change to 1
-        
+        player = False      #at increment_turn it will change to True
         game_going = True
         
         while(game_going):
+            
+            if self.b_test_exit:
+                return self.test_data
             
             player, self.i_turn = increment_turn(player, self.i_turn)
 
             moves = get_available_moves(pieces, board, player)
 
             #TODO - Filter moves for king in check
-            #NOTE - how to get out of check? all moves filtered by king_in_check
-            #   but how to handle killing the checking piece?
+            
+            self.log.print_turn(board, pieces, player)
 
-            #TODO - rename check_endgame()
-            check_code = check_moves(moves, board, player)
+            check_code = check_moves(moves, board, player)  #TODO - rename check_endgame()
             
             if check_code < 0:
                 game.outcome = 'LOSS' # or 'STALEMATE'
                 game_going = False
                 continue
 
-            self.log.print_turn(board, pieces, player)
-
-            #TODO - the_move should be a named tuple
             the_move, the_move_code = self.select_move(moves, player, board)
 
-            #TODO - eliminate
-            #self.exit_check()
-            if the_move == -1: return self.i_turn
+            if the_move == -1:      #TODO if the_move is None:
+                self.b_test_exit = True
+                self.test_data = self.i_turn
+                continue
 
             board, pieces = apply_move(the_move, the_move_code, board, pieces, player)
-            #TODO - out: board, pieces, in: move, board, pieces
-            
-            #TODO - turn on/off game logging
-            self.log.moves_log.append(the_move)
+                        
+            self.log.add_moves_log(the_move) #TODO - turn on/off game logging
 
-            #TODO - eliminate
-            #self.exit_check()
-            if int(player) in self.instruction_control:
-                if self.i_turn == len(self.instructions):
-                    game_going = False
-                    return board
+            if self.check_test_exit():
+                self.b_test_exit = True
+                self.test_data = copy.deepcopy(board)
+                continue
 
-        log.log_game()
+        return self.outcome, self.log.get_moves_log()
 
 
 if __name__ == "__main__":

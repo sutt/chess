@@ -111,6 +111,8 @@ board should store edge cases:
 
     modular idea: what if board.data was a numpy array? smaller mem and faster?
 
+    #NOTE - how to get out of check? all moves filtered by king_in_check
+            #   but how to handle killing the checking piece?
 
     TODO:
         refactor data_by_player
