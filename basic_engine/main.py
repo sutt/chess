@@ -1,7 +1,9 @@
 import sys, random, time
+
 from basic import *
 from utils import *
 from GameLog import GameLog
+from TurnStage import get_available_moves, check_moves, select_move
 
 b_player_control = [True,False]
 b_instruction_control = [False,False]
@@ -31,45 +33,27 @@ def game(s_instructions = "", **kwargs):
             i_turn += 1
             
             #Find all Moves available
-            moves_player = []
-            for p in pieces:
-                if p.white == _player:
-                    
-                    moves_p = p.get_available_moves(board, move_type_flag = True)
-                    moves_p = filter(lambda _m: len(_m) > 0, moves_p)
-                    
-                    current_pos = p.pos
-                    d_moves_p = [(current_pos,_move[0],_move[1]) for _move in moves_p]
-                    
-                    moves_player.extend(d_moves_p)
+            moves_player = get_available_moves(pieces,board,_player)
 
             #TODO - Filter moves for king in check
-            
-            if log.all_moves: print moves_player
+            #NOTE - how to get out of check? all moves filtered by king_in_check
+            #   but how to handle killing the checking piece?
 
             #Check for end-game conditions
-            num_moves = len(moves_player)
-            if  num_moves == 0:
+            check_code = check_moves(moves_player, board, _player)
+            if check_code < 0:
+                #It's a loss or a stalemate
                 game_going = False
-                print 'Player ', str(board.player_name_from_bool(_player)), ' has no moves available. Game over.'
-                #TODO - add checkmate detector
                 continue
-            else:
-                if log.num_moves: print "Player: ", str(_player), " has num moves: ", str(num_moves)
 
             #Select the Move
-            if b_instruction_control[1 - int(_player)]:
-                #Predefined instructions
-                the_move, the_move_code = instruction_input(board, moves_player, instructions, i_turn)
-                if the_move == -1: return i_turn
-            elif b_player_control[1 - int(_player)]:
-                #Manual
-                the_move, the_move_code = player_control_input(board, moves_player)
-            else:
-                #Random
-                move_i = random.sample(range(0,num_moves),1)[0]
-                the_move = moves_player[move_i][0:2]
-                the_move_code = moves_player[move_i][2] 
+            #TODO - this should be self.select_move
+            the_move, the_move_code = select_move(moves_player,_player, board, instructions,i_turn
+                                        ,b_instruction_control, b_player_control)
+            if the_move == -1: return i_turn
+
+
+
                 
 
             #Interpret the Move
@@ -85,11 +69,12 @@ def game(s_instructions = "", **kwargs):
                 not(b_castling):
                 kill_flag = True
 
-
-            #clear previous before the move is applied
-            board.clear_enpassant_vulnerability(_player)
-
             #Apply the Move
+
+            #turn-reset: clear previous before the move is applied
+            board.clear_enpassant_vulnerability(_player)
+            #also "previous check has been cleared (but new check may apply)"
+
             if not(the_move_code == MOVE_CODE['castling']):
                 
                 board.old_player_pos(pos0)
@@ -197,3 +182,4 @@ def test_enpassant_disallowed():
 # if __name__ == "__main__":
 #     test_enpassant_take()
 #     game()
+    # test_castling_disallowed_king()
