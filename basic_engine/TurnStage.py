@@ -100,5 +100,5 @@ def apply_move(the_move, the_move_code, board, pieces, _player):
                 
     #TODO - any promotions here    
 
-    return board, pieces, kill_flag, pos0, pos1
+    return board, pieces
 

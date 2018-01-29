@@ -4,7 +4,7 @@ class GameLog:
     def __init__(self,**kwargs):
         
         self.board_pre_turn = True
-        self.board_pre_turn_oppoenent = True
+        self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())
         
         self.moves_log = []

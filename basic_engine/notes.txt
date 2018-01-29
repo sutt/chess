@@ -116,6 +116,7 @@ board should store edge cases:
         refactor data_by_player
         add named_tuple for move
         make player 0,1 not true,False
+        make board the first argument in TurnStage functions
 
     Idea for perf analysis:
 

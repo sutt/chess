@@ -12,6 +12,7 @@ class Game():
                 ,manual_control = () 
                 ,instruction_control = (0,1) 
                 ,s_instructions = ""
+                ,b_log_show_opponent = False
                 ):
 
         self.outcome = None
@@ -22,7 +23,10 @@ class Game():
         if len(self.instructions) == 0:
             self.instruction_control = ()
         self.i_turn = 0
-        self.log = GameLog(manual_control = self.manual_control)
+        self.log = GameLog(manual_control = self.manual_control
+                          ,b_log_show_opponent = b_log_show_opponent 
+                           )
+
 
 
     def select_move(self, moves, player, board): 
@@ -53,9 +57,9 @@ class Game():
         board = Board()
         board, pieces = place_pieces(board)
         
-        player = False  #at increment_turn it will change to True
+        player = False      #at increment_turn it will change to True
 
-        self.i_turn = 0
+        self.i_turn = 0     #at increment_turn it will change to 1
         
         game_going = True
         
@@ -69,6 +73,7 @@ class Game():
             #NOTE - how to get out of check? all moves filtered by king_in_check
             #   but how to handle killing the checking piece?
 
+            #TODO - rename check_endgame()
             check_code = check_moves(moves, board, player)
             
             if check_code < 0:
@@ -79,18 +84,13 @@ class Game():
             self.log.print_turn(board, pieces, player)
 
             #TODO - the_move should be a named tuple
-            the_move, the_move_code = self.select_move(
-                                        moves
-                                        ,player
-                                        ,board
-                                        )
+            the_move, the_move_code = self.select_move(moves, player, board)
 
             #TODO - eliminate
             #self.exit_check()
             if the_move == -1: return self.i_turn
 
-            #Apply the Move
-            board, pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, player)
+            board, pieces = apply_move(the_move, the_move_code, board, pieces, player)
             #TODO - out: board, pieces, in: move, board, pieces
             
             #TODO - turn on/off game logging
@@ -107,7 +107,7 @@ class Game():
 
 
 if __name__ == "__main__":
-    game = Game(manual_control = (1,))
+    game = Game(manual_control = (1,), b_log_show_opponent = True)
     game.play()
 
 b_instruction_control = [True,True]
