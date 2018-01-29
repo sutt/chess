@@ -135,6 +135,7 @@ def game(**kwargs):
                 
             #TODO - any promotions here
 
+
             #Log / Record the Move
             log.moves_log.append(the_move)
 
@@ -152,20 +153,11 @@ def game(**kwargs):
                     game_going = False
                     return board
 
-            
-
-        if log.proc: print 'new turn...'
-
-        if i_turn == 15:
-            break
-
-        
-
-    print 'game over.'
+    log.log_game()
 
 
-# if __name__ == "__main__":
-#     game()
+if __name__ == "__main__":
+    game()
 
 b_instruction_control = [True,True]
 
@@ -204,6 +196,6 @@ def test_enpassant_disallowed():
     break_turn = game(instructions = ss)
     assert break_turn == 7
 
-if __name__ == "__main__":
-    test_enpassant_take()
-    game()
+# if __name__ == "__main__":
+#     test_enpassant_take()
+#     game()
