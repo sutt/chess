@@ -19,8 +19,12 @@ class Game():
         self.outcome = None
         self.board = None
         self.manual_control = manual_control
-        self.instruction_control = instruction_control
         self.instructions = parse_instructions(s_instructions)
+        if len(self.instructions) > 0:
+            self.instruction_control = instruction_control 
+        else:
+            self.instruction_control = ()
+        
 
 
     def select_move(self, moves, player,board, i_turn): 
@@ -64,17 +68,17 @@ class Game():
         while(game_going):
             
             #TODO this is a counter-mod, not a for-loop
-            for _player in (True,False):
+            for player in (True,False):
                 
                 i_turn += 1
                 
-                moves_player = get_available_moves(pieces,board,_player)
+                moves = get_available_moves(pieces, board, player)
 
                 #TODO - Filter moves for king in check
                 #NOTE - how to get out of check? all moves filtered by king_in_check
                 #   but how to handle killing the checking piece?
 
-                check_code = check_moves(moves_player, board, _player)
+                check_code = check_moves(moves, board, player)
                 if check_code < 0:
                     #It's a loss or a stalemate
                     game_going = False
@@ -82,8 +86,8 @@ class Game():
 
                 #TODO - this should be self.select_move
                 the_move, the_move_code = self.select_move(
-                                            moves_player
-                                            ,_player
+                                            moves
+                                            ,player
                                             ,board
                                             ,i_turn
                                             )
@@ -91,7 +95,7 @@ class Game():
                 if the_move == -1: return i_turn
 
                 #Apply the Move
-                board, pieces, dead_pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, dead_pieces, _player)
+                board, pieces, dead_pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, dead_pieces, player)
                 
                 #Log / Record the Move
                 log.moves_log.append(the_move)
@@ -105,7 +109,7 @@ class Game():
                                 )
 
                 #Exit from main for predefined instructions
-                if int(_player) in self.instruction_control:
+                if int(player) in self.instruction_control:
                     if i_turn == len(self.instructions):
                         game_going = False
                         return board
