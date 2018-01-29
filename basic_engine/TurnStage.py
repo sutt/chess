@@ -29,27 +29,12 @@ def check_moves(moves, board, player):
     else:
         pass
         #if log.num_moves: print "Player: ", str(_player), " has num moves: ", str(num_moves))
-    
+
+    #TODO this should be a function of game to use self.propA, etc.
+    #TODO this should include check and checkmate logging
+
     return 1
 
-#TODO this should be a function of game to use self.propA, etc.
-#TODO this should include check and checkmate logging
-def select_move(moves, player,board, instructions, i_turn, b_instruction_control, b_player_control ):
-
-    if b_instruction_control[1 - int(player)]:
-        #Predefined instructions
-        the_move, the_move_code = instruction_input(board, moves, instructions, i_turn)
-    elif b_player_control[1 - int(player)]:
-        #Manual
-        the_move, the_move_code = player_control_input(board, moves)
-    else:
-        #Random
-        num_moves = len(moves)
-        move_i = random.sample(range(0,num_moves),1)[0]
-        the_move = moves[move_i][0:2]
-        the_move_code = moves[move_i][2] 
-    
-    return the_move, the_move_code
 
 def apply_move(the_move, the_move_code, board, pieces, dead_pieces, _player):
     
