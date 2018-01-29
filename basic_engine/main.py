@@ -5,8 +5,6 @@ from utils import *
 from GameLog import GameLog
 from TurnStage import get_available_moves, check_moves, apply_move
 
-# b_player_control = [True,False]
-# b_instruction_control = [False,False]
 
 class Game():
     
@@ -20,21 +18,20 @@ class Game():
         self.board = None
         self.manual_control = manual_control
         self.instructions = parse_instructions(s_instructions)
-        if len(self.instructions) > 0:
-            self.instruction_control = instruction_control 
-        else:
+        self.instruction_control = instruction_control 
+        if len(self.instructions) == 0:
             self.instruction_control = ()
-        
+        self.i_turn = 0
 
 
-    def select_move(self, moves, player,board, i_turn): 
+    def select_move(self, moves, player, board): 
     
         if int(player) in self.instruction_control:
             
             the_move, the_move_code = instruction_input(board
                                                         ,moves
                                                         ,self.instructions
-                                                        ,i_turn
+                                                        ,self.i_turn
                                                         )
         elif int(player) in self.manual_control:
             
@@ -50,7 +47,7 @@ class Game():
 
 
 
-    def play(self, s_instructions = "", **kwargs):
+    def play(self, **kwargs):
 
         #INIT Board and pieces
         board = Board()
@@ -60,9 +57,9 @@ class Game():
         log = GameLog()
 
         game_going = True
-        i_turn = 0
+        self.i_turn = 0
 
-        print_board_letters(board, pieces, True)
+        print_board_letters(board, pieces, True)        #TODO - eliminate, move to manual input
 
         #Turn Loop
         while(game_going):
@@ -70,7 +67,7 @@ class Game():
             #TODO this is a counter-mod, not a for-loop
             for player in (True,False):
                 
-                i_turn += 1
+                self.i_turn += 1
                 
                 moves = get_available_moves(pieces, board, player)
 
@@ -79,23 +76,25 @@ class Game():
                 #   but how to handle killing the checking piece?
 
                 check_code = check_moves(moves, board, player)
+                
                 if check_code < 0:
-                    #It's a loss or a stalemate
+                    game.outcome = 'LOSS' # or 'STALEMATE'
                     game_going = False
                     continue
 
-                #TODO - this should be self.select_move
+                #TODO - the_move should be a named tuple
                 the_move, the_move_code = self.select_move(
                                             moves
                                             ,player
                                             ,board
-                                            ,i_turn
                                             )
 
-                if the_move == -1: return i_turn
+                #TODO - eliminate
+                if the_move == -1: return self.i_turn
 
                 #Apply the Move
                 board, pieces, dead_pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, dead_pieces, player)
+                #TODO - out: board, pieces, in: move, board, pieces
                 
                 #Log / Record the Move
                 log.moves_log.append(the_move)
@@ -108,9 +107,10 @@ class Game():
                                 ,pos1 = pos1
                                 )
 
+                #TODO - eliminate
                 #Exit from main for predefined instructions
                 if int(player) in self.instruction_control:
-                    if i_turn == len(self.instructions):
+                    if self.i_turn == len(self.instructions):
                         game_going = False
                         return board
 
@@ -118,7 +118,7 @@ class Game():
 
 
 if __name__ == "__main__":
-    game = Game(manual_control = (1,), instruction_control = ())
+    game = Game(manual_control = (1,))
     game.play()
 
 b_instruction_control = [True,True]
