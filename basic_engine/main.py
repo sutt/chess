@@ -3,7 +3,7 @@ from basic import *
 from utils import *
 from GameLog import GameLog
 
-b_player_control = [True,False]
+b_player_control = [True,True]
 b_instruction_control = [False,False]
 
 
@@ -171,7 +171,7 @@ b_instruction_control = [True,True]
 def test_castling_allowed():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
-    board = gmae(instructions = ss)
+    board = game(instructions = ss)
     assert board.data_by_player[7][5] == 1
     assert board.data_by_player[7][6] == 3
 
@@ -187,16 +187,20 @@ def test_castling_disallowed_king():
     break_turn = game(instructions = ss)
     assert break_turn == 11
 
-# def test_enpassant_take():
+def test_enpassant_take():
     
-#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-#     break_turn = main(instructions = ss)
-#     assert break_turn == 11
+    ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. d2 c3"
+    board = game(instructions = ss)
+    print 'IN TEST'
+    board.print_board(b_player_data=True)
+    assert board.data_by_player[2][2] == 1
+    assert board.data_by_player[3][2] == 0
+    
 
-# def test_enpassant_disallowed():
+def test_enpassant_disallowed():
     
-#     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-#     break_turn = main(instructions = ss)
-#     assert break_turn == 11
+    ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. g8 e8 6. b1 c1 7. d2 c3"
+    break_turn = game(instructions = ss)
+    assert break_turn == 7
 
 
