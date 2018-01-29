@@ -19,7 +19,7 @@ class Game():
         self.instructions = parse_instructions(s_instructions)
         self.instruction_control = instruction_control 
         if len(self.instructions) > 0:
-            self.instruction_control = (1,2)
+            self.instruction_control = (0,1)
         
         self.i_turn = 0
         self.b_test_exit = False
