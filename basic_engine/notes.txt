@@ -109,7 +109,11 @@ board should store edge cases:
         -check_flag = True
     -> so the real heart of the game is calc'ing is_king_in_check
 
+    modular idea: what if board.data was a numpy array? smaller mem and faster?
 
+    TODO:
+        refactor data_by_player
+        add named_tuple for move
 
     Idea for perf analysis:
 

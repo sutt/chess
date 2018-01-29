@@ -22,6 +22,7 @@ class Game():
         if len(self.instructions) == 0:
             self.instruction_control = ()
         self.i_turn = 0
+        self.log = GameLog(manual_control = self.manual_control)
 
 
     def select_move(self, moves, player, board): 
@@ -52,14 +53,11 @@ class Game():
         #INIT Board and pieces
         board = Board()
         board, pieces = place_pieces(board)
-        dead_pieces = []
-
-        log = GameLog()
 
         game_going = True
         self.i_turn = 0
 
-        print_board_letters(board, pieces, True)        #TODO - eliminate, move to manual input
+        # print_board_letters(board, pieces, True)        #TODO - eliminate, move to manual input
 
         #Turn Loop
         while(game_going):
@@ -82,6 +80,8 @@ class Game():
                     game_going = False
                     continue
 
+                self.log.print_turn(board, pieces, player)
+
                 #TODO - the_move should be a named tuple
                 the_move, the_move_code = self.select_move(
                                             moves
@@ -93,19 +93,11 @@ class Game():
                 if the_move == -1: return self.i_turn
 
                 #Apply the Move
-                board, pieces, dead_pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, dead_pieces, player)
+                board, pieces, kill_flag, pos0, pos1 = apply_move(the_move,the_move_code,board, pieces, player)
                 #TODO - out: board, pieces, in: move, board, pieces
                 
                 #Log / Record the Move
-                log.moves_log.append(the_move)
-
-                log.print_turn(  board = board
-                                ,pieces = pieces
-                                ,dead_pieces = dead_pieces
-                                ,kill_flag = kill_flag
-                                ,pos0 = pos0
-                                ,pos1 = pos1
-                                )
+                self.log.moves_log.append(the_move)
 
                 #TODO - eliminate
                 #Exit from main for predefined instructions

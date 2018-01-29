@@ -36,7 +36,7 @@ def check_moves(moves, board, player):
     return 1
 
 
-def apply_move(the_move, the_move_code, board, pieces, dead_pieces, _player):
+def apply_move(the_move, the_move_code, board, pieces, _player):
     
     b_enpassant, b_castling = False, False
     if the_move_code == MOVE_CODE['en_passant']: b_enpassant = True
@@ -93,10 +93,9 @@ def apply_move(the_move, the_move_code, board, pieces, dead_pieces, _player):
                                 ,enumerate(pieces))
         killed_piece_i = killed_piece_i[0][0]
         pieces[killed_piece_i].alive = False
-        dead_pieces.append(pieces.pop(killed_piece_i))
         board.old_player_pos(kill_pos)
                 
     #TODO - any promotions here    
 
-    return board, pieces, dead_pieces, kill_flag, pos0, pos1
+    return board, pieces, kill_flag, pos0, pos1
 
