@@ -131,6 +131,7 @@ def game(**kwargs):
                 killed_piece_i = killed_piece_i[0][0]
                 pieces[killed_piece_i].alive = False
                 dead_pieces.append(pieces.pop(killed_piece_i))
+                board.old_player_pos(kill_pos)
                 
             #TODO - any promotions here
 
@@ -163,8 +164,8 @@ def game(**kwargs):
     print 'game over.'
 
 
-if __name__ == "__main__":
-    game()
+# if __name__ == "__main__":
+#     game()
 
 b_instruction_control = [True,True]
 
@@ -203,4 +204,6 @@ def test_enpassant_disallowed():
     break_turn = game(instructions = ss)
     assert break_turn == 7
 
-
+if __name__ == "__main__":
+    test_enpassant_take()
+    game()
