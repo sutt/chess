@@ -274,15 +274,10 @@ def test_king_in_check3():
     
     moves = game.play()
     print moves
-    #assert moves == [ ( (7,0),(6,0),0) ]
-
-
-
-
-
+    assert moves == [ ( (7,0),(6,0),0) ]
 
 
 if __name__ == "__main__":
-    test_king_in_check3()
-    # game = Game(manual_control = (1,), b_log_show_opponent = True)
-    # game.play()
+    # test_king_in_check3()
+    game = Game(manual_control = (1,), b_log_show_opponent = True)
+    game.play()
