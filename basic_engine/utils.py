@@ -73,6 +73,7 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
     if raw == "hint":
         return 1, []
     try:
+        #TODO - out numeric section
         if input_type == 'numeric':
             data = raw.split('|')
             data = [x.split(',') for x in data]
@@ -96,10 +97,12 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
         print 'failure in routine to parse user input.'
     return ret, data
 
+#TODO - add return_the_move() for common return function
 
 def instruction_input(board, moves, instructions, i_turn):
     ret, the_move = parse_player_input(instructions[i_turn - 1], board)
     if ret == 0:
+        #TODO - call common return function
         for _m in moves:
             if the_move == (_m.pos0, _m.pos1):
                 return Move(_m.pos0, _m.pos1, _m.code)
@@ -115,9 +118,10 @@ def player_control_input(board, moves_player, **kwargs):
         raw = raw_input(msg)    #example: >1,1 | 2,2
         ret, the_move = parse_player_input(raw, board)
         if ret == 0:
+            #TODO - call common return function
             for _m in moves_player:
-                if the_move == _m[0:2]:
-                    return (_m[0:2], _m[2])
+                if the_move == (_m.pos0, _m.pos1):
+                    return Move(_m.pos0, _m.pos1, _m.code)
             else:
                 print 'this move is not legal according to the game engine.'
         if ret == 1: 

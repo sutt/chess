@@ -10,12 +10,13 @@ Move = moveHolder()
 
 class Game():
     
-    def __init__(self
-                ,manual_control = () 
-                ,instruction_control = () 
-                ,s_instructions = ""
-                ,b_log_show_opponent = False
-                ):
+    def __init__(
+        self
+        ,manual_control = () 
+        ,instruction_control = () 
+        ,s_instructions = ""
+        ,b_log_show_opponent = False
+        ):
 
         self.manual_control = manual_control
         self.instructions = parse_instructions(s_instructions)
@@ -39,27 +40,18 @@ class Game():
                 return True
         return False
         
+    
     def select_move(self, moves, player, board): 
     
         if int(player) in self.instruction_control:
-            
-            the_move = instruction_input(board
-                                                        ,moves
-                                                        ,self.instructions
-                                                        ,self.i_turn    #TODO - eliminate with pop
-                                                        )
-            return the_move
+            #TODO - instruction.pop(0)
+            move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
-            
-            the_move, the_move_code = player_control_input(board, moves)
-
+            move = player_control_input(board, moves)
         else:
-            
             move_i = random.sample(range(0,len(moves)),1)[0]
-            the_move = moves[move_i][0:2]
-            the_move_code = moves[move_i][2] 
-
-        return the_move, the_move_code
+            move = moves[move_i]
+        return move
 
 
 
