@@ -24,6 +24,21 @@ def get_available_moves(pieces, board, player):
     
     return moves
 
+def get_possible_check(pieces, board, player):
+    
+    moves = []
+    for p in pieces:
+        if p.white == player:
+            
+            b_check = p.get_available_moves(board
+                                            ,move_type_flag = True
+                                            ,check_flag = True)
+            
+            if b_check:
+                return True
+    
+    return False    #no checks found
+
 
 def check_moves(moves, board, player):
     
@@ -103,3 +118,23 @@ def apply_move(move, board, pieces, _player):
 
     return board, pieces
 
+
+def filter_king_check(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+        player2 = not(player)
+
+        b_check = get_possible_check(pieces2, board2, player2)
+        
+        if not(b_check):
+            out.append(_move)
+
+    return out

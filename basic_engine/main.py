@@ -5,6 +5,7 @@ from utils import *
 from datatypes import moveHolder
 from GameLog import GameLog
 from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
+from TurnStage import filter_king_check
 
 Move = moveHolder()
 
@@ -73,7 +74,7 @@ class Game():
 
             moves = get_available_moves(pieces, board, player)
 
-            #TODO - Filter moves for king in check
+            moves = filter_king_check(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
 
@@ -102,12 +103,6 @@ class Game():
 
         return self.outcome, self.log.get_moves_log()
 
-
-if __name__ == "__main__":
-    game = Game(manual_control = (1,), b_log_show_opponent = True)
-    game.play()
-
-b_instruction_control = [True,True]
 
 def test_castling_allowed():
     
@@ -150,3 +145,8 @@ def test_enpassant_disallowed():
 
 # if __name__ == "__main__":
 #     test_castling_disallowed_king()
+
+if __name__ == "__main__":
+    # test_castling_allowed()
+    game = Game(manual_control = (1,), b_log_show_opponent = True)
+    game.play()
