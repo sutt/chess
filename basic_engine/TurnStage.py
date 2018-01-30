@@ -36,19 +36,20 @@ def check_moves(moves, board, player):
 
 
 # def apply_move(the_move, the_move_code, board, pieces, _player):
-def apply_move(the_move, board, pieces, _player):
+def apply_move(move, board, pieces, _player):
     
-    the_move_code = the_move.code
-    the_move = (the_move.pos0, the_move.pos1)
+    move_code = move.code
+    move = (move.pos0, move.pos1)
     
     b_enpassant, b_castling = False, False
-    if the_move_code == MOVE_CODE['en_passant']: b_enpassant = True
-    if the_move_code == MOVE_CODE['castling']: b_castling = True
+    if move_code == MOVE_CODE['en_passant']: b_enpassant = True
+    if move_code == MOVE_CODE['castling']: b_castling = True
                 
-    pos0,pos1 = the_move[0], the_move[1]
+    pos0,pos1 = move[0], move[1]
     piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
 
     kill_flag = False   # before the move, check if opp's piece is there
+    #TODO - board.get_data(rc = pos1)
     if (board.data_by_player[pos1[0]][pos1[1]] != 0 or b_enpassant) and \
         not(b_castling):
         kill_flag = True
@@ -58,7 +59,7 @@ def apply_move(the_move, board, pieces, _player):
     board.clear_enpassant_vulnerability(_player)
     #also "previous check has been cleared (but new check may apply)"
 
-    if not(the_move_code == MOVE_CODE['castling']):
+    if not(move_code == MOVE_CODE['castling']):
         
         board.old_player_pos(pos0)
         b_two_advances = two_advances(pos0,pos1)   #if its enpassant_vulnerable

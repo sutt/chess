@@ -84,16 +84,16 @@ class Game():
                 game_going = False
                 continue
 
-            the_move = self.select_move(moves, player, board)
+            move = self.select_move(moves, player, board)
 
-            if the_move == -1:      #TODO if the_move is None:
+            if move == -1:      #TODO if the_move is None:
                 self.b_test_exit = True
                 self.test_data = self.i_turn
                 continue
 
-            board, pieces = apply_move(the_move, board, pieces, player)
+            board, pieces = apply_move(move, board, pieces, player)
                         
-            self.log.add_moves_log(the_move)
+            self.log.add_moves_log(move)
 
             if self.check_test_exit():
                 self.b_test_exit = True
