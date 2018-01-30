@@ -24,21 +24,15 @@ def get_available_moves(pieces, board, player):
     
     return moves
 
+
 def check_moves(moves, board, player):
     
-    num_moves = len(moves)
-    if  num_moves == 0:
-        game_going = False
-        print 'Player ', str(board.player_name_from_bool(player)), ' has no moves available. Game over.'
+    if  len(moves) == 0:
         #TODO - add checkmate detector
+        return -1
     else:
-        pass
-        #if log.num_moves: print "Player: ", str(_player), " has num moves: ", str(num_moves))
-
-    #TODO this should be a function of game to use self.propA, etc.
-    #TODO this should include check and checkmate logging
-
-    return 1
+        return 0
+    
 
 
 # def apply_move(the_move, the_move_code, board, pieces, _player):

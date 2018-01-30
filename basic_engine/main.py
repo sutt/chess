@@ -85,7 +85,6 @@ class Game():
                 continue
 
             the_move = self.select_move(moves, player, board)
-            # the_move, the_move_code = self.select_move(moves, player, board)
 
             if the_move == -1:      #TODO if the_move is None:
                 self.b_test_exit = True
@@ -93,9 +92,8 @@ class Game():
                 continue
 
             board, pieces = apply_move(the_move, board, pieces, player)
-            # board, pieces = apply_move(the_move, the_move_code, board, pieces, player)
                         
-            self.log.add_moves_log(the_move) #TODO - turn on/off game logging
+            self.log.add_moves_log(the_move)
 
             if self.check_test_exit():
                 self.b_test_exit = True

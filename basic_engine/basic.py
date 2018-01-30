@@ -1,9 +1,10 @@
 import sys, copy, time
 from datatypes import moveAHolder
+
 MoveA = moveAHolder()
 
 BOARD_WIDTH = 8
-KING_COL = 4        #based on index0
+KING_COL = 4        #based on index0 and a White-POV
 
 MOVE_CODE = dict()
 MOVE_CODE['regular'] = 0
