@@ -113,6 +113,8 @@ def apply_move(move, board, pieces, _player):
         killed_piece_i = killed_piece_i[0][0]
         pieces[killed_piece_i].alive = False
         board.old_player_pos(kill_pos)
+        #BUG - this erases killing_piece at killpos
+        #BUG - old piece needs to be popped
                 
     #TODO - any promotions here    
 

@@ -45,6 +45,9 @@ class Board:
         # player_in_check: ind 0=white 1=black
         # rooks_can_castle: ind-outer 0=white, ind-inner 0=left-rook, 1=right-rook
 
+    def set_data(self, data):
+        self.data_by_player = data
+
     def modify_castling_property(self, player, piece, pos0):
         if piece.__class__.__name__ != "Rook":
             return 0
@@ -57,8 +60,7 @@ class Board:
         if rook_side == -1:
             return 0
         self.rooks_can_castle[1- int(player)][rook_side] = False
-        
-        
+
     
     def get_rook_castle_move(self, player, left_side):
         row = self.width - 1 if player else 0

@@ -17,6 +17,10 @@ class Game():
         ,instruction_control = () 
         ,s_instructions = ""
         ,b_log_show_opponent = False
+        ,init_board = None
+        ,init_player = None
+        ,init_pieces = None
+        ,test_exit_moves = None
         ):
 
         self.manual_control = manual_control
@@ -26,14 +30,29 @@ class Game():
             self.instruction_control = (0,1)
         
         self.i_turn = 0
+        
         self.b_test_exit = False
         self.test_data = None
+        self.test_exit_iturn = test_exit_moves
+
         self.outcome = None
+
+        self.init_player = init_player
+        self.init_board = copy.deepcopy(init_board)
+        self.init_pieces = copy.deepcopy(init_pieces)
 
         self.log = GameLog(manual_control = self.manual_control
                           ,b_log_show_opponent = b_log_show_opponent 
                            )
+        
 
+
+    def check_test_exit_moves(self, **kwargs):
+        if self.test_exit_iturn is not None:
+            if self.i_turn == self.test_exit_iturn:
+                return True
+        return False
+            
 
     def check_test_exit(self, **kwargs):
         if len(self.instruction_control) > 0:
@@ -59,10 +78,19 @@ class Game():
     def play(self, **kwargs):
 
         board = Board()
-        board, pieces = place_pieces(board)
         
-        self.i_turn = 0     #at increment_turn it will change to 1
+        if self.init_board is not None:
+            board.set_data(self.init_board)
+            pieces = self.init_pieces
+        else:
+            board, pieces = place_pieces(board)
+        
         player = False      #at increment_turn it will change to True
+        if self.init_player is not None:
+            player = not(self.init_player)
+
+        self.i_turn = 0     #at increment_turn it will change to 1
+
         game_going = True
         
         while(game_going):
@@ -77,6 +105,11 @@ class Game():
             moves = filter_king_check(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
+
+            if self.check_test_exit_moves():
+                self.b_test_exit = True
+                self.test_data = copy.deepcopy(moves)
+                continue
 
             check_code = check_moves(moves, board, player)  #TODO - rename check_endgame()
             
@@ -143,10 +176,113 @@ def test_enpassant_disallowed():
     break_turn = game.play()
     assert break_turn == 7
 
-# if __name__ == "__main__":
-#     test_castling_disallowed_king()
+def test_king_in_check1():
+    
+    ''' Don't let white king move into check '''
+
+    test_board = Board()
+    test_pieces = []
+    
+    POS = (6,0)
+    test_pieces.append( Pawn(b_white = True, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = 1
+
+    POS = (7,0)
+    white_king = King(b_white = True, pos = POS)
+    white_king.king_can_castle = False
+    test_pieces.append(white_king )
+    test_board.data_by_player[POS[0]][POS[1]] = 3
+
+    POS = (0,1)
+    test_pieces.append( Rook(b_white = False, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = -1
+
+    game = Game(init_board = test_board.data_by_player
+                ,init_pieces = test_pieces
+                ,init_player = True
+                ,test_exit_moves = 1
+                )
+    
+    moves = game.play()
+
+    assert moves == [Move(pos0=(6, 0), pos1=(5, 0), code=0), Move(pos0=(6, 0), pos1=(4, 0), code=0)]
+    #yes, namedtuples are assert as equivalent to generic-tuples
+    assert moves == [ ( (6,0),(5,0),0), ( (6,0),(4,0),0) ]
+
+def test_king_in_check2():
+    
+    ''' White can only kill the black rook putting him in check '''
+
+    test_board = Board()
+    test_pieces = []
+    
+    POS = (6,0)
+    test_pieces.append( Pawn(b_white = True, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = 1
+
+    POS = (7,0)
+    white_king = King(b_white = True, pos = POS)
+    white_king.king_can_castle = False
+    test_pieces.append(white_king )
+    test_board.data_by_player[POS[0]][POS[1]] = 3
+
+    POS = (7,1)
+    test_pieces.append( Rook(b_white = False, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = -1
+
+    game = Game(init_board = test_board.data_by_player
+                ,init_pieces = test_pieces
+                ,init_player = True
+                ,test_exit_moves = 1
+                )
+    
+    moves = game.play()
+    print moves
+    assert moves == [ ( (7,0),(7,1),0) ]
+
+def test_king_in_check3():
+    
+    ''' White can NOT kill the black rook putting him in check;
+    only hide. '''
+
+    test_board = Board()
+    test_pieces = []
+    
+    POS = (5,0)
+    test_pieces.append( Pawn(b_white = True, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = 1
+
+    POS = (7,0)
+    white_king = King(b_white = True, pos = POS)
+    white_king.king_can_castle = False
+    test_pieces.append(white_king )
+    test_board.data_by_player[POS[0]][POS[1]] = 3
+
+    POS = (7,1)
+    test_pieces.append( Rook(b_white = False, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = -1
+
+    POS = (0,1)
+    test_pieces.append( Rook(b_white = False, pos = POS))
+    test_board.data_by_player[POS[0]][POS[1]] = -1
+
+    game = Game(init_board = test_board.data_by_player
+                ,init_pieces = test_pieces
+                ,init_player = True
+                ,test_exit_moves = 1
+                )
+    
+    moves = game.play()
+    print moves
+    #assert moves == [ ( (7,0),(6,0),0) ]
+
+
+
+
+
+
 
 if __name__ == "__main__":
-    # test_castling_allowed()
-    game = Game(manual_control = (1,), b_log_show_opponent = True)
-    game.play()
+    test_king_in_check3()
+    # game = Game(manual_control = (1,), b_log_show_opponent = True)
+    # game.play()

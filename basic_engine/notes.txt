@@ -116,9 +116,36 @@ board should store edge cases:
 
     TODO:
         refactor data_by_player
-        add named_tuple for move
+    x    add named_tuple for move
         make player 0,1 not true,False
         make board the first argument in TurnStage functions
+
+1/29
+
+    TODO:
+        add to Game() init_board, init_player 
+           to allow testing specific situations
+
+        add exit code for available moves
+        add exit code for total number of moves to allow random play
+
+        build tests for king in check in specific situations
+
+        add perf_test.py to time play()
+
+            add a bool to game to turn on/off filter_king_check()
+            check the difference in time
+
+            add perf_test_log to GameLog to collect granular timing
+               data and additional info at each step
+
+        build analyze_perf_test to analyze num_moves vs time_compute, etc.
+        
+            
+
+
+
+    
 
     Idea for perf analysis:
 
