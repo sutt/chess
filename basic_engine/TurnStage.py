@@ -2,6 +2,8 @@ import random
 
 from utils import *
 from basic import *
+from datatypes import moveHolder
+Move = moveHolder()
 
 def increment_turn(player, i_turn):
     i_turn += 1
@@ -16,9 +18,9 @@ def get_available_moves(pieces, board, player):
             moves_p = p.get_available_moves(board, move_type_flag = True)
             moves_p = filter(lambda _m: len(_m) > 0, moves_p)
             
-            d_moves_p = [(p.pos,_move[0],_move[1]) for _move in moves_p]
+            d_moves = [Move(p.pos, _m.pos1, _m.code) for _m in moves_p]
             
-            moves.extend(d_moves_p)
+            moves.extend(d_moves)
     
     return moves
 
@@ -39,7 +41,11 @@ def check_moves(moves, board, player):
     return 1
 
 
-def apply_move(the_move, the_move_code, board, pieces, _player):
+# def apply_move(the_move, the_move_code, board, pieces, _player):
+def apply_move(the_move, board, pieces, _player):
+    
+    the_move_code = the_move.code
+    the_move = (the_move.pos0, the_move.pos1)
     
     b_enpassant, b_castling = False, False
     if the_move_code == MOVE_CODE['en_passant']: b_enpassant = True

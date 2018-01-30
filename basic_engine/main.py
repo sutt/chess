@@ -2,9 +2,11 @@ import sys, random, time
 
 from basic import *
 from utils import *
+from datatypes import moveHolder
 from GameLog import GameLog
 from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
 
+Move = moveHolder()
 
 class Game():
     
@@ -41,11 +43,12 @@ class Game():
     
         if int(player) in self.instruction_control:
             
-            the_move, the_move_code = instruction_input(board
+            the_move = instruction_input(board
                                                         ,moves
                                                         ,self.instructions
                                                         ,self.i_turn    #TODO - eliminate with pop
                                                         )
+            return the_move
         elif int(player) in self.manual_control:
             
             the_move, the_move_code = player_control_input(board, moves)
@@ -89,14 +92,16 @@ class Game():
                 game_going = False
                 continue
 
-            the_move, the_move_code = self.select_move(moves, player, board)
+            the_move = self.select_move(moves, player, board)
+            # the_move, the_move_code = self.select_move(moves, player, board)
 
             if the_move == -1:      #TODO if the_move is None:
                 self.b_test_exit = True
                 self.test_data = self.i_turn
                 continue
 
-            board, pieces = apply_move(the_move, the_move_code, board, pieces, player)
+            board, pieces = apply_move(the_move, board, pieces, player)
+            # board, pieces = apply_move(the_move, the_move_code, board, pieces, player)
                         
             self.log.add_moves_log(the_move) #TODO - turn on/off game logging
 

@@ -1,4 +1,6 @@
 import sys, copy, time
+from datatypes import moveAHolder
+MoveA = moveAHolder()
 
 BOARD_WIDTH = 8
 KING_COL = 4        #based on index0
@@ -10,7 +12,7 @@ MOVE_CODE['castling'] = 2
 
 def move_tuple(b_append, move, move_type):
     move_code = MOVE_CODE[move_type]
-    out = (move,move_code) if b_append else move
+    out = MoveA(move, move_code) if b_append else move
     return out
 
 

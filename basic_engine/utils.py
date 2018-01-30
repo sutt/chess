@@ -1,5 +1,7 @@
 import sys
 from basic import *
+from datatypes import moveHolder
+Move = moveHolder()
 
 # example
 # 1. e4 d5 2. d3 e5 3. Nf3 dxe4 4. dxe4 Qxd1+ 5. Kxd1 b6 6. Nxe5 Nf6 7. Bb5+ Bd7
@@ -95,15 +97,15 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
     return ret, data
 
 
-def instruction_input(board, moves_player, instructions, i_turn):
+def instruction_input(board, moves, instructions, i_turn):
     ret, the_move = parse_player_input(instructions[i_turn - 1], board)
     if ret == 0:
-        for _m in moves_player:
-            if the_move == _m[0:2]:
-                return (_m[0:2], _m[2])
-        return -1,-1  # to demonstrate an error in instruction input
+        for _m in moves:
+            if the_move == (_m.pos0, _m.pos1):
+                return Move(_m.pos0, _m.pos1, _m.code)
+        return -1  # to demonstrate an error in instruction input
     else:
-        return -1,-1  # to demonstrate an error in instruction input
+        return -1  # to demonstrate an error in instruction input
 
 def player_control_input(board, moves_player, **kwargs):
     
