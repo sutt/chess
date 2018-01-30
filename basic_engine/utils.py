@@ -54,7 +54,7 @@ def alphanum_to_pos(inp):
     return (pos0,pos1)
 
 def alphamove_to_posmove(inp):
-    print inp
+    
     try:
         inputs = inp.split(" ")
         if len(inputs) != 2:
