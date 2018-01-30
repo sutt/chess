@@ -6,6 +6,7 @@ from datatypes import moveHolder
 from GameLog import GameLog
 from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
 from TurnStage import filter_king_check
+from TurnStage import filter_king_check_test_copy   #temp
 
 Move = moveHolder()
 
@@ -102,7 +103,11 @@ class Game():
 
             moves = get_available_moves(pieces, board, player)
 
-            moves = filter_king_check(board, pieces, moves, player)
+            if kwargs.get('king_in_check_on', True):
+                moves = filter_king_check(board, pieces, moves, player)
+
+            if kwargs.get('king_in_check_test_copy', False):
+                moves = filter_king_check_test_copy(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
 

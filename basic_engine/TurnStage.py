@@ -145,3 +145,16 @@ def filter_king_check(board, pieces, moves, player):
             out.append(_move)
 
     return out
+
+def filter_king_check_test_copy(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        out.append(_move)
+
+    return out
