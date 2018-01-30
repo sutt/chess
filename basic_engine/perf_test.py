@@ -42,9 +42,17 @@ t = float(t)/ float(n)
 print 'per game: ', str(t)[:7]
 
 ### 100x slower without filter king in check, 50x slower just with copying ###
+### so half of the slowdown is copying, the other half is computation: ###
+### if n ~ 20: O(20) * 20 = O(20^2) but this is 50x
+### Adding apply_rule is .01 per round, but no_filter is only .005, 
+### so it triples time there
 # total time:  2.502
 # per game:  0.25020
 # total time:  0.046
 # per game:  0.00469
+# without apply_rule in test_copy
 # total time:  1.657
 # per game:  0.16570
+# with apply_rule in test_copy
+# total time:  1.734
+# per game:  0.17340

@@ -140,6 +140,26 @@ board should store edge cases:
                data and additional info at each step
 
         build analyze_perf_test to analyze num_moves vs time_compute, etc.
+
+        Ahh so optimal is O(n) * c where c is in [1,4]
+
+        there are multiple optimizations:
+            
+            instead of copying the board, just set different positions,
+            and then set them back as you exit function. (or is that even needed?) 
+                (this could be wrong for en passant situations, 
+                 so dont run this optimize if this is so )
+
+            how about "piping" moves from get_available -> filter_check
+                this involves async in py3?
+
+            using numpy instead of list of list
+            using a 64char string instead of a list
+
+            using superking instead of all opponent's pieces
+
+
+            
         
             
 

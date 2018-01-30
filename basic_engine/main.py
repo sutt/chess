@@ -108,6 +108,9 @@ class Game():
 
             if kwargs.get('king_in_check_test_copy', False):
                 moves = filter_king_check_test_copy(board, pieces, moves, player)
+
+            if False:   #TODO - turn on for testing
+                filter_king_check_optimal(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
 

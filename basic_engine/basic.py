@@ -439,8 +439,6 @@ class King(Piece):
         self.diagonal = 1
 
 
-
-
 class Rook(Piece):
     
     def __init__(self,b_white,pos):
@@ -467,6 +465,15 @@ class Queen(Piece):
         Piece.__init__(self,b_white,pos)
         self.upacross = BOARD_WIDTH
         self.diagonal = BOARD_WIDTH
+
+class SuperKing(Piece):
+    
+    def __init__(self,b_white,pos):
+        Piece.__init__(self,b_white,pos)
+        self.upacross = BOARD_WIDTH
+        self.diagonal = BOARD_WIDTH
+        self.twobyone = True
+        #self.pawn_move = True
 
 
 

@@ -44,6 +44,8 @@ def check_moves(moves, board, player):
     
     if  len(moves) == 0:
         #TODO - add checkmate detector
+        #TODO - add stalemate detector
+        #TODO - add lone-king-50-move-rule detector
         return -1
     else:
         return 0
@@ -116,15 +118,51 @@ def apply_move(move, board, pieces, _player):
         pieces.pop(killed_piece_i)
         
         if (b_enpassant):
-            board.old_player_pos(kill_pos)
-
-        
-        
+            board.old_player_pos(kill_pos)    
                 
     #TODO - any promotions here    
 
     return board, pieces
 
+def movements_possessed(piece):
+    '''returns a tuple of attack movements contained by the piece 
+    (sans-enpassant as this only captures pawns and this is about the king.)'''
+    pass
+
+
+def match_func(piece_movetype):
+    #TODO - move to basic.py
+    ''' return True if any of the pieces have the movetype in the tuple'''
+    for pmt in piece_movetype:
+        if pmt.movetype in movements_possessed(ppmt.piece):
+            
+            return True
+    return False
+        
+
+
+def filter_king_check_optimal(board, pieces, moves, player):
+    
+    player_king_i = filter(lambda p: p.white == player and 
+                                    p.__class__.__name__ == "King" 
+                        ,pieces)
+    
+    player_king = pieces[player_king_i]
+    
+    player_king_pos = player_king.pos
+
+    player_king_code = 3 if player else -3
+
+    hypo_king = SuperKing(b_white = player,pos = player_king_pos )
+
+    piece_movetype = hypo_king.get_available_moves(board
+                                                  ,move_type_flag=True
+                                                  ,check_flag=False
+                                                  )
+
+    b_check = match_func(piece_movetype)
+
+    return b_check
 
 def filter_king_check(board, pieces, moves, player):
     
@@ -154,6 +192,8 @@ def filter_king_check_test_copy(board, pieces, moves, player):
 
         _board = copy.deepcopy(board)   # .copy?
         _pieces = copy.deepcopy(pieces)
+
+        #board2, pieces2 = apply_move(_move, _board, _pieces, player)    
 
         out.append(_move)
 
