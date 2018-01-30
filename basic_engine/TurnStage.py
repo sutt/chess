@@ -111,10 +111,15 @@ def apply_move(move, board, pieces, _player):
                                             not(_p[1].white == _player)
                                 ,enumerate(pieces))
         killed_piece_i = killed_piece_i[0][0]
+        
         pieces[killed_piece_i].alive = False
-        board.old_player_pos(kill_pos)
-        #BUG - this erases killing_piece at killpos
-        #BUG - old piece needs to be popped
+        pieces.pop(killed_piece_i)
+        
+        if (b_enpassant):
+            board.old_player_pos(kill_pos)
+
+        
+        
                 
     #TODO - any promotions here    
 
