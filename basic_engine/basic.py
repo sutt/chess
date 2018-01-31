@@ -295,7 +295,7 @@ class Piece:
 
         b_move_type = True if kwargs.get('move_type_flag', False) else False
         
-        check_flag = False
+        b_check = False
 
         b_king = True if self.__class__.__name__ == "King" else False
         
@@ -325,7 +325,7 @@ class Piece:
                     if there in yours:
                         valids.append(move_tuple(b_move_type, move, 'regular'))
                         if there == yours_king:
-                            check_flag = True
+                            b_check = True
                         break
                     if enpassant_there == yours_enpassant_pawn:
                         valids.append(move_tuple(b_move_type, move, 'en_passant'))
@@ -365,14 +365,14 @@ class Piece:
                 elif there in yours:
                     valids.append(move_tuple(b_move_type, move, 'regular'))
                     if there == yours_king:
-                        check_flag = True
+                        b_check = True
                     break
                 elif there == 0:
                     valids.append(move_tuple(b_move_type, move, 'regular'))
 
         
         if kwargs.get('check_flag', False):
-            return check_flag
+            return b_check
 
         return valids
 
