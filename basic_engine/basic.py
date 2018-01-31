@@ -11,6 +11,12 @@ MOVE_CODE['regular'] = 0
 MOVE_CODE['en_passant'] = 1
 MOVE_CODE['castling'] = 2
 
+MOVE_TYPE = {}
+MOVE_TYPE['upacross'] = 0
+MOVE_TYPE['diagonal'] = 1
+MOVE_TYPE['twobyone'] = 2
+
+
 def move_tuple(b_append, move, move_type):
     move_code = MOVE_CODE[move_type]
     out = MoveA(move, move_code) if b_append else move
@@ -279,7 +285,8 @@ class Piece:
         """input: moves (list of list of pos-tuples), each list-of-pos-tuples is 
                         an ordered "move-set"
                   board obj with current positions
-            returns: list of pos-tuples that are valid moves """
+            returns: list of pos-tuples that are valid moves 
+                    or, if check_flag=True that are opponent piece takes"""
 
         valids = []
         
@@ -293,9 +300,15 @@ class Piece:
         yours_king = -3 if self.white else 3
         yours_enpassant_pawn = -2 if self.white else 2
 
-        b_move_type = True if kwargs.get('move_type_flag', False) else False
+        b_move_type = kwargs.get('move_type_flag', False)
         
+        mirror_flag = kwargs.get('mirror_flag', False)
+        
+        if mirror_flag:
+            b_pawn = True
+
         b_check = False
+        mirrors = []
 
         b_king = True if self.__class__.__name__ == "King" else False
         
@@ -324,6 +337,8 @@ class Piece:
                         break
                     if there in yours:
                         valids.append(move_tuple(b_move_type, move, 'regular'))
+                        if mirror_flag: 
+                            mirrors.append(move)
                         if there == yours_king:
                             b_check = True
                         break
@@ -364,6 +379,8 @@ class Piece:
                     break
                 elif there in yours:
                     valids.append(move_tuple(b_move_type, move, 'regular'))
+                    if mirror_flag:
+                        mirrors.append(move)
                     if there == yours_king:
                         b_check = True
                     break
@@ -375,16 +392,20 @@ class Piece:
             return b_check
 
         return valids
+        
 
-
-    def get_available_moves(self,board, move_type_flag = False, check_flag = False):
+    def get_available_moves(self, board, move_type_flag = False, check_flag = False
+                            ,mirror_flag = False):
         """input: board (obj) current board
                   move_type_flag (bool) appends MOVE_CODE to pos in temp2
                   check_flag (bool) 
+                  mirror_flag (bool) 
 
            returns: [check=F; move=F] list of pos-tuples (or empty list), or 
                     [check=T]         bool for if opposing king-in-check, or
-                    [check=F, move=T] list of (pos-tuple, MOVE_CODE)      """
+                    [check=F, move=T] list of (pos-tuple, MOVE_CODE), or      
+                    [mirror=T]         bool for if own king-in-check
+                    """
         
         temp = []
         
@@ -400,7 +421,7 @@ class Piece:
             advances = 2 if home_pos == self.pos else 1
             temp.extend( board.get_upacross(self.pos, spaces = advances, i_dir = upwards[0]) )            
             temp.extend( board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1]) )
-        
+
         if self.king_can_castle and not(board.b_in_check(self.white)):
             b_castle = board.get_rooks_castle(player = self.white)
             if any(b_castle):
@@ -412,14 +433,21 @@ class Piece:
         temp2 = self.filter_by_blocking_pieces(temp, board
                                                 ,b_pawn = self.pawn_move
                                                 ,check_flag = check_flag
-                                                ,move_type_flag = move_type_flag)
+                                                ,move_type_flag = move_type_flag
+                                                ,mirror_flag = mirror_flag
+                                                )
         
+        # if mirror_flag:
+            # note: upwards works under mirror_flag too because its 
+            # direction-reciprocal for opponent-pawn and player-king
+            # return temp2    #??
+
         if check_flag:
             if isinstance(temp2, bool) and temp2: 
                 return True
             else:
                 return False
-        
+
         return temp2
 
 class Pawn(Piece):
