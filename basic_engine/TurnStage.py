@@ -124,21 +124,122 @@ def apply_move(move, board, pieces, _player):
 
     return board, pieces
 
-def movements_possessed(piece):
-    '''returns a tuple of attack movements contained by the piece 
-    (sans-enpassant as this only captures pawns and this is about the king.)'''
-    pass
+    
+class Mirror():
 
+    '''This handles the data and calculation of check from 
+    superking.available_moves. It builds an increasingly large
+    and informative tuples within a list entered. 
+    run_calc() answers the question is the piece at init_pos
+    threatened by capture of any other piece '''
 
-def match_func(piece_movetype):
-    #TODO - move to basic.py
-    ''' return True if any of the pieces have the movetype in the tuple'''
-    for pmt in piece_movetype:
-        if pmt.movetype in movements_possessed(ppmt.piece):
-            
-            return True
-    return False
+    def __init__(self):
+        self.init_pos = None
+        self.moves = None
+        self.pieces = None
+
+        self.move_types = None
+        self.piece_classes = None        
+        self.move_spaces = None
+        self.class_move_types = None
+
+        self.outcome = None
+
+    def set_init_pos(self, init_pos):
+        self.init_pos = init_pos
+
+    def set_moves(self, moves):
+        self.moves = moves
+
+    def set_pieces(self, pieces):
+        self.pieces = pieces
+        # does this create a problem with byref for pieces list?
+
+    @staticmethod
+    def get_piece_class(pieces, pos):
+        piece = filter(lambda piece: piece.pos == pos)[0]
+        return piece.__class__.__name__
+
+    @staticmethod
+    def infer_move_type(move):
         
+        row0, row1 = move.pos0[0], move.pos1[0]
+        col0, col1 = move.pos0[1], move.pos1[1]
+        
+        if (row0 == row1) or (col0 == col1):
+            return MOVE_TYPE['upacross']
+        elif abs(row0 - row1) == abs(col0 - col1):
+            return MOVE_TYPE['diagonal']
+        else:
+            return MOVE_TYPE['twobyone']
+
+    @staticmethod
+    def chess_squares(pos0, pos1):
+        return max(abs(pos0[0] - pos1[0]), abs(pos0[1] - pos1[1]))
+        # meaningless but relevant to knight downstream
+
+    @staticmethod
+    def class_movements(_class):
+        #or make this reflective?
+        #TODO - remove hard coded 8's
+        if _class == "Pawn":
+            return ((MOVE_TYPE['diagonal'], 1))
+        if _class == "King":
+            return ((MOVE_TYPE['diagonal'], 1), (MOVE_TYPE['upacross'], 1))
+        if _class == "Queen":
+            return ((MOVE_TYPE['diagonal'], 8), (MOVE_TYPE['upacross'], 8))
+        if _class == "Bishop":
+            return ((MOVE_TYPE['diagonal'], 8))
+        if _class == "Rook":
+            return ((MOVE_TYPE['upacross'], 8))
+        if _class == "Knight":
+            return ((MOVE_TYPE['twobyone'], 2)) #2 for max_spaces in match()
+
+    def calc_move_type(self):
+        self.move_types = [self.infer_move_type(x) for x in self.moves]
+
+    def calc_classes(self):
+        #using pos to find piece
+        #right now it uses pieces, later it may have to use board
+        self.piece_classes = [self.get_piece_class(self.pieces, x) for x in moves]
+
+    def calc_move_spaces(self):
+        self.move_spaces = [self.chess_squares(self.king_pos, x) for x in self.moves]
+
+    def calc_class_move_types(self):
+        self.class_move_types = [self.class_movements(x) for x in self.piece_classes]
+
+    
+    @staticmethod
+    def match(class_move_type, move_type, move_space):
+        if move_type in class_move_type:                       #slice first element
+            max_spaces = class_move_type.index(move_type)[1]   #key=0?
+            if move_space <= max_spaces:                
+                return True
+            # need this if max_spaces for knight is not hard-coded to 2
+            # if move_type == MOVE_TYPE['twobyone']:
+            #     return True
+        return False
+        
+
+    def calc_match(self):
+        self.outcome = [self.match(self.class_move_types[i]
+                                   ,self.move_types[i]
+                                   ,self.move_spaces[i]
+                                   )
+                        for i in range(len(self.moves))
+                        ]
+
+    def run_calc(self):
+
+        self.calc_move_spaces()
+        self.calc_classes()
+        self.calc_class_move_types()
+
+        self.calc_match()
+
+        return any(self.outcome)
+
 
 
 def filter_king_check_optimal(board, pieces, moves, player):
@@ -149,18 +250,37 @@ def filter_king_check_optimal(board, pieces, moves, player):
     
     player_king = pieces[player_king_i]
     
-    player_king_pos = player_king.pos
+    player_king_pos = player_king.pos 
+    
+    #maybe cancel this if castling?
+
+    if player_king_pos == move.pos0:
+        player_king_pos == move.pos1
 
     player_king_code = 3 if player else -3
 
     hypo_king = SuperKing(b_white = player,pos = player_king_pos )
 
-    piece_movetype = hypo_king.get_available_moves(board
+    opp_kill_moves = hypo_king.get_available_moves(board
                                                   ,move_type_flag=True
                                                   ,check_flag=False
                                                   )
 
-    b_check = match_func(piece_movetype)
+
+    mirror = Mirror()
+    mirror.set_king_pos(player_king_pos)
+    mirror.set_moves(opp_kill_moves)
+    mirror.set_all_moves()
+    mirror.set_pieces(pieces)
+    b_check = mirror.run_calc()
+    
+    # full_moves = kill_moves
+    # piece_move = [get_piece_class_from_pos(m) for m full_move]
+    # piece_move_type = get_piece_move(piece_move)
+    # #Piece-Class, Num_spaces [quasi-cartesian distance], MOVE_TYPE
+    # # max(abs(row- row2) + abs(col-col2))
+    # piece_space_type = [PST(m[0],calc_space(player_king_pos,m), m[1])]
+    # b_check = match_func(piece_space_type)
 
     return b_check
 
