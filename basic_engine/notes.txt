@@ -141,27 +141,88 @@ board should store edge cases:
 
         build analyze_perf_test to analyze num_moves vs time_compute, etc.
 
-        Ahh so optimal is O(n) * c where c is in [1,4]
+    Ahh so optimal is O(n) * c where c is in [1,4]
 
-        there are multiple optimizations:
-            
-            instead of copying the board, just set different positions,
-            and then set them back as you exit function. (or is that even needed?) 
-                (this could be wrong for en passant situations, 
-                 so dont run this optimize if this is so )
-
-            how about "piping" moves from get_available -> filter_check
-                this involves async in py3?
-
-            using numpy instead of list of list
-            using a 64char string instead of a list
-
-            using superking instead of all opponent's pieces
-
-
-            
+    there are multiple optimizations:
         
-            
+        instead of copying the board, just set different positions,
+        and then set them back as you exit function. (or is that even needed?) 
+            (this could be wrong for en passant situations, 
+                so dont run this optimize if this is so )
+
+        how about "piping" moves from get_available -> filter_check
+            this involves async in py3?
+
+        using numpy instead of list of list
+        using a 64char string instead of a list
+
+        using superking instead of all opponent's pieces
+
+        pre-computation+lookup for piece.get_moves() instead of on-the-spot calc
+
+    so the initial abstraction of piece kills opponents piece regardless of rank
+    breaks down here, as the king is special. we already knew that with check_flag 
+    but that is poor because a. it's arduous to compute move_yourself_into_check 
+    in O(n^2) and b. it doesnt capture the idea of moving so as to place opponent 
+    in check.
+
+    Ah, but none of the atomic-moves overlap thus the move_type and move can be parsed
+    after exiting blocking_piece() at the bottom of get_available()
+
+    Playful aside: like in poker with 'Hand' as a concept, 'check' is an ambiguous
+    and overused concept in chess.
+
+    TODO
+
+        add board.get_pos_value(pos) and refactor
+        add put_in_check also using mirror
+        write non encapsulated
+        apply yield in select spots
+        create a modularized perf_test
+        add more insturctions to see larger n
+        build a n_available_moves log into GameLog and record during perf_test
+        how to do reflective class.getattr()
+            -> if so get to class_move_types in one calc?
+            should be named piece_movetypes_spaces
+        
+
+    a better name for super-king is mirror-piece: "if it can kill you, you can kill it"
+    or an anti-king: "can attack only when in check"
+        this is like a queen plus a horse but can't kill pawns head-on
+        and cant kill king except directly adjacent
+        but it doesn't neccesarily move unless attacking.
+
+
+        
+    Takeaway 1/30
+
+        check out Mirror class for a pattern for building up a list of 
+        increasingly large and informative tuples. But could this be accomplished
+        in the other direction for each move, go through all the steps...?
+
+        can't you just build list<-map() for each step      
+
+        overall, a pretty good way to build 'a mirror image piece in OO chess engine'
+        but YMMV. why:
+
+            - encapsulation of functions, even staticmoves dont crowd into other modules
+
+            - it represents one esoteric, isolated, confusing concept - that these 
+            three pieces of information - move_type, move_paces, piece_class - can
+            allow you to deduce if king is in check (or any piece in general is threatend)
+            and this doesnt get applied or depended on anywhere else.            
+
+            - it allows you to build up a naming motif in a completely enclosed scope
+
+            - it allows you to build up a processing motif e.g 
+              self.var2 = [func(x) for x in self.var]
+
+            - shows you clearly what are inputs and outputs to this processing, and if
+              any special order is needed
+
+            - modularizes comments to its atomic concern: you can't about Hypothetical
+              code changes that might affect this instruction while proc procedurally
+
 
 
 
