@@ -5,6 +5,7 @@ from main import Game
 #TODO's here:
 #add in sqlite3 for logging
 #add in git hashes, etc
+#add in a plot to compare N to King_in_Check(N)
 
 ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
 

@@ -150,6 +150,7 @@ class Mirror():
 
     def set_moves(self, moves):
         self.moves = moves
+        # move_code enpassant and castling not applicable here, only regular captures
 
     def set_pieces(self, pieces):
         self.pieces = pieces
@@ -193,7 +194,7 @@ class Mirror():
         if _class == "Rook":
             return ((MOVE_TYPE['upacross'], 8))
         if _class == "Knight":
-            return ((MOVE_TYPE['twobyone'], 2)) #2 for max_spaces in match()
+            return ((MOVE_TYPE['twobyone'], 2)) #2 needed to satisfy max_spaces in match()
 
     def calc_move_type(self):
         self.move_types = [self.infer_move_type(x) for x in self.moves]
@@ -212,11 +213,12 @@ class Mirror():
     
     @staticmethod
     def match(class_move_type, move_type, move_space):
+        
         if move_type in class_move_type:                       #slice first element
             max_spaces = class_move_type.index(move_type)[1]   #key=0?
             if move_space <= max_spaces:                
                 return True
-            # need this if max_spaces for knight is not hard-coded to 2
+            # need this below if max_spaces for knight is not hard-coded to 2
             # if move_type == MOVE_TYPE['twobyone']:
             #     return True
         return False
@@ -267,11 +269,12 @@ def filter_king_check_optimal(board, pieces, moves, player):
                                                   )
 
 
-    mirror = Mirror()
+    mirror = Mirror()   #or instatiate outside and reuse each time?
+    
     mirror.set_king_pos(player_king_pos)
     mirror.set_moves(opp_kill_moves)
-    mirror.set_all_moves()
     mirror.set_pieces(pieces)
+    
     b_check = mirror.run_calc()
     
     # full_moves = kill_moves

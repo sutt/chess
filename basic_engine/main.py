@@ -22,6 +22,8 @@ class Game():
         ,init_player = None
         ,init_pieces = None
         ,test_exit_moves = None
+        ,b_log_indv_times = False
+        ,b_log_ = False
         ):
 
         self.manual_control = manual_control
@@ -46,6 +48,8 @@ class Game():
                           ,b_log_show_opponent = b_log_show_opponent 
                            )
         
+    def get_gamelog(self):
+        return self.log
 
 
     def check_test_exit_moves(self, **kwargs):
@@ -106,6 +110,7 @@ class Game():
             if kwargs.get('king_in_check_on', True):
                 moves = filter_king_check(board, pieces, moves, player)
 
+
             if kwargs.get('king_in_check_test_copy', False):
                 moves = filter_king_check_test_copy(board, pieces, moves, player)
 
@@ -135,7 +140,7 @@ class Game():
 
             board, pieces = apply_move(move, board, pieces, player)
                         
-            self.log.add_moves_log(move)
+            self.log.add_moves_log(move, len(moves))
 
             if self.check_test_exit():
                 self.b_test_exit = True

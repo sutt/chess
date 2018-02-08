@@ -184,6 +184,10 @@ board should store edge cases:
         how to do reflective class.getattr()
             -> if so get to class_move_types in one calc?
             should be named piece_movetypes_spaces
+
+    1/31
+
+        investigate pieces.pop() issue?
         
 
     a better name for super-king is mirror-piece: "if it can kill you, you can kill it"
@@ -191,6 +195,10 @@ board should store edge cases:
         this is like a queen plus a horse but can't kill pawns head-on
         and cant kill king except directly adjacent
         but it doesn't neccesarily move unless attacking.
+        ahh but what if oppoent piece cant kill it because doing so would put 
+        himself in check? can the mirror-piece still attack opponent, except with king
+        where he cant kill it because that would put him in check
+        
 
 
         
