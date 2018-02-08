@@ -27,9 +27,22 @@ def select_function(s_function):
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_test_copy=True)
 
+    if s_function == "test_copy_apply":
+        
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_test_copy_apply=True)
+
     if s_function == "example_return":
         
         game = Game(s_instructions = ss, b_log_turn_time = True )  
+        game.play()
+
+        return game.get_gamelog()
+
+    if s_function == "example_return_2":
+        
+        game = Game(s_instructions = ss, b_log_turn_time = True
+                        , b_log_num_available = True )  
         game.play()
 
         return game.get_gamelog()
@@ -216,33 +229,52 @@ s_tests = [
     "baseline"
     ,"naive_check"
     ,"test_copy"
+    ,"test_copy_apply"
     ]
+
+results = perf_test(s_tests,n=10)
+print_test_results(results)
 
 #TEMP - For building new features
 s_tests = [
-    "example_return"
+    "example_return_2"
     ]
 
 #TEMP - For building new features
 #results = perf_test(s_tests,n=10)
 #print_test_results(results)
-results = perf_test(s_tests,n=2, b_turn_time=True)
-my_test = results["example_return"]
+results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
+my_test = results["example_return_2"]
 print my_test
 my_metric = my_test["turn_time"]
 print "\n".join([str(x)[:4] for x in my_metric[0]])
 print '---------'
 print "\n".join([str(x)[:4] for x in my_metric[1]])
+my_metirc2 = my_test["num_available"]
+print my_metirc2
 
 
 # print "".join([ k +":\n" for k in results.keys()]
 
 #2/8
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00469                      n/a        10               0.046
+#     naive_check             0.25490                     54.2        10               2.549
+#       test_copy             0.16560                     35.2        10               1.656
+# test_copy_apply             0.18129                     38.5        10               1.812
+
+#NOTE: test_copy_apply also factors in apply_move(), thus the rest 54.2 - 38.5 is
+#       time eaten up by get_possible_check() calls, which is where 
+#       get_possible_check_optimal() can improve perf right now
+
 #NOTE: "Avg Time:" is simply TotalTime/N and means avg time to run a full game, not do a move
 #     test["turn_time"] and test["num_available"] are list of lists
 #        outer index is trial_i
 #        inner index is turn_j
 #     Thus, we sum each j_th inner list element together, for all i in trials
+
+
 
 
 

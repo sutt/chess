@@ -244,7 +244,8 @@ class Mirror():
 
 
 
-def filter_king_check_optimal(board, pieces, moves, player):
+
+def get_possible_check_optimal(board, pieces, move, player):
     
     player_king_i = filter(lambda p: p.white == player and 
                                     p.__class__.__name__ == "King" 
@@ -271,7 +272,7 @@ def filter_king_check_optimal(board, pieces, moves, player):
 
     mirror = Mirror()   #or instatiate outside and reuse each time?
     
-    mirror.set_king_pos(player_king_pos)
+    mirror.set_init_pos(player_king_pos)
     mirror.set_moves(opp_kill_moves)
     mirror.set_pieces(pieces)
     
@@ -286,6 +287,27 @@ def filter_king_check_optimal(board, pieces, moves, player):
     # b_check = match_func(piece_space_type)
 
     return b_check
+
+
+def filter_king_check_optimal(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+        player2 = not(player)
+
+        b_check = get_possible_check_optimal(pieces2, board2, _move, player)
+        
+        if not(b_check):
+            out.append(_move)
+
+    return out
 
 def filter_king_check(board, pieces, moves, player):
     
@@ -317,6 +339,21 @@ def filter_king_check_test_copy(board, pieces, moves, player):
         _pieces = copy.deepcopy(pieces)
 
         #board2, pieces2 = apply_move(_move, _board, _pieces, player)    
+
+        out.append(_move)
+
+    return out
+
+def filter_king_check_test_copy_apply(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)    
 
         out.append(_move)
 

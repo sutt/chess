@@ -7,6 +7,8 @@ from GameLog import GameLog
 from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
 from TurnStage import filter_king_check
 from TurnStage import filter_king_check_test_copy   #temp
+from TurnStage import filter_king_check_test_copy_apply   #temp
+from TurnStage import filter_king_check_optimal   #temp
 
 Move = moveHolder()
 
@@ -111,13 +113,12 @@ class Game():
 
             if kwargs.get('king_in_check_on', True):
                 moves = filter_king_check(board, pieces, moves, player)
-
-
             if kwargs.get('king_in_check_test_copy', False):
                 moves = filter_king_check_test_copy(board, pieces, moves, player)
-
+            if kwargs.get('king_in_check_test_copy_apply', False):
+                moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
             if False:   #TODO - turn on for testing
-                filter_king_check_optimal(board, pieces, moves, player)
+                moves = filter_king_check_optimal(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
 
