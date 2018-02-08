@@ -29,7 +29,7 @@ def select_function(s_function):
 
     if s_function == "example_return":
         
-        game = Game(s_instructions = ss)  #, log_num_moves
+        game = Game(s_instructions = ss, b_log_turn_time = True )  
         game.play()
 
         return game.get_gamelog()
@@ -168,6 +168,7 @@ def perf_test(s_tests
     for i_test, s_test in enumerate(s_tests):
     
         trial_time = []
+        trial_turn_time = []
         trial_num_available = []
 
         t0 = time.time()
@@ -175,18 +176,18 @@ def perf_test(s_tests
         for trial_i in range(n):
             
             t0_trial = time.time()
-            opt_game_log = select_function(s_test)
+            opt_game_log = select_function(s_test)  #call main
             t1_trial = time.time()
 
             #any data from each run of .play()
             if b_by_trial:    
                 trial_time.append(t1_trial - t0_trial)
                     
-            if b_num_available:
-                trial_num_available = opt_game_log.get_log_num_available()
-
             if b_turn_time:
-                pass
+                trial_turn_time.append( opt_game_log.get_log_turn_time() )
+            
+            if b_num_available:
+                trial_num_available.append( opt_game_log.get_log_num_available() )
                     
         t1 = time.time() 
 
@@ -198,16 +199,12 @@ def perf_test(s_tests
         test['n'] = n
         test['total_time'] = t1 - t0
         
-        b_indv_time = False
-        b_each_turn = False
-        b_num_available = False
-        
-        if b_indv_time:
-            test['indv_time'] = log_trial_time
+        if b_turn_time:
+            test['turn_time'] = trial_turn_time
         if b_num_available:
-            trial['num_available'] = log_num_available
-        if b_each_turn:
-            pass
+            test['num_available'] = trial_num_available
+        # if b_each_turn:
+        #     pass
 
         result[s_test] = test
 
@@ -221,12 +218,32 @@ s_tests = [
     ,"test_copy"
     ]
 
-results = perf_test(s_tests,n=10)
+#TEMP - For building new features
+s_tests = [
+    "example_return"
+    ]
 
-print_test_results(results)
+#TEMP - For building new features
+#results = perf_test(s_tests,n=10)
+#print_test_results(results)
+results = perf_test(s_tests,n=2, b_turn_time=True)
+my_test = results["example_return"]
+print my_test
+my_metric = my_test["turn_time"]
+print "\n".join([str(x)[:4] for x in my_metric[0]])
+print '---------'
+print "\n".join([str(x)[:4] for x in my_metric[1]])
 
 
 # print "".join([ k +":\n" for k in results.keys()]
+
+#2/8
+#NOTE: "Avg Time:" is simply TotalTime/N and means avg time to run a full game, not do a move
+#     test["turn_time"] and test["num_available"] are list of lists
+#        outer index is trial_i
+#        inner index is turn_j
+#     Thus, we sum each j_th inner list element together, for all i in trials
+
 
 
 #2/1

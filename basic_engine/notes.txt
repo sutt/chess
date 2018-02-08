@@ -200,6 +200,12 @@ board should store edge cases:
         where he cant kill it because that would put him in check
         
 
+    2/8
+
+    TODO
+
+        PoC with turn_times in perf_test
+
 
         
     Takeaway 1/30

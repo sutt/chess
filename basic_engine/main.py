@@ -22,8 +22,8 @@ class Game():
         ,init_player = None
         ,init_pieces = None
         ,test_exit_moves = None
-        ,b_log_indv_times = False
-        ,b_log_ = False
+        ,b_log_turn_time = False
+        ,b_log_num_available = False
         ):
 
         self.manual_control = manual_control
@@ -46,6 +46,8 @@ class Game():
 
         self.log = GameLog(manual_control = self.manual_control
                           ,b_log_show_opponent = b_log_show_opponent 
+                          ,b_turn_time = b_log_turn_time
+                          ,b_num_available = b_log_num_available
                            )
         
     def get_gamelog(self):

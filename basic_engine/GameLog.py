@@ -1,4 +1,4 @@
-import time
+import time, copy
 
 from utils import print_board_letters
 
@@ -16,8 +16,8 @@ class GameLog:
         self.log_num_available = []
         
         self.b_turn_time = kwargs.get('b_turn_time',False)
-        self.t0 = time.time()
         self.log_turn_time = []
+        self.t0 = time.time()
         
 
     def add_moves_log(self
@@ -44,7 +44,7 @@ class GameLog:
         return copy.copy(self.log_num_available)
 
     def get_log_turn_time(self):
-        return copy.copy(self.log_num_available)
+        return copy.copy(self.log_turn_time)
 
     
     def print_turn(self, board, pieces, player, **kwargs):
