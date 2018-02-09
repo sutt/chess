@@ -158,14 +158,17 @@ class Mirror():
 
     @staticmethod
     def get_piece_class(pieces, pos):
-        piece = filter(lambda piece: piece.pos == pos)[0]
+        piece = filter(lambda piece: piece.pos == pos, pieces)[0]
         return piece.__class__.__name__
 
-    @staticmethod
-    def infer_move_type(move):
+    # not a static method
+    def infer_move_type(self, move):
         
-        row0, row1 = move.pos0[0], move.pos1[0]
-        col0, col1 = move.pos0[1], move.pos1[1]
+        pos0 = self.init_pos
+        pos1 = move
+        
+        row0, row1 = pos0[0], pos1[0]
+        col0, col1 = pos0[1], pos1[1]
         
         if (row0 == row1) or (col0 == col1):
             return MOVE_TYPE['upacross']
@@ -202,10 +205,10 @@ class Mirror():
     def calc_classes(self):
         #using pos to find piece
         #right now it uses pieces, later it may have to use board
-        self.piece_classes = [self.get_piece_class(self.pieces, x) for x in moves]
+        self.piece_classes = [self.get_piece_class(self.pieces, x) for x in self.moves]
 
     def calc_move_spaces(self):
-        self.move_spaces = [self.chess_squares(self.king_pos, x) for x in self.moves]
+        self.move_spaces = [self.chess_squares(self.init_pos, x) for x in self.moves]
 
     def calc_class_move_types(self):
         self.class_move_types = [self.class_movements(x) for x in self.piece_classes]
@@ -214,6 +217,8 @@ class Mirror():
     @staticmethod
     def match(class_move_type, move_type, move_space):
         
+        #TMP!
+        return False
         if move_type in class_move_type:                       #slice first element
             max_spaces = class_move_type.index(move_type)[1]   #key=0?
             if move_space <= max_spaces:                
@@ -237,6 +242,7 @@ class Mirror():
         self.calc_move_spaces()
         self.calc_classes()
         self.calc_class_move_types()
+        self.calc_move_type()       #added
 
         self.calc_match()
 
@@ -245,15 +251,18 @@ class Mirror():
 
 
 
-def get_possible_check_optimal(board, pieces, move, player):
+def get_possible_check_optimal(pieces, board, move, player):
     
-    player_king_i = filter(lambda p: p.white == player and 
-                                    p.__class__.__name__ == "King" 
-                        ,pieces)
+    # player_king_i = filter(lambda p: p.white == player and 
+    #                                 p.__class__.__name__ == "King" 
+    #                     ,pieces)
     
-    player_king = pieces[player_king_i]
+    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+
+    # player_king = pieces[player_king_i[0]]
     
-    player_king_pos = player_king.pos 
+    player_king_pos = player_king[0].pos 
     
     #maybe cancel this if castling?
 
@@ -267,9 +276,13 @@ def get_possible_check_optimal(board, pieces, move, player):
     opp_kill_moves = hypo_king.get_available_moves(board
                                                   ,move_type_flag=True
                                                   ,check_flag=False
+                                                  ,mirror_flag=True
                                                   )
-
-
+                                                  
+    if len(opp_kill_moves) > 0:
+        pass
+    #can exit here if len(opp_kill_moves) == 0
+    #also can go back to naive_check with only opp_kill_moves opponent pieces
     mirror = Mirror()   #or instatiate outside and reuse each time?
     
     mirror.set_init_pos(player_king_pos)
@@ -295,12 +308,12 @@ def filter_king_check_optimal(board, pieces, moves, player):
     
     for _move in moves:
 
-        _board = copy.deepcopy(board)   # .copy?
+        #cant these just move outside the loop?
+        #The problem is apply_move mutates state piece, right?
+        _board = copy.deepcopy(board)   
         _pieces = copy.deepcopy(pieces)
 
         board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-        player2 = not(player)
 
         b_check = get_possible_check_optimal(pieces2, board2, _move, player)
         

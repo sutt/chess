@@ -47,8 +47,10 @@ def select_function(s_function):
 
         return game.get_gamelog()
 
-    if s_function == "another_one":
-        pass
+    if s_function == "check_optimal":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_optimal=True)
 
     return None     #to show that the function is no returning a test exit data
 
@@ -208,7 +210,7 @@ def perf_test(s_tests
         test = {}
         
         test['test_name'] = s_test
-        test['order'] = i_test
+        test['order'] = i_test      #to print out results in correct order
         test['n'] = n
         test['total_time'] = t1 - t0
         
@@ -230,6 +232,7 @@ s_tests = [
     ,"naive_check"
     ,"test_copy"
     ,"test_copy_apply"
+    ,"check_optimal"
     ]
 
 results = perf_test(s_tests,n=10)
@@ -257,6 +260,15 @@ print my_metirc2
 # print "".join([ k +":\n" for k in results.keys()]
 
 #2/8
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00469                      n/a        10               0.046
+#     naive_check             0.25160                     53.5        10               2.516
+#       test_copy             0.16719                     35.5        10               1.671
+# test_copy_apply               0.175                     37.2        10                1.75
+#   check_optimal             0.18910                     40.2        10               1.891
+
+#NOTE: check_optimal is using a dummy version, but it looks helpful so far
 
 #      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
 #        baseline             0.00469                      n/a        10               0.046

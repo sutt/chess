@@ -305,7 +305,7 @@ class Piece:
         mirror_flag = kwargs.get('mirror_flag', False)
         
         if mirror_flag:
-            b_pawn = True
+            b_pawn = False  #for now
 
         b_check = False
         mirrors = []
@@ -390,6 +390,9 @@ class Piece:
         
         if kwargs.get('check_flag', False):
             return b_check
+
+        if kwargs.get('mirror_flag', False):
+            return mirrors
 
         return valids
         

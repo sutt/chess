@@ -204,8 +204,24 @@ board should store edge cases:
 
     TODO
 
-        PoC with turn_times in perf_test
+        x PoC with turn_times in perf_test
+        basic check_optimal implementation
+        perf_test of using bypass mirror calc in possible_check_optimal() 
+        tests to figure out if optimal works for all cases naive does
+        does check_optimal work with pawns? prolly not right now
 
+        think about how to mutate board instead of apply_rule
+            do you need pos0? or pos1?
+            do you need to account for kill_piece popping? - (yes)
+            and how does this change in check_opponent vs 
+                dont_move_self_into_check
+
+            so i think you need pos0 only on dont_move_self_into_check,
+                (for everything execpt castling, and king moves)
+                but you need pos1 only on opponent_check. True?
+
+            so essentially if MOVE_CODE == 'regular' then do mirror, 
+            otherwise do naive could work
 
         
     Takeaway 1/30
