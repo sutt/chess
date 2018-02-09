@@ -187,17 +187,17 @@ class Mirror():
         #or make this reflective?
         #TODO - remove hard coded 8's
         if _class == "Pawn":
-            return ((MOVE_TYPE['diagonal'], 1))
+            return [(MOVE_TYPE['diagonal'], 1)]
         if _class == "King":
-            return ((MOVE_TYPE['diagonal'], 1), (MOVE_TYPE['upacross'], 1))
+            return [(MOVE_TYPE['diagonal'], 1), (MOVE_TYPE['upacross'], 1)]
         if _class == "Queen":
-            return ((MOVE_TYPE['diagonal'], 8), (MOVE_TYPE['upacross'], 8))
+            return [(MOVE_TYPE['diagonal'], 8), (MOVE_TYPE['upacross'], 8)]
         if _class == "Bishop":
-            return ((MOVE_TYPE['diagonal'], 8))
+            return [(MOVE_TYPE['diagonal'], 8)]
         if _class == "Rook":
-            return ((MOVE_TYPE['upacross'], 8))
+            return [(MOVE_TYPE['upacross'], 8)]
         if _class == "Knight":
-            return ((MOVE_TYPE['twobyone'], 2)) #2 needed to satisfy max_spaces in match()
+            return [(MOVE_TYPE['twobyone'], 2)] #2 needed to satisfy max_spaces in match()
 
     def calc_move_type(self):
         self.move_types = [self.infer_move_type(x) for x in self.moves]
@@ -217,10 +217,10 @@ class Mirror():
     @staticmethod
     def match(class_move_type, move_type, move_space):
         
-        #TMP!
-        return False
-        if move_type in class_move_type:                       #slice first element
-            max_spaces = class_move_type.index(move_type)[1]   #key=0?
+        temp_class_move_type = map(lambda x: x[0], class_move_type)
+        if move_type in temp_class_move_type:  
+            max_spaces_ind = temp_class_move_type.index(move_type)
+            max_spaces = class_move_type[max_spaces_ind][1]
             if move_space <= max_spaces:                
                 return True
             # need this below if max_spaces for knight is not hard-coded to 2
@@ -244,9 +244,12 @@ class Mirror():
         self.calc_class_move_types()
         self.calc_move_type()       #added
 
-        self.calc_match()
+        if len(self.moves) > 0:
+            self.calc_match()
 
-        return any(self.outcome)
+            return any(self.outcome)
+        else:
+            return False
 
 
 
