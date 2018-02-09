@@ -156,10 +156,10 @@ class Game():
                 self.test_data = copy.deepcopy(board)
                 continue
 
-        return self.outcome, self.log.get_moves_log()
+        return self.outcome, self.log.get_log_move()
 
 
-def test_castling_allowed():
+def test_castling_allowed_misc():
     
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
     game = Game(s_instructions = ss)

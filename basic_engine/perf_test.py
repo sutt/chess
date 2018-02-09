@@ -52,6 +52,24 @@ def select_function(s_function):
         game.play()
 
         return game.get_gamelog()
+    
+    if s_function == "baseline_tt":
+        
+        game = Game(s_instructions = ss
+                    ,b_log_turn_time = True
+                    ,b_log_num_available = True 
+                    )  
+        game.play(king_in_check_on=False)    
+        return game.get_gamelog()
+    
+    if s_function == "naive_check_tt":
+
+        game = Game(s_instructions = ss
+            ,b_log_turn_time = True
+            ,b_log_num_available = True 
+            )  
+        game.play(king_in_check_on=True)    
+        return game.get_gamelog()
 
     if s_function == "check_optimal":
             
@@ -179,6 +197,60 @@ def interpret_variation_data(results):
         temp[order_test] = test_info
     return temp
 
+def interpret_turn_time_data(results):
+
+    turn_time_data = [ [], [] ]
+
+    for k in results.keys():
+        
+        data_test = results[k]
+
+        test_name = str(k)
+
+        n_test = data_test['n']
+
+        order_test = data_test['order']
+        if order_test == 0:
+            print 'Test A: ', test_name
+        else:
+            print 'Test B: ', test_name
+            print 'N tests: ', str(n_test), '\n'
+
+        list_trial_times = data_test['turn_time']
+        list_num_moves = data_test['num_available']
+        
+        #Sum each jth element
+        n_j = len(list_trial_times[0])
+        turn_times = []
+        for j in range(n_j):
+            _tmp = 0
+            for _trial_time in list_trial_times:
+                _tmp += _trial_time[j]
+            turn_times.append(_tmp)
+
+        n_test = data_test['n']
+
+        turn_times_avg = [float(x) / float(n_test) for x in turn_times]
+        turn_times_avg_ms = [x * float(1000) for x in turn_times_avg]
+
+        turn_time_data[order_test].extend(turn_times_avg_ms)
+
+        num_moves = list_num_moves[0]   #same for each trial
+
+        turn_num = [i + 1 for i in range(len(num_moves))]
+
+    temp = [
+              [
+                turn_num[i]
+                ,num_moves[i]
+                ,turn_time_data[0][i]    
+                ,turn_time_data[1][i]    
+              ]
+                for i in range(len(num_moves))
+            ]
+
+    return temp
+
 
 # Output Styles -----------------------------------------------------------
 
@@ -200,7 +272,7 @@ def print_results(results, **kwargs):
             ,('n:', 5, 5, 4)
             ,('Total Time:', 15, 5, 5)
             ]
-
+        
         print_formatted_results(dims_out, data)
 
     if kwargs.get('b_basic_variation', False):
@@ -215,6 +287,21 @@ def print_results(results, **kwargs):
             ]
 
         print_formatted_results(dims_out, data)
+
+    if kwargs.get('b_turn_time', False):
+
+        data = interpret_turn_time_data(results)
+
+        dims_out = [
+            ('Turn Num:', 10, 5, 10)
+            ,('Num Moves:', 10, 5, 10)
+            ,('Test A (ms):', 12, 5, 5)
+            ,('Test B (ms):', 12, 5, 5)
+            ]
+        
+        print_formatted_results(dims_out, data)
+
+
 
 
 
@@ -235,9 +322,10 @@ def perf_test(s_tests
     '''
 
     result = {}
+    xx = 0
 
     for i_test, s_test in enumerate(s_tests):
-    
+        xx += 1
         trial_time = []
         trial_turn_time = []
         trial_num_available = []
@@ -292,31 +380,41 @@ s_tests = [
     ,"check_optimal_3"
     ]
 
-
 results = perf_test(s_tests, n=10, b_trial_time=True)
 
+print('')
 print_results(results, b_basic=True)
-print('---')
+print('')
 print_results(results, b_basic_variation=True)
+print('')
 
-#TEMP - For building new features
-# s_tests = [
-#     "example_return_2"
-#     ]
-# results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
-# my_test = results["example_return_2"]
-# print my_test
-# my_metric = my_test["turn_time"]
-# print "\n".join([str(x)[:4] for x in my_metric[0]])
-# print '---------'
-# print "\n".join([str(x)[:4] for x in my_metric[1]])
-# my_metirc2 = my_test["num_available"]
-# print my_metirc2
+s_tests = [
+    "baseline_tt"
+    ,"naive_check_tt"
+    ]
+results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
 
+print_results(results, b_turn_time=True)
 
-# print "".join([ k +":\n" for k in results.keys()]
 
 #2/9
+
+# Test A:  baseline_tt
+# Test B:  naive_check_tt
+# N tests:  30
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            1.200            21.30
+#          2             20            0.399            20.80
+#          3             20            0.399            22.36
+#          4             19            0.666            20.66
+#          5             29            0.666            30.70
+#          6             19            0.533            21.36
+#          7             30            0.400            31.73
+#          8             18            0.266            18.43
+#          9             29            0.533            31.03
+#         10             25            0.533            28.16
+
 
 #      Test Name:           Avg Time:     Min Trial Time:     Max Trial Time:
 #        baseline             0.00700             0.00399             0.01399

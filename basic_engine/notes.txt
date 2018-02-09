@@ -229,6 +229,14 @@ board should store edge cases:
         Try @classmethod
         https://julien.danjou.info/blog/2013/guide-python-static-class-abstract-methods
 
+    2/9
+
+        Print out turn_time
+        try to remove copy(board) from inner loop
+        do a plt
+        do a regression
+        first we need more game-data, need a save function from manual mode
+
         
     Takeaway 1/30
 
