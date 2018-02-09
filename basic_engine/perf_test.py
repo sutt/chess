@@ -1,5 +1,6 @@
-import time
+from time import time
 from main import Game
+import copy
 
 
 #TODO's here:
@@ -10,6 +11,10 @@ from main import Game
 ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
 
 def select_function(s_function):
+    ''' input: s_function (string)
+        output: [optional] usually a GameLog but really completely dynamic
+        This string choses a way to:
+             init Game(), param's for play(), possible return value.'''
     
     if s_function == "baseline":
         
@@ -19,7 +24,6 @@ def select_function(s_function):
     if s_function == "naive_check":
 
         game = Game(s_instructions = ss)
-        # game.play(king_in_check_on=False)    
         game.play()
 
     if s_function == "test_copy":
@@ -41,8 +45,10 @@ def select_function(s_function):
 
     if s_function == "example_return_2":
         
-        game = Game(s_instructions = ss, b_log_turn_time = True
-                        , b_log_num_available = True )  
+        game = Game(s_instructions = ss
+                    ,b_log_turn_time = True
+                    ,b_log_num_available = True 
+                    )  
         game.play()
 
         return game.get_gamelog()
@@ -65,9 +71,7 @@ def select_function(s_function):
     return None     #to show that the function is no returning a test exit data
 
 
-def print_indv_turn_times(data):
-    pass    
-
+#Pretty Print Helper Functions ------------------
 
 def align_col(s_line, chars_=10, r_align=True):
     
@@ -87,53 +91,8 @@ def align_col(s_line, chars_=10, r_align=True):
 def char_round(s_line, chars_):
     return str(s_line)[:chars_]
 
-def print_test_results(results):
-
-    temp = [0 for i in range(len(results.keys()))]
-
-    for k in results.keys():
-        
-        d_test = results[k]
-        
-        test_name = str(k)
-
-        order_test = d_test['order']
-        n_test = d_test['n']
-        totaltime_test = d_test['total_time']
-
-        avgtime_test = float(totaltime_test) / float(n_test)
-
-        test_info = [
-                        test_name
-                        ,avgtime_test
-                        ,"n/a"          #placeholder for Multiplier
-                        ,n_test
-                        ,totaltime_test
-                    ]
-
-        temp[order_test] = test_info
-
+def print_formatted_results(dims_out, data):
     
-    #Build X-diff column
-    avgtime_col = 1
-    xdiff_col = 2
-
-    avgtime_baseline = temp[0][avgtime_col]
-
-    for i in range(1,len(temp)):
-         xdiff = float(temp[i][avgtime_col]) / float(avgtime_baseline)
-         s_xdiff = str(xdiff)
-         temp[i][xdiff_col] = s_xdiff
-
-    #('Col Heading', chars_in_col, chars_spacer_right, char_round)
-    dims_out = [
-        ('Test Name:', 15, 5, 15)
-        ,('Avg Time:', 15, 5, 7)
-        ,('Diff from baseline:', 20, 5, 4)
-        ,('n:', 5, 5, 4)
-        ,('Total Time:', 15, 5, 5)
-        ]
-
     #print col heading
     s_row = ""
     for col in dims_out:
@@ -142,7 +101,7 @@ def print_test_results(results):
     print s_row
 
     #print data
-    for row in temp:
+    for row in data:
         
         s_row = ""
 
@@ -163,76 +122,162 @@ def print_test_results(results):
 
         print s_row
 
+#Interpret Functions (slice and calc on results) -------------------------
+
+def interpret_basic_data(results):
+    '''Build a five col printout for avg trial time of different tests'''
+    temp = [0 for i in range(len(results.keys()))]
+    for k in results.keys():
+        d_test = results[k]
+        test_name = str(k)
+        order_test = d_test['order']
+        n_test = d_test['n']
+        totaltime_test = d_test['total_time']
+        avgtime_test = float(totaltime_test) / float(n_test)
+
+        test_info = [
+                        test_name
+                        ,avgtime_test
+                        ,"n/a"          #placeholder for Multiplier
+                        ,n_test
+                        ,totaltime_test
+                    ]
+
+        temp[order_test] = test_info
+    #Build X-diff column
+    avgtime_col = 1
+    xdiff_col = 2
+    avgtime_baseline = temp[0][avgtime_col]
+    for i in range(1,len(temp)):
+         xdiff = float(temp[i][avgtime_col]) / float(avgtime_baseline)
+         s_xdiff = str(xdiff)
+         temp[i][xdiff_col] = s_xdiff
+    return temp
+
+def interpret_variation_data(results):
+    '''Find Min/Max from the dataset'''
+    temp = [0 for i in range(len(results.keys()))]
+    for k in results.keys():
+        d_test = results[k]
+        test_name = str(k)
+        order_test = d_test['order']
+        n_test = d_test['n']
+        totaltime_test = d_test['total_time']
+        avgtime_test = float(totaltime_test) / float(n_test)
+
+        list_trial_time = d_test['trial_time']
+        min_test = min(list_trial_time)
+        max_test = max(list_trial_time)
+
+        test_info = [
+                        test_name
+                        ,avgtime_test
+                        ,min_test        
+                        ,max_test
+                    ]
+
+        temp[order_test] = test_info
+    return temp
 
 
+# Output Styles -----------------------------------------------------------
 
-def interpret_results(results):
-    pass
-    #need to not use index-0 on log_turn_time
+def print_results(results, **kwargs):
+    ''' input: results (dict) b_interpret_Style (bool).
+        output: This will first slice the results, generate calc'd fields
+            based on an interpret_function. The print out based a dims_out
+            list of formatting params.'''
     
+    if kwargs.get('b_basic', False):
+        
+        data = interpret_basic_data(results)
+        
+        #('Col Heading', chars_in_col, chars_spacer_right, char_round)
+        dims_out = [
+            ('Test Name:', 15, 5, 15)
+            ,('Avg Time:', 15, 5, 7)
+            ,('Diff from baseline:', 20, 5, 4)
+            ,('n:', 5, 5, 4)
+            ,('Total Time:', 15, 5, 5)
+            ]
+
+        print_formatted_results(dims_out, data)
+
+    if kwargs.get('b_basic_variation', False):
+        
+        data = interpret_variation_data(results)
+
+        dims_out = [
+            ('Test Name:', 15, 5, 15)
+            ,('Avg Time:', 15, 5, 7)
+            ,('Min Trial Time:', 15, 5, 7)
+            ,('Max Trial Time:', 15, 5, 7)
+            ]
+
+        print_formatted_results(dims_out, data)
 
 
 
 def perf_test(s_tests
                 ,n=10 
-                ,b_by_trial=False
+                ,b_trial_time=False
                 ,b_num_available=False
                 ,b_turn_time=False
                 ):
-    
-    # Heirarchy------------------------------
-    # result         - a set of tests
-    #   test         - a set of full games
-    #       trial    - one full game
-    #           turn - one move in the game
+
+    '''main function to take a list of s_test, and log the time perf
+
+        Output Terminology Heirarchy:
+            result         - a set of tests
+                test         - a set of full games
+                    trial    - one full game
+                        turn - one move in the game
+    '''
 
     result = {}
-    
 
-    
     for i_test, s_test in enumerate(s_tests):
     
         trial_time = []
         trial_turn_time = []
         trial_num_available = []
 
-        t0 = time.time()
+        t0 = time()
         
         for trial_i in range(n):
             
-            t0_trial = time.time()
-            opt_game_log = select_function(s_test)  #call main
-            t1_trial = time.time()
+            t0_trial = time()
+            opt_game_log = select_function(s_test)  # Main
+            t1_trial = time()
 
-            #any data from each run of .play()
-            if b_by_trial:    
-                trial_time.append(t1_trial - t0_trial)
-                    
+            if b_trial_time:    
+                trial_time.append(t1_trial - t0_trial)        
             if b_turn_time:
                 trial_turn_time.append( opt_game_log.get_log_turn_time() )
-            
             if b_num_available:
                 trial_num_available.append( opt_game_log.get_log_num_available() )
                     
-        t1 = time.time() 
-
-        #logging 
+        t1 = time() 
+         
         test = {}
-        
+
+        #by test
         test['test_name'] = s_test
         test['order'] = i_test      #to print out results in correct order
         test['n'] = n
         test['total_time'] = t1 - t0
         
+        #by trial
+        if b_trial_time:
+            test['trial_time'] = copy.copy(trial_time)
+        
+        #by turn
         if b_turn_time:
-            test['turn_time'] = trial_turn_time
+            test['turn_time'] = copy.copy(trial_turn_time)
         if b_num_available:
-            test['num_available'] = trial_num_available
-        # if b_each_turn:
-        #     pass
+            test['num_available'] = copy.copy(trial_num_available)        
 
         result[s_test] = test
-
     
     return result
     
@@ -247,25 +292,41 @@ s_tests = [
     ,"check_optimal_3"
     ]
 
-results = perf_test(s_tests,n=10)
-print_test_results(results)
+
+results = perf_test(s_tests, n=10, b_trial_time=True)
+
+print_results(results, b_basic=True)
+print('---')
+print_results(results, b_basic_variation=True)
 
 #TEMP - For building new features
-s_tests = [
-    "example_return_2"
-    ]
-results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
-my_test = results["example_return_2"]
-print my_test
-my_metric = my_test["turn_time"]
-print "\n".join([str(x)[:4] for x in my_metric[0]])
-print '---------'
-print "\n".join([str(x)[:4] for x in my_metric[1]])
-my_metirc2 = my_test["num_available"]
-print my_metirc2
+# s_tests = [
+#     "example_return_2"
+#     ]
+# results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
+# my_test = results["example_return_2"]
+# print my_test
+# my_metric = my_test["turn_time"]
+# print "\n".join([str(x)[:4] for x in my_metric[0]])
+# print '---------'
+# print "\n".join([str(x)[:4] for x in my_metric[1]])
+# my_metirc2 = my_test["num_available"]
+# print my_metirc2
 
 
 # print "".join([ k +":\n" for k in results.keys()]
+
+#2/9
+
+#      Test Name:           Avg Time:     Min Trial Time:     Max Trial Time:
+#        baseline             0.00700             0.00399             0.01399
+#     naive_check             0.25399                0.25             0.26600
+#       test_copy             0.18280             0.15599             0.28100
+# test_copy_apply             0.18129             0.17100             0.21799
+#   check_optimal             0.19219             0.17199             0.21900
+# check_optimal_2             0.19219             0.18699             0.21899
+# check_optimal_3             0.19060             0.18700             0.21900
+
 
 #2/8
 

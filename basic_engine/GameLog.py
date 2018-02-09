@@ -49,6 +49,7 @@ class GameLog:
         return copy.deepcopy(self.log_turn_time)
 
     
+    #TODO - remove this
     def print_turn(self, board, pieces, player, **kwargs):
 
         if (self.board_pre_turn and 

@@ -300,8 +300,10 @@ def test_king_in_check3():
 
 
 if __name__ == "__main__":
-    # test_king_in_check3()
-    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-    # game = Game(manual_control = (1,), b_log_show_opponent = True)
-    game = Game(s_instructions = ss, b_log_show_opponent = True)
-    game.play(king_in_check_on=False, king_in_check_optimal=True)
+    
+    game = Game(manual_control = (1,), b_log_show_opponent = True)
+    game.play()
+
+    # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
+    # game = Game(s_instructions = ss, b_log_show_opponent = True)
+    # game.play(king_in_check_on=False, king_in_check_optimal=True)
