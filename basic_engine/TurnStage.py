@@ -304,6 +304,127 @@ def get_possible_check_optimal(pieces, board, move, player):
 
     return b_check
 
+_mirror = Mirror()
+
+def get_possible_check_optimal_2(pieces, board, move, player):
+    
+    # player_king_i = filter(lambda p: p.white == player and 
+    #                                 p.__class__.__name__ == "King" 
+    #                     ,pieces)
+    
+    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+
+    # player_king = pieces[player_king_i[0]]
+    
+    player_king_pos = player_king[0].pos 
+    
+    #maybe cancel this if castling?
+
+    if player_king_pos == move.pos0:
+        player_king_pos == move.pos1
+
+    player_king_code = 3 if player else -3
+
+    hypo_king = SuperKing(b_white = player,pos = player_king_pos )
+
+    opp_kill_moves = hypo_king.get_available_moves(board
+                                                  ,move_type_flag=True
+                                                  ,check_flag=False
+                                                  ,mirror_flag=True
+                                                  )
+                                                  
+    #_mirror = Mirror()   #instatiated outside
+    
+    _mirror.set_init_pos(player_king_pos)
+    _mirror.set_moves(opp_kill_moves)
+    _mirror.set_pieces(pieces)
+    
+    b_check = _mirror.run_calc()
+
+    return b_check
+
+_mirror3 = Mirror()
+
+def get_possible_check_optimal_3(pieces, board, move, player):
+    
+    # player_king_i = filter(lambda p: p.white == player and 
+    #                                 p.__class__.__name__ == "King" 
+    #                     ,pieces)
+    
+    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+
+    # player_king = pieces[player_king_i[0]]
+    
+    player_king_pos = player_king[0].pos 
+    
+    #maybe cancel this if castling?
+
+    if player_king_pos == move.pos0:
+        player_king_pos == move.pos1
+
+    player_king_code = 3 if player else -3
+
+    hypo_king = SuperKing(b_white = player,pos = player_king_pos )
+
+    opp_kill_moves = hypo_king.get_available_moves(board
+                                                  ,move_type_flag=True
+                                                  ,check_flag=False
+                                                  ,mirror_flag=True
+                                                  )
+                                                  
+    #_mirror = Mirror()   #instatiated outside
+    if len(opp_kill_moves) == 0:
+        return False
+    
+    _mirror3.set_init_pos(player_king_pos)
+    _mirror3.set_moves(opp_kill_moves)
+    _mirror3.set_pieces(pieces)
+    
+    b_check = _mirror3.run_calc()
+
+    return b_check
+
+def filter_king_check_optimal_2(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        #cant these just move outside the loop?
+        #The problem is apply_move mutates state piece, right?
+        _board = copy.deepcopy(board)   
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+        b_check = get_possible_check_optimal_2(pieces2, board2, _move, player)
+        
+        if not(b_check):
+            out.append(_move)
+
+    return out
+
+def filter_king_check_optimal_3(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        #cant these just move outside the loop?
+        #The problem is apply_move mutates state piece, right?
+        _board = copy.deepcopy(board)   
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+        b_check = get_possible_check_optimal_3(pieces2, board2, _move, player)
+        
+        if not(b_check):
+            out.append(_move)
+
+    return out
 
 def filter_king_check_optimal(board, pieces, moves, player):
     

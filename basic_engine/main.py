@@ -9,6 +9,8 @@ from TurnStage import filter_king_check
 from TurnStage import filter_king_check_test_copy   #temp
 from TurnStage import filter_king_check_test_copy_apply   #temp
 from TurnStage import filter_king_check_optimal   #temp
+from TurnStage import filter_king_check_optimal_2   #temp
+from TurnStage import filter_king_check_optimal_3   #temp
 
 Move = moveHolder()
 
@@ -119,6 +121,10 @@ class Game():
                 moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal', False):
                 moves = filter_king_check_optimal(board, pieces, moves, player)
+            if kwargs.get('king_in_check_optimal_2', False):
+                moves = filter_king_check_optimal_2(board, pieces, moves, player)
+            if kwargs.get('king_in_check_optimal_3', False):
+                moves = filter_king_check_optimal_3(board, pieces, moves, player)
             
             self.log.print_turn(board, pieces, player)
 

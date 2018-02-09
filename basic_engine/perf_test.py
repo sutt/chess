@@ -52,6 +52,16 @@ def select_function(s_function):
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_optimal=True)
 
+    if s_function == "check_optimal_2":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_optimal_2=True)
+
+    if s_function == "check_optimal_3":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_optimal_3=True)
+
     return None     #to show that the function is no returning a test exit data
 
 
@@ -233,33 +243,42 @@ s_tests = [
     ,"test_copy"
     ,"test_copy_apply"
     ,"check_optimal"
+    ,"check_optimal_2"
+    ,"check_optimal_3"
     ]
 
 results = perf_test(s_tests,n=10)
 print_test_results(results)
 
 #TEMP - For building new features
-s_tests = [
-    "example_return_2"
-    ]
-
-#TEMP - For building new features
-#results = perf_test(s_tests,n=10)
-#print_test_results(results)
-results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
-my_test = results["example_return_2"]
-print my_test
-my_metric = my_test["turn_time"]
-print "\n".join([str(x)[:4] for x in my_metric[0]])
-print '---------'
-print "\n".join([str(x)[:4] for x in my_metric[1]])
-my_metirc2 = my_test["num_available"]
-print my_metirc2
+# s_tests = [
+#     "example_return_2"
+#     ]
+# results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
+# my_test = results["example_return_2"]
+# print my_test
+# my_metric = my_test["turn_time"]
+# print "\n".join([str(x)[:4] for x in my_metric[0]])
+# print '---------'
+# print "\n".join([str(x)[:4] for x in my_metric[1]])
+# my_metirc2 = my_test["num_available"]
+# print my_metirc2
 
 
 # print "".join([ k +":\n" for k in results.keys()]
 
 #2/8
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00469                      n/a        10               0.046
+#     naive_check             0.25800                     54.8        10               2.580
+#       test_copy             0.17039                     36.2        10               1.703
+# test_copy_apply             0.17519                     37.2        10               1.751
+#   check_optimal             0.19070                     40.5        10               1.907
+# check_optimal_2             0.18949                     40.3        10               1.894
+# check_optimal_3              0.1875                     39.8        10               1.875
+
+#NOTE optimal_2, optimal_3 are little optimizations with little perf boost
 
 #      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
 #        baseline             0.00469                      n/a        10               0.046
