@@ -13,6 +13,7 @@ from TurnStage import filter_king_check_optimal_2   #temp
 from TurnStage import filter_king_check_optimal_3   #temp
 from TurnStage import filter_king_check_test_copy_apply_2   #temp
 from TurnStage import filter_king_check_test_copy_apply_3   #temp
+from TurnStage import filter_king_check_test_copy_apply_4   #temp
 
 Move = moveHolder()
 
@@ -127,6 +128,8 @@ class Game():
                 moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
             if kwargs.get('king_in_check_test_copy_apply_3', False):
                 moves = filter_king_check_test_copy_apply_3(board, pieces, moves, player)
+            if kwargs.get('king_in_check_test_copy_apply_4', False):
+                moves = filter_king_check_test_copy_apply_4(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal', False):
                 moves = filter_king_check_optimal(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal_2', False):
@@ -323,7 +326,7 @@ if __name__ == "__main__":
             ,b_log_move = True
             )
 
-    game.play(king_in_check_on=False, king_in_check_test_copy_apply_3=True)
+    game.play(king_in_check_on=False, king_in_check_test_copy_apply_4=True)
     # game.play()
 
     # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"

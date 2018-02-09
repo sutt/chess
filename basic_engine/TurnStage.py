@@ -662,3 +662,40 @@ def filter_king_check_test_copy_apply_3(board, pieces, moves, player):
 
     return out
 
+def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
+    
+    '''Rough draft of fully optimized filter_check()'''
+
+    out = []
+
+    mutator = Mutator()
+    
+    for _move in moves:
+
+        b_regular =  (_move.code == MOVE_CODE['regular'])
+
+        if b_regular:
+            _board = mutator.mutate_board(board, _move)
+            _pieces = mutator.mutate_pieces(pieces, player)
+        else:
+            _board = copy.deepcopy(board)
+            _pieces = copy.deepcopy(pieces)
+
+
+        if not(b_regular):
+            _board, _pieces = apply_move(_move, _board, _pieces, player)    
+
+        #Added in actual function
+        b_check = get_possible_check_optimal(_pieces, _board, _move, player)
+        
+        if not(b_check):
+            out.append(_move)
+
+        if b_regular:
+            board = mutator.demutate_board(_board)
+            pieces = mutator.demutate_pieces(_pieces, player)
+        
+        out.append(_move)
+
+    return out
+

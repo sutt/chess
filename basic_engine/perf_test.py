@@ -48,6 +48,11 @@ def select_function(s_function):
             
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_test_copy_apply_3=True)
+
+    if s_function == "test_c_apply_4":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_test_copy_apply_4=True)
     
     if s_function == "baseline_tt":
         
@@ -409,6 +414,7 @@ s_tests = [
     ,"test_copy_apply"
     ,"test_c_apply_2"
     ,"test_c_apply_3"
+    ,"test_c_apply_4"
     ,"check_optimal"
     ,"check_optimal_2"
     ,"check_optimal_3"
@@ -447,6 +453,18 @@ s_tests = [
 
 
 #2/9
+
+# Note: there's a 3.5x penalty over baseline for a new optimaized method
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00479                      n/a        10               0.047
+#     naive_check             0.26749                     55.7        10               2.674
+#       test_copy             0.17340                     36.1        10               1.734
+# test_copy_apply             0.17969                     37.4        10               1.796
+#  test_c_apply_2             0.14619                     30.4        10               1.461
+#  test_c_apply_3             0.00629                     1.31        10               0.062
+#  test_c_apply_4             0.01740                     3.62        10               0.174
+#   check_optimal             0.19670                     40.9        10               1.967
 
 # Note Yuug! perf improvement 30x -> ~1.3x
 

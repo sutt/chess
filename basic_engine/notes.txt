@@ -240,6 +240,7 @@ board should store edge cases:
 
         BUGS
             moving R or K after castling does not work
+            filter_copy_apply_4 is fast but doesnt pass 3 test
         
     Takeaway 1/30
 
