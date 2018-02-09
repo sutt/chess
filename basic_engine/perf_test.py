@@ -43,6 +43,11 @@ def select_function(s_function):
             
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_test_copy_apply_2=True)
+
+    if s_function == "test_c_apply_3":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_test_copy_apply_3=True)
     
     if s_function == "baseline_tt":
         
@@ -403,6 +408,7 @@ s_tests = [
     ,"test_copy"
     ,"test_copy_apply"
     ,"test_c_apply_2"
+    ,"test_c_apply_3"
     ,"check_optimal"
     ,"check_optimal_2"
     ,"check_optimal_3"
@@ -441,6 +447,17 @@ s_tests = [
 
 
 #2/9
+
+# Note Yuug! perf improvement 30x -> ~1.3x
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00470                      n/a        10               0.047
+#     naive_check             0.28129                     59.8        10               2.812
+#       test_copy             0.17569                     37.3        10               1.756
+# test_copy_apply             0.18020                     38.3        10               1.802
+#  test_c_apply_2             0.14609                     31.0        10               1.460
+#  test_c_apply_3             0.00610                     1.29        10               0.061
+#   check_optimal             0.19429                     41.3        10               1.942
 
 # Note: test_c_apply uses Mutator to go from 25x to 20x slowdown
 

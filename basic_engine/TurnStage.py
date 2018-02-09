@@ -552,6 +552,38 @@ class Mutator():
 
         return board
 
+    def mutate_pieces(self, pieces, player):
+            
+        #get_possible_check_optimal uses King's POS, otherwise does
+        #not use pieces.
+        #get_possible_check uses only opponents pieces, and board, 
+        # so you must eliminate captured piece.
+        
+        self.mutation_king_piece = None
+        
+        moving_piece_enum = self.old_mutation[1]
+        if (moving_piece_enum) == 3:
+            
+            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
+            old_pos = player_king.pos
+            new_pos = self.new_mutation[0]
+
+            self.mutation_king_piece = (old_pos, new_pos)
+            
+            player_king.pos = new_pos
+
+        return pieces
+
+    def demutate_pieces(self, pieces, player):
+        
+        if self.mutation_king_piece is None:
+            return pieces
+        else:
+            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
+            old_pos = self.mutation_king_piece[0]
+            player_king.pos = old_pos
+            return pieces
+
 def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
     
     '''Analyze the computational cost of mutating board instead of
@@ -588,3 +620,45 @@ def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
         out.append(_move)
 
     return out
+
+def filter_king_check_test_copy_apply_3(board, pieces, moves, player):
+    
+    '''Analyze the computational cost of mutating board instead of
+        copying it.'''
+    
+    #We'll need to set this as the default and run pytest to see if
+    # it's working
+
+    out = []
+
+    mutator = Mutator()
+    
+    for _move in moves:
+
+        b_regular =  (_move.code == MOVE_CODE['regular'])
+
+        if b_regular:
+            _board = mutator.mutate_board(board, _move)
+            #TODO - in other routines, account for piece.alive
+            #       this only includes get_possible_check, 
+            #       also get_possible_optimal need king_pos altered
+            _pieces = mutator.mutate_pieces(pieces, player)
+        else:
+            # continue   #dont process these for computational testing
+            _board = copy.deepcopy(board)
+            _pieces = copy.deepcopy(pieces)
+
+
+        if not(b_regular):
+            board2, pieces2 = apply_move(_move, _board, _pieces, player)    
+
+        #Call Here: get_possible_check_optimal()
+
+        if b_regular:
+            board = mutator.demutate_board(_board)
+            pieces = mutator.demutate_pieces(_pieces, player)
+        
+        out.append(_move)
+
+    return out
+
