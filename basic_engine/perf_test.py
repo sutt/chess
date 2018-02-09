@@ -75,6 +75,24 @@ def select_function(s_function):
         game.play(king_in_check_on=True)    
         return game.get_gamelog()
 
+    if s_function == "optimal1_long":
+            
+        game = Game(s_instructions = ss_long
+                    ,b_log_turn_time = True
+                    ,b_log_num_available = True 
+                    )  
+        game.play(king_in_check_on=False, king_in_check_optimal = True)    
+        return game.get_gamelog()
+    
+    if s_function == "optimal3_long":
+
+        game = Game(s_instructions = ss_long
+            ,b_log_turn_time = True
+            ,b_log_num_available = True 
+            )  
+        game.play(king_in_check_on=False, king_in_check_optimal_3 = True)    
+        return game.get_gamelog()
+
     if s_function == "check_optimal":
             
         game = Game(s_instructions = ss)
@@ -406,6 +424,12 @@ s_tests = [
     "baseline_long"
     ,"naive_long"
     ]
+
+s_tests = [
+    "optimal1_long"
+    ,"optimal3_long"
+    ]
+
 results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
 
 print_results(results, b_turn_time=True)
@@ -413,6 +437,56 @@ print_results(results, b_turn_time=True)
 
 #2/9
 
+# Note: Num Moves = 1, when king is in check
+
+# Test A:  optimal1_long
+# Test B:  optimal3_long
+# N tests:  30
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            17.33            16.66
+#          2             20            17.23            16.69
+#          3             20            16.83            16.53
+#          4             21            17.63            17.73
+#          5             23            19.46            19.06
+#          6             20            16.26            16.30
+#          7             21            17.20            16.93
+#          8             21            18.03            17.26
+#          9             31            24.39            25.09
+#         10              1            20.16            19.80
+#         11             39            31.43            31.79
+#         12             26            21.76            21.89
+#         13             35            28.19            27.33
+#         14             25            20.26            20.70
+#         15             39            31.09            31.03
+#         16             28            22.93            23.10
+#         17             38            29.89            29.96
+#         18             29            24.13            24.26
+#         19             44            35.23            35.63
+#         20             29            23.10            23.59
+#         21             48            37.43            37.06
+#         22             30            24.99            25.73
+#         23             56            41.63            43.13
+#         24             33            27.73            27.33
+#         25             49            36.16            37.20
+#         26             30            25.33            25.56
+#         27             47            34.83            35.30
+#         28             28            24.06            24.66
+#         29             43            32.06            32.46
+#         30              2            29.13            30.13
+#         31             40            29.79            30.83
+#         32              2            27.50            28.30
+#         33             26            19.73            20.13
+#         34             37            27.46            26.93
+#         35             30            22.43            22.43
+#         36             35            24.96            25.86
+#         37             34            23.73            23.49
+#         38             34            23.66            23.76
+#         39             34            24.60            24.56
+#         40             37            26.33            25.86
+
+
+# Note: Num Moves is incorrect below as its not doing check_filter in baseline
 
 #      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
 #   baseline_long             0.01609                      n/a        10               0.160
