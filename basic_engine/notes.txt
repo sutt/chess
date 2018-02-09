@@ -231,12 +231,15 @@ board should store edge cases:
 
     2/9
 
-        Print out turn_time
+        x Print out turn_time
         try to remove copy(board) from inner loop
         do a plt
         do a regression
         first we need more game-data, need a save function from manual mode
+        need a way to return game state data in  board, like in-check to tests
 
+        BUGS
+            moving R or K after castling does not work
         
     Takeaway 1/30
 

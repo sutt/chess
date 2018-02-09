@@ -10,6 +10,9 @@ import copy
 
 ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
 
+# mm_long = [((6, 0), (4, 0)), ((1, 0), (3, 0)), ((6, 1), (4, 1)), ((1, 2), (3, 2)), ((4, 1), (3, 2)), ((1, 5), (3, 5)), ((6, 4), (4, 4)), ((0, 1), (2, 2)), ((7, 3), (3, 7)), ((1, 6), (2, 6)), ((7, 5), (2, 0)), ((0, 0), (2, 0)), ((7, 0), (5, 0)), ((0, 5), (2, 7)), ((7, 6), (5, 5)), ((1, 1), (3, 1)), ((7, 2), (6, 1)), ((0, 4), (0, 5)), ((4, 0), (3, 1)), ((2, 7), (3, 6)), ((3, 7), (2, 6)), ((3, 6), (4, 5)), ((7, 4), (7, 6)), ((1, 7), (2, 7)), ((6, 2), (4, 2)), ((4, 5), (1, 2)), ((6, 6), (4, 6)), ((2, 2), (4, 3)), ((2, 6), (1, 6)), ((0, 5), (0, 4)), ((1, 6), (2, 6)), ((2, 0), (2, 6)), ((3, 1), (2, 1)), ((1, 3), (3, 3)), ((5, 5), (4, 3)), ((3, 5), (4, 4)), ((7, 1), (5, 2)), ((2, 7), (3, 7)), ((5, 0), (3, 0)), ((2, 6), (2, 3))]
+ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '
+
 def select_function(s_function):
     ''' input: s_function (string)
         output: [optional] usually a GameLog but really completely dynamic
@@ -48,6 +51,24 @@ def select_function(s_function):
     if s_function == "naive_check_tt":
 
         game = Game(s_instructions = ss
+            ,b_log_turn_time = True
+            ,b_log_num_available = True 
+            )  
+        game.play(king_in_check_on=True)    
+        return game.get_gamelog()
+
+    if s_function == "baseline_long":
+            
+        game = Game(s_instructions = ss_long
+                    ,b_log_turn_time = True
+                    ,b_log_num_available = True 
+                    )  
+        game.play(king_in_check_on=False)    
+        return game.get_gamelog()
+    
+    if s_function == "naive_long":
+
+        game = Game(s_instructions = ss_long
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
@@ -363,6 +384,11 @@ s_tests = [
     ,"check_optimal_3"
     ]
 
+s_tests = [
+    "baseline_long"
+    ,"naive_long"
+    ]
+
 results = perf_test(s_tests, n=10, b_trial_time=True)
 
 print('')
@@ -375,12 +401,73 @@ s_tests = [
     "baseline_tt"
     ,"naive_check_tt"
     ]
+
+s_tests = [
+    "baseline_long"
+    ,"naive_long"
+    ]
 results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
 
 print_results(results, b_turn_time=True)
 
 
 #2/9
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#   baseline_long             0.01609                      n/a        10               0.160
+#      naive_long             1.28770                     79.9        10               12.87
+
+#      Test Name:           Avg Time:     Min Trial Time:     Max Trial Time:
+#   baseline_long             0.01609             0.01499             0.02099
+#      naive_long             1.28770             1.28099             1.29700
+
+# Test B:  naive_long
+# N tests:  30
+
+# Test A:  baseline_long
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20              0.0            22.90
+#          2             20              0.0            19.33
+#          3             20              0.0            22.36
+#          4             21              0.0            23.46
+#          5             23            4.166            24.46
+#          6             20            2.600            22.16
+#          7             21            2.099            19.30
+#          8             21            1.566            25.59
+#          9             31            3.633            31.19
+#         10             24            0.499            19.79
+#         11             39              0.0            41.63
+#         12             27              0.0            28.16
+#         13             35            0.533            36.46
+#         14             26              0.0            26.56
+#         15             39            0.533            40.10
+#         16             29              0.0            31.19
+#         17             38              0.0            37.06
+#         18             30              0.0            31.19
+#         19             44              0.0            43.26
+#         20             30              0.0            30.20
+#         21             48              0.0            46.89
+#         22             33              0.0            33.80
+#         23             56              0.0            56.83
+#         24             36              0.0            33.33
+#         25             49              0.0            46.86
+#         26             33              0.0            31.20
+#         27             47              0.0            46.93
+#         28             31              0.0            30.20
+#         29             43              0.0            40.63
+#         30             38              0.0            29.26
+#         31             40              0.0            38.99
+#         32             36              0.0            28.09
+#         33             27              0.0            21.90
+#         34             37              0.0            38.06
+#         35             31              0.0            27.09
+#         36             35              0.0            33.79
+#         37             34              0.0            29.66
+#         38             34              0.0            30.23
+#         39             35              0.0            30.79
+#         40             37              0.0            33.26
+
 
 # Test A:  baseline_tt
 # Test B:  naive_check_tt

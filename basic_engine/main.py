@@ -26,6 +26,7 @@ class Game():
         ,init_player = None
         ,init_pieces = None
         ,test_exit_moves = None
+        ,b_log_move = False
         ,b_log_turn_time = False
         ,b_log_num_available = False
         ):
@@ -50,6 +51,7 @@ class Game():
 
         self.log = GameLog(manual_control = self.manual_control
                           ,b_log_show_opponent = b_log_show_opponent 
+                          ,b_log_move = b_log_move
                           ,b_turn_time = b_log_turn_time
                           ,b_num_available = b_log_num_available
                            )
@@ -78,7 +80,7 @@ class Game():
             #TODO - instruction.pop(0)
             move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
-            move = player_control_input(board, moves)
+            move = player_control_input(board, moves, self.log)
         else:
             move_i = random.sample(range(0,len(moves)),1)[0]
             move = moves[move_i]
@@ -301,7 +303,10 @@ def test_king_in_check3():
 
 if __name__ == "__main__":
     
-    game = Game(manual_control = (1,), b_log_show_opponent = True)
+    game = Game(manual_control = (1,)
+                ,b_log_show_opponent = True
+                ,b_log_move = True
+                )
     game.play()
 
     # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"

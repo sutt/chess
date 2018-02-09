@@ -53,6 +53,13 @@ def alphanum_to_pos(inp):
     pos1 = int(inp[1]) - 1
     return (pos0,pos1)
 
+def pos_to_alphanum(inp):
+    letter_data = 'abcdefgh'
+    number_data = [i+1 for i in range(8)]
+    s1 = letter_data[inp[0]]
+    s2 = str(number_data[inp[1]])
+    return s1 + s2
+
 def alphamove_to_posmove(inp):
     
     try:
@@ -72,6 +79,8 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
     ret = -1
     if raw == "hint":
         return 1, []
+    if raw == 'out_log':
+        return 2, []
     try:
         #TODO - out numeric section
         if input_type == 'numeric':
@@ -110,9 +119,33 @@ def instruction_input(board, moves, instructions, i_turn):
     else:
         return -1  # to demonstrate an error in instruction input
 
-def player_control_input(board, moves_player, **kwargs):
+def moves_to_alphanum(list_inp):
     
-    msg = "Type your move. Or type 'hint' to see list of all available moves..."
+    # return [(i,v) for i, v in enumerate(list_inp)]
+    temp = [
+        str(i + 1) +
+        ". " +
+        pos_to_alphanum(v[0]) +
+        " " +
+        pos_to_alphanum(v[1]) +
+        " "
+
+        for i, v in enumerate(list_inp)
+    ]
+    
+    return "".join(temp)
+
+def format_move_log(inp_move_log):
+    '''converts from MoveHolder to tuple for printout'''
+    out = [(x.pos0, x.pos1) for x in inp_move_log]
+    out = moves_to_alphanum(out)
+    return str(out)
+
+
+
+def player_control_input(board, moves_player, log, **kwargs):
+    
+    msg = "Type your move. Or type 'hint' or 'out_log'..."
     msg += "\n"
     while(True):
         raw = raw_input(msg)    #example: >1,1 | 2,2
@@ -126,5 +159,7 @@ def player_control_input(board, moves_player, **kwargs):
                 print 'this move is not legal according to the game engine.'
         if ret == 1: 
             print moves_player
+        if ret == 2:
+            print format_move_log(log.get_log_move())
         if ret == -1:
             print 'could not recognize move ', str(raw), ". Try again:"

@@ -9,7 +9,7 @@ class GameLog:
         self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())
         
-        self.b_log_move = False
+        self.b_log_move = kwargs.get('b_log_move', False)
         self.log_move = []
         
         self.b_num_available = kwargs.get('b_num_available',False)
