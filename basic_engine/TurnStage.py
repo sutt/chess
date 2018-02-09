@@ -495,3 +495,96 @@ def filter_king_check_test_copy_apply(board, pieces, moves, player):
         out.append(_move)
 
     return out
+
+class Mutator():
+    
+    '''Helper Class for preserving board state without deepcopying.'''
+
+    # mutate() consists of 
+    #   (pos0, pos0-val) - always going to be 0 as new value
+    #   (pos1, pos1-val) - either 0 or opponents enum
+
+    
+    def __init__(self):
+        self.old_mutation = None
+        self.new_mutation = None
+
+    def mutate_board(self,board, move):
+
+        '''apply new board state and save the changes, or reapply old board state'''
+
+        #can use methods on .data_by_player ?
+        #this might need adjusting under promotion
+        #no need to account for enpassant
+        
+        r,c = move.pos0[0], move.pos0[1]
+        old_piece_enum = board.data_by_player[r][c]       
+        
+        #mutation
+        self.old_mutation = ((r,c), old_piece_enum)
+        
+        #set new
+        board.data_by_player[r][c] = 0                     #always leaving
+
+        new_val = old_piece_enum              #save this as well overwrite
+        r,c = move.pos1[0], move.pos1[1]
+        old_piece_enum = board.data_by_player[r][c]
+
+        #mutation
+        self.new_mutation = ((r,c), old_piece_enum)
+        
+        #set_new
+        board.data_by_player[r][c] = new_val   #use saved value from leaving square
+
+        return board
+
+    def demutate_board(self,board):
+        
+        pos = self.old_mutation[0]
+        r, c = pos[0], pos[1]
+        val = self.old_mutation[1]
+        board.data_by_player[r][c] = val
+
+        pos = self.new_mutation[0]
+        r, c = pos[0], pos[1]
+        val = self.new_mutation[1]
+        board.data_by_player[r][c] = val
+
+        return board
+
+def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
+    
+    '''Analyze the computational cost of mutating board instead of
+        copying it.'''
+    
+    #We'll need to set this as the default and run pytest to see if
+    # it's working
+
+    out = []
+
+    mutator = Mutator()
+    
+    for _move in moves:
+
+        b_regular =  (_move.code == MOVE_CODE['regular'])
+
+        if b_regular:
+            _board = mutator.mutate_board(board, _move)
+        else:
+            #continue   #dont process these for computational testing
+            _board = copy.deepcopy(board)
+            
+
+        _pieces = copy.deepcopy(pieces)
+
+        if not(b_regular):
+            board2, pieces2 = apply_move(_move, _board, _pieces, player)    
+
+        #Call Here: get_possible_check_optimal()
+
+        if b_regular:
+            board = mutator.demutate_board(board)
+        
+        out.append(_move)
+
+    return out

@@ -38,6 +38,11 @@ def select_function(s_function):
         
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_test_copy_apply=True)
+
+    if s_function == "test_c_apply_2":
+            
+        game = Game(s_instructions = ss)
+        game.play(king_in_check_on=False, king_in_check_test_copy_apply_2=True)
     
     if s_function == "baseline_tt":
         
@@ -397,15 +402,16 @@ s_tests = [
     ,"naive_check"
     ,"test_copy"
     ,"test_copy_apply"
+    ,"test_c_apply_2"
     ,"check_optimal"
     ,"check_optimal_2"
     ,"check_optimal_3"
     ]
 
-s_tests = [
-    "baseline_long"
-    ,"naive_long"
-    ]
+# s_tests = [
+#     "baseline_long"
+#     ,"naive_long"
+#     ]
 
 results = perf_test(s_tests, n=10, b_trial_time=True)
 
@@ -430,12 +436,21 @@ s_tests = [
     ,"optimal3_long"
     ]
 
-results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
-
-print_results(results, b_turn_time=True)
+# results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
+# print_results(results, b_turn_time=True)
 
 
 #2/9
+
+# Note: test_c_apply uses Mutator to go from 25x to 20x slowdown
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#        baseline             0.00699                      n/a        10               0.069
+#     naive_check             0.26970                     38.5        10               2.697
+#       test_copy             0.17550                     25.0        10               1.755
+# test_copy_apply             0.17949                     25.6        10               1.794
+#  test_c_apply_2             0.14640                     20.9        10               1.464
+#   check_optimal             0.19629                     28.0        10               1.962
 
 # Note: Num Moves = 1, when king is in check
 

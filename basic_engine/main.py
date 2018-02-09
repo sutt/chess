@@ -11,6 +11,7 @@ from TurnStage import filter_king_check_test_copy_apply   #temp
 from TurnStage import filter_king_check_optimal   #temp
 from TurnStage import filter_king_check_optimal_2   #temp
 from TurnStage import filter_king_check_optimal_3   #temp
+from TurnStage import filter_king_check_test_copy_apply_2   #temp
 
 Move = moveHolder()
 
@@ -121,6 +122,8 @@ class Game():
                 moves = filter_king_check_test_copy(board, pieces, moves, player)
             if kwargs.get('king_in_check_test_copy_apply', False):
                 moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
+            if kwargs.get('king_in_check_test_copy_apply_2', False):
+                moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal', False):
                 moves = filter_king_check_optimal(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal_2', False):
@@ -303,20 +306,22 @@ def test_king_in_check3():
 
 if __name__ == "__main__":
     
-    game = Game(manual_control = (1,)
-                ,b_log_show_opponent = True
-                ,b_log_move = True
-                )
+    #Interactive Setup
+    # game = Game(manual_control = (1,)
+    #             ,b_log_show_opponent = True
+    #             ,b_log_move = True
+    #             )
     
     #Printout a game to observe it
-    # ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '            
-    # game = Game(s_instructions = ss_long
-    #         ,test_exit_moves = 12
-    #         ,b_log_show_opponent = True
-    #         ,b_log_move = True
-    #         )
+    ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '            
+    game = Game(s_instructions = ss_long
+            ,test_exit_moves = None
+            ,b_log_show_opponent = True
+            ,b_log_move = True
+            )
 
-    game.play()
+    game.play(king_in_check_on=False, king_in_check_test_copy_apply_2=True)
+    # game.play()
 
     # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
     # game = Game(s_instructions = ss, b_log_show_opponent = True)
