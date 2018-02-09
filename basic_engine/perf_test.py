@@ -251,18 +251,18 @@ results = perf_test(s_tests,n=10)
 print_test_results(results)
 
 #TEMP - For building new features
-# s_tests = [
-#     "example_return_2"
-#     ]
-# results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
-# my_test = results["example_return_2"]
-# print my_test
-# my_metric = my_test["turn_time"]
-# print "\n".join([str(x)[:4] for x in my_metric[0]])
-# print '---------'
-# print "\n".join([str(x)[:4] for x in my_metric[1]])
-# my_metirc2 = my_test["num_available"]
-# print my_metirc2
+s_tests = [
+    "example_return_2"
+    ]
+results = perf_test(s_tests,n=2, b_turn_time=True, b_num_available=True)
+my_test = results["example_return_2"]
+print my_test
+my_metric = my_test["turn_time"]
+print "\n".join([str(x)[:4] for x in my_metric[0]])
+print '---------'
+print "\n".join([str(x)[:4] for x in my_metric[1]])
+my_metirc2 = my_test["num_available"]
+print my_metirc2
 
 
 # print "".join([ k +":\n" for k in results.keys()]

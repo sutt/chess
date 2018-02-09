@@ -205,9 +205,9 @@ board should store edge cases:
     TODO
 
         x PoC with turn_times in perf_test
-        basic check_optimal implementation
+        x basic check_optimal implementation
         copy.deepcopy on get_log_X() as they are list of lists
-        perf_test of using bypass mirror calc in possible_check_optimal() 
+        x perf_test of using bypass mirror calc in possible_check_optimal() 
         tests to figure out if optimal works for all cases naive does
         does check_optimal work with pawns? prolly not right now
 
@@ -225,6 +225,9 @@ board should store edge cases:
             otherwise do naive could work
 
         how do you isolate get_available_moves() time from full turn loop?
+
+        Try @classmethod
+        https://julien.danjou.info/blog/2013/guide-python-static-class-abstract-methods
 
         
     Takeaway 1/30

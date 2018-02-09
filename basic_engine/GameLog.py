@@ -9,8 +9,8 @@ class GameLog:
         self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())
         
-        self.b_moves_log = False
-        self.moves_log = []
+        self.b_log_move = False
+        self.log_move = []
         
         self.b_num_available = kwargs.get('b_num_available',False)
         self.log_num_available = []
@@ -20,15 +20,17 @@ class GameLog:
         self.t0 = time.time()
         
 
-    def add_moves_log(self
+    def add_turn_log(self
                      ,move
-                     ,num_available = None
+                     ,num_available = 0
                      ):
-        if self.b_moves_log:
-            self.moves_log.append(move)
+        
+        '''each turn append a data element on to each of these logs'''
+
+        if self.b_log_move:
+            self.log_move.append(move)
         
         if self.b_num_available:
-            #note this first
             self.log_num_available.append(num_available)
         
         if self.b_turn_time:
@@ -37,14 +39,14 @@ class GameLog:
             self.t0 = time.time()
 
 
-    def get_moves_log(self):
-        return copy.copy(self.moves_log)
+    def get_log_move(self):
+        return copy.deepcopy(self.log_move)
 
     def get_log_num_available(self):
-        return copy.copy(self.log_num_available)
+        return copy.deepcopy(self.log_num_available)
 
     def get_log_turn_time(self):
-        return copy.copy(self.log_turn_time)
+        return copy.deepcopy(self.log_turn_time)
 
     
     def print_turn(self, board, pieces, player, **kwargs):

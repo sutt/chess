@@ -149,7 +149,7 @@ class Game():
 
             board, pieces = apply_move(move, board, pieces, player)
                         
-            self.log.add_moves_log(move, len(moves))
+            self.log.add_turn_log(move, len(moves))
 
             if self.check_test_exit():
                 self.b_test_exit = True
