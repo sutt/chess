@@ -35,23 +35,6 @@ def select_function(s_function):
         
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_test_copy_apply=True)
-
-    if s_function == "example_return":
-        
-        game = Game(s_instructions = ss, b_log_turn_time = True )  
-        game.play()
-
-        return game.get_gamelog()
-
-    if s_function == "example_return_2":
-        
-        game = Game(s_instructions = ss
-                    ,b_log_turn_time = True
-                    ,b_log_num_available = True 
-                    )  
-        game.play()
-
-        return game.get_gamelog()
     
     if s_function == "baseline_tt":
         
