@@ -241,6 +241,36 @@ board should store edge cases:
         BUGS
             moving R or K after castling does not work
             filter_copy_apply_4 is fast but doesnt pass 3 test
+
+    2/12
+
+        BUGS
+            can't use raw_input in git-bash or in vscode-python-debug (just hangs)
+            fixed by loading root dir of exercises and picking up integrated shell settings?
+            this way, python debug stdout loads in 'Terminal' tab under 'python debug' mode,
+            otherwise it loads in 'Debug Console'
+
+                Fixes:
+                    GitBash: prepend with 'winpty'
+                        >winpty python file.py
+                        >python -i
+
+                    VSCode: In Debug section, get a launch.json settings
+                        chose 'Python Terminal (integrated)' or
+                        'Python Terminal (external).
+
+        TODO:
+            use piece.alive=False in naive-check-filter
+            need to use a fork for filter_king_in_check when opponents pieces < 4 (?)
+            pass the pytest's that are broken 
+                (? they arent croken currently,turn of c_apply_4 by default ?)
+            Better prettyprint for 'hint'
+            more tests for check
+            Find way to view size of memory of the python program
+            
+
+
+                        
         
     Takeaway 1/30
 
