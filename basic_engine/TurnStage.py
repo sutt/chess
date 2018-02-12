@@ -118,6 +118,7 @@ def apply_move(move, board, pieces, _player):
         killed_piece_i = killed_piece_i[0][0]
         
         pieces[killed_piece_i].alive = False
+        #TODO - don't pop piece in hypothetical_pieces=True
         pieces.pop(killed_piece_i)
         
         if (b_enpassant):
@@ -259,18 +260,15 @@ class Mirror():
 
 def get_possible_check_optimal(pieces, board, move, player):
     
-    # player_king_i = filter(lambda p: p.white == player and 
-    #                                 p.__class__.__name__ == "King" 
-    #                     ,pieces)
-    
-    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
-    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+    ''' This optimized substitute for get_possible_check() (the niave func)
+     There are further optimization-tweaks in v _2, _3 '''
 
-    # player_king = pieces[player_king_i[0]]
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
     
     player_king_pos = player_king[0].pos 
     
     #maybe cancel this if castling?
+    #think we should be good as filter_king() has already apply_move a castling move
 
     if player_king_pos == move.pos0:
         player_king_pos == move.pos1
@@ -285,25 +283,14 @@ def get_possible_check_optimal(pieces, board, move, player):
                                                   ,mirror_flag=True
                                                   )
                                                   
-    if len(opp_kill_moves) > 0:
-        pass
-    #can exit here if len(opp_kill_moves) == 0
     #also can go back to naive_check with only opp_kill_moves opponent pieces
-    mirror = Mirror()   #or instatiate outside and reuse each time?
+    mirror = Mirror()   
     
     mirror.set_init_pos(player_king_pos)
     mirror.set_moves(opp_kill_moves)
     mirror.set_pieces(pieces)
     
     b_check = mirror.run_calc()
-    
-    # full_moves = kill_moves
-    # piece_move = [get_piece_class_from_pos(m) for m full_move]
-    # piece_move_type = get_piece_move(piece_move)
-    # #Piece-Class, Num_spaces [quasi-cartesian distance], MOVE_TYPE
-    # # max(abs(row- row2) + abs(col-col2))
-    # piece_space_type = [PST(m[0],calc_space(player_king_pos,m), m[1])]
-    # b_check = match_func(piece_space_type)
 
     return b_check
 
@@ -311,14 +298,11 @@ _mirror = Mirror()
 
 def get_possible_check_optimal_2(pieces, board, move, player):
     
-    # player_king_i = filter(lambda p: p.white == player and 
-    #                                 p.__class__.__name__ == "King" 
-    #                     ,pieces)
+    ''' This build off _check_optimal and uses an already instatiated 
+        _mirror object.
+        This does not appear to out-perform at all.'''
     
-    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
     player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
-
-    # player_king = pieces[player_king_i[0]]
     
     player_king_pos = player_king[0].pos 
     
@@ -347,18 +331,17 @@ def get_possible_check_optimal_2(pieces, board, move, player):
 
     return b_check
 
-_mirror3 = Mirror()
+
+_mirror3 = Mirror() #For use in function below
 
 def get_possible_check_optimal_3(pieces, board, move, player):
     
-    # player_king_i = filter(lambda p: p.white == player and 
-    #                                 p.__class__.__name__ == "King" 
-    #                     ,pieces)
-    
-    # player_king_i = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
-    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
+    ''' This build off _2 and uses an already instatiated _mirror3 object.
+        Also it uses a quick return to not process mirror, when there are
+        "no threats in range".
+        These does not appear to out-perform at all.'''
 
-    # player_king = pieces[player_king_i[0]]
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
     
     player_king_pos = player_king[0].pos 
     
@@ -700,3 +683,27 @@ def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
 
     return out
 
+def is_king_in_check(board, pieces, moves, player):
+
+    '''return a boolean for if current player is in check'''
+
+    # Actually, this doesn't need to be run to test end game conditions, we can go
+    # untill there are no moves available to the player, "mate", and test only *once*
+    # the player's "check-state" at the beginning of that turn
+
+    # But, it is impossible to assess whether castling is legal?
+    # We could say compare moves before and after filter_king_v_x(), and if the only 
+    # ones available are castling then we check if check was in effect?
+
+    # We already do check for castling into check in filter (by do a hypo apply_move
+    # and then looking at mirror-king). So how not to castle out-of / while-in check?
+
+    # Maybe by applying the check only in filter_king() when _move.code == 'castling'?
+    # But this is done multiple time instead of once per turn, so just do it once
+    # which leads to ...
+
+    # Actually this all ridiculous,
+    # It's ultimately O(n+1) not O(n*2) as it seemed initially, because it's not called
+    # for each available_move once for all of them
+
+    b_check = get_possible_check_optimal(_pieces, _board, _move, player)

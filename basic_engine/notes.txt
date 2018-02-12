@@ -260,15 +260,58 @@ board should store edge cases:
                         'Python Terminal (external).
 
         TODO:
+            add in player-in-check
             use piece.alive=False in naive-check-filter
             need to use a fork for filter_king_in_check when opponents pieces < 4 (?)
-            pass the pytest's that are broken 
+            x pass the pytest's that are broken 
                 (? they arent croken currently,turn of c_apply_4 by default ?)
             Better prettyprint for 'hint'
             more tests for check
             Find way to view size of memory of the python program
             
+        Takeaways
 
+            There is the notion of move or turn characteristics / features.
+            Here we build an engine which minimizes computation time, and thus
+            construct the bare number of features available, 
+
+            THIS WAS ALL BAD SPECULATION DOWN A RABBIT HOLE
+
+                e.g. not checking for check at the end/beginning of the turn.
+
+                There might be some weird/theoretical cases where castling is a 
+                valid escape sowe can identify those individually and test for 
+                them in a sub-module?
+
+                The unintuitive notion this exercises exposes is "Don't move a piece such
+                that it puts yourself in check" is a rather estoric rule, but it is the only
+                rule neccessary for computing: legal_moves, and end_game.
+                This is because people don't build a list of all possible legal spaces each
+                turn, instead they focus on five or six, and thus the verbal "check" helps
+                them refocus their search.
+                This also suggests that an AI would do well to limit its considerations
+                to ~5 moves each turn, not every legally permissible one.
+
+            Actually there is a good optimization to do here:
+                If the king has len(opp_kill_moves) == 0 at the beggining of turn, 
+                when you check is_king_in_check() then don't bother doing a mirror
+                except with the move is associated with king.
+                -> TODO: get a bunch or real life games and see when this comes 
+                        into effect
+
+                NOPE - this is all wrong speculation again; mirror_flag uses board
+                pos to assess blocking pieces. 
+                
+                Still, there seems something to notion that opponents pieces
+                don't move during your turn, thus some kind shortcut?
+
+                    Maybe 'bypass' the first piece of yours in filter_blocking()
+                    and cache that pos as in list_calc_needed when another piece
+                    is validated as a threat. Then only run 
+                    mirror on a move where pos0 is in list_calc_needed. A "moving
+                    away a blocker" type move; implied is you can never add to possibility
+                    of being in check based on where you end up.
+                
 
                         
         
