@@ -101,6 +101,7 @@ class Game():
         if self.init_board is not None:
             board.set_data(self.init_board)
             pieces = self.init_pieces
+            #note this has fresh king_can_castle property
         else:
             board, pieces = place_pieces(board)
         
@@ -369,9 +370,21 @@ def test_player_in_and_out_of_check():
     
     assert b_check == False
 
-# def castling_disallowed_in_check():    
+def test_castling_disallowed_in_check():    
 
-# def castling_disallowed_into_check():    
+    #Black queen has King in check on turn 8
+    ss = "1. h7 f8 2. b4 d4 3. g5 e5 4. a4 c4 5. h6 f4 6. b1 d1 7. e5 d5 8. c4 d5 9. h5 h7 10.g1 e1"
+    game = Game(s_instructions = ss)
+    exit_turn = game.play()
+    assert exit_turn == 9
+
+def test_castling_disallowed_into_check():  
+
+    #Black queen has King-Castling destination in check on turn 8, try to castle turn 9
+    ss = "1. h7 f8 2. b4 d4 3. g5 e5 4. a4 c4 5. h6 e3 6. c4 f7 7. g1 e1 8. f7 g7 9. h5 h7 10. g2 e2"
+    game = Game(s_instructions = ss)
+    exit_turn = game.play()
+    assert exit_turn == 9  
 
 
 if __name__ == "__main__":

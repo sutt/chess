@@ -432,7 +432,7 @@ class Piece:
             temp.extend( board.get_diagonals(self.pos, spaces = 1, i_dir = upwards[1]) )
 
         if self.king_can_castle and not(board.b_in_check(self.white)):
-            b_castle = board.get_rooks_castle(player = self.white)
+            b_castle = board.get_rooks_castle(player = self.white)  #not using player, but piece-color attribute
             if any(b_castle):
                 temp_castle = board.get_castle_interspaces(player = self.white)
                 temp_castle = [temp_castle[i] for i in range(2) if b_castle[i]]
