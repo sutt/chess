@@ -83,6 +83,12 @@ class Board:
     def get_rooks_castle(self,player):
         return self.rooks_can_castle[1 - int(player)][:]
 
+    def set_player_in_check(self, player, b_check):
+        self.player_in_check[1 - int(player)] = b_check
+
+    def set_player_not_in_check(self, player):
+        self.player_in_check[1 - int(player)] = False
+    
     def b_in_check(self,_player):
         return self.player_in_check[1 - int(_player)]
 

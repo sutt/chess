@@ -6,6 +6,7 @@ from datatypes import moveHolder
 from GameLog import GameLog
 from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
 from TurnStage import filter_king_check
+from TurnStage import is_king_in_check
 from TurnStage import filter_king_check_test_copy   #temp
 from TurnStage import filter_king_check_test_copy_apply   #temp
 from TurnStage import filter_king_check_optimal   #emp
@@ -64,13 +65,14 @@ class Game():
 
 
     def check_test_exit_moves(self, **kwargs):
+        '''bool: exit after 'moves' is calcd / before check_enggame() in play().'''
         if self.test_exit_iturn is not None:
             if self.i_turn == self.test_exit_iturn:
                 return True
         return False
             
-
     def check_test_exit(self, **kwargs):
+        '''bool: exit at bottom of turn loop in play(), after apply_move(). '''
         if len(self.instruction_control) > 0:
             if self.i_turn == len(self.instructions):
                 return True
@@ -81,6 +83,7 @@ class Game():
     
         if int(player) in self.instruction_control:
             #TODO - instruction.pop(0)
+            #       but move == -1 needs to be calc'd for wrong moves
             move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
             move = player_control_input(board, moves, self.log)
@@ -116,6 +119,9 @@ class Game():
             
             player, self.i_turn = increment_turn(player, self.i_turn)
 
+            b_player_in_check = is_king_in_check(board, pieces, player)
+            board.set_player_in_check(player, b_player_in_check)
+
             moves = get_available_moves(pieces, board, player)
 
             if kwargs.get('king_in_check_on', False):
@@ -137,22 +143,33 @@ class Game():
             if kwargs.get('king_in_check_optimal_3', False):
                 moves = filter_king_check_optimal_3(board, pieces, moves, player)
             
+            #TODO - sepearate log from console-log
             self.log.print_turn(board, pieces, player)
 
             if self.check_test_exit_moves():
                 self.b_test_exit = True
-                self.test_data = copy.deepcopy(moves)
+                self.test_data = {}
+                self.test_data['moves'] = copy.deepcopy(moves)
+                self.test_data['board'] = copy.deepcopy(board)
                 continue
 
             check_code = check_moves(moves, board, player)  #TODO - rename check_endgame()
             
+            #TODO - move this into check_endgame
             if check_code < 0:
-                game.outcome = 'LOSS' # or 'STALEMATE'
+                if check_code == -2:
+                    self.outcome = 'WIN'    #50 moves with only king
+                else:
+                    if board.b_in_check(player):
+                        self.outcome = 'LOSS'
+                    else:    
+                        self.outcome = 'STALEMATE' 
                 game_going = False
                 continue
 
             move = self.select_move(moves, player, board)
 
+            #Catch move which is not legal
             if move == -1:      #TODO if the_move is None:
                 self.b_test_exit = True
                 self.test_data = self.i_turn
@@ -167,6 +184,7 @@ class Game():
                 self.test_data = copy.deepcopy(board)
                 continue
 
+        #True exit: only here check_endgame has been satisfied
         return self.outcome, self.log.get_log_move()
 
 
@@ -237,6 +255,7 @@ def test_king_in_check1():
                 )
     
     moves = game.play()
+    moves = moves['moves']
 
     assert moves == [Move(pos0=(6, 0), pos1=(5, 0), code=0), Move(pos0=(6, 0), pos1=(4, 0), code=0)]
     #yes, namedtuples are assert as equivalent to generic-tuples
@@ -270,6 +289,7 @@ def test_king_in_check2():
                 )
     
     moves = game.play()
+    moves = moves['moves']
     print moves
     assert moves == [ ( (7,0),(7,1),0) ]
 
@@ -306,6 +326,7 @@ def test_king_in_check3():
                 )
     
     moves = game.play()
+    moves = moves['moves']
     print moves
     assert moves == [ ( (7,0),(6,0),0) ]
 
@@ -317,12 +338,46 @@ def test_post_castling_move_rook():
     assert board.data_by_player[7][4] == 1
     assert board.data_by_player[7][5] == 0
 
+def test_player_in_and_out_of_check():
+    
+    #Black is checked on 7th move
+    ss = "1. g4 e4 2. b5 d5 3. h2 f1 4. d5 e4 5. h4 e4 6. b8 d8 7. e4 e5 8. a6 b5 9. e5 d5 10. b1 c1"
+    _i_exit_moves = 8
+    _b_current_player = False
+    
+    game = Game(s_instructions = ss
+                ,test_exit_moves = _i_exit_moves
+                )
+    test_data = game.play()
+    
+    board_data = test_data['board']
+    b_check = board_data.b_in_check(_b_current_player)
+    
+    assert b_check == True
+
+    #Black is not in check after white's 9th move
+    _i_exit_moves = 10
+    _b_current_player = False
+    
+    game = Game(s_instructions = ss
+                ,test_exit_moves = _i_exit_moves
+                )
+    test_data = game.play()
+    
+    board_data = test_data['board']
+    b_check = board_data.b_in_check(_b_current_player)
+    
+    assert b_check == False
+
+# def castling_disallowed_in_check():    
+
+# def castling_disallowed_into_check():    
 
 
 if __name__ == "__main__":
     
     #Interactive Setup
-    game = Game(manual_control = (1,)
+    game = Game(manual_control = (1,0)
                 ,b_log_show_opponent = True
                 ,b_log_move = True
                 )

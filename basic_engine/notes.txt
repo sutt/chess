@@ -311,6 +311,10 @@ board should store edge cases:
                     mirror on a move where pos0 is in list_calc_needed. A "moving
                     away a blocker" type move; implied is you can never add to possibility
                     of being in check based on where you end up.
+
+                To consider: enpassant is the one move where pos1 != kill_pos, and that
+                             oppoent pawn could be blocking check, with no piece there
+                             to replace it.
                 
 
                         

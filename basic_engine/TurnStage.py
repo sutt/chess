@@ -42,17 +42,16 @@ def get_possible_check(pieces, board, player):
 
 def check_moves(moves, board, player):
     
-    if  len(moves) == 0:
-        #TODO - add checkmate detector
-        #TODO - add stalemate detector
-        #TODO - add lone-king-50-move-rule detector
+    if len(moves) == 0:
         return -1
+    #TODO - add lone-king-50-move-rule detector
+    #elif board.player_only_king_moves(player) == 50
+    #   return -2
     else:
         return 0
     
 
 
-# def apply_move(the_move, the_move_code, board, pieces, _player):
 def apply_move(move, board, pieces, _player):
     
     move_code = move.code
@@ -84,6 +83,9 @@ def apply_move(move, board, pieces, _player):
         pieces[piece_i].pos = pos1
     
     else:
+        
+        #TODO - turn off castling moves when b_player_in_check upstream
+
         # is it a left castle or a right castle, from POV of white
         castle_absolute_left = True if (KING_COL > pos1[1]) else False
         
@@ -125,6 +127,11 @@ def apply_move(move, board, pieces, _player):
             board.old_player_pos(kill_pos)    
                 
     #TODO - any promotions here    
+
+    #TODO - we can't alter this property when considering hypotheticals
+    #Actually we can because only time this is done hypothetically is when
+    #board is deepcopied and discarded
+    board.set_player_not_in_check(_player)   #based on previous validations
 
     return board, pieces
 
@@ -270,8 +277,9 @@ def get_possible_check_optimal(pieces, board, move, player):
     #maybe cancel this if castling?
     #think we should be good as filter_king() has already apply_move a castling move
 
-    if player_king_pos == move.pos0:
-        player_king_pos == move.pos1
+    if move is not None:
+        if player_king_pos == move.pos0:
+            player_king_pos == move.pos1
 
     player_king_code = 3 if player else -3
 
@@ -683,27 +691,17 @@ def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
 
     return out
 
-def is_king_in_check(board, pieces, moves, player):
+def is_king_in_check(board, pieces, player):
 
     '''return a boolean for if current player is in check'''
 
-    # Actually, this doesn't need to be run to test end game conditions, we can go
-    # untill there are no moves available to the player, "mate", and test only *once*
-    # the player's "check-state" at the beginning of that turn
+    # It's ultimately O(n+1) not O(n*2) , because it's not called
+    # for each available_move once but for all of them, at start of the turn.
 
-    # But, it is impossible to assess whether castling is legal?
-    # We could say compare moves before and after filter_king_v_x(), and if the only 
-    # ones available are castling then we check if check was in effect?
+    #TODO - here construct cache_pos0_king_check_calc_needed list
+    #       for downstream consumption by filter_king_check()
 
-    # We already do check for castling into check in filter (by do a hypo apply_move
-    # and then looking at mirror-king). So how not to castle out-of / while-in check?
+    return get_possible_check_optimal(pieces, board, None, player)
 
-    # Maybe by applying the check only in filter_king() when _move.code == 'castling'?
-    # But this is done multiple time instead of once per turn, so just do it once
-    # which leads to ...
-
-    # Actually this all ridiculous,
-    # It's ultimately O(n+1) not O(n*2) as it seemed initially, because it's not called
-    # for each available_move once for all of them
-
-    b_check = get_possible_check_optimal(_pieces, _board, _move, player)
+    
+    
