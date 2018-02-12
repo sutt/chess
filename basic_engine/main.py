@@ -309,6 +309,15 @@ def test_king_in_check3():
     print moves
     assert moves == [ ( (7,0),(6,0),0) ]
 
+def test_post_castling_move_rook():
+
+    ss_post_castling = "1. h7 f8 2. b8 c8 3. g5 e5 4. b1 d1 5. h6 f4 6. b2 c2 7. h5 h7 8. a8 b8 9. h6 h5 10. a7 c6"    
+    game = Game(s_instructions = ss_post_castling)
+    board = game.play()
+    assert board.data_by_player[7][4] == 1
+    assert board.data_by_player[7][5] == 0
+
+
 
 if __name__ == "__main__":
     

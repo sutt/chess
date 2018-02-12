@@ -100,6 +100,9 @@ def apply_move(move, board, pieces, _player):
         board.new_player_pos(_player, k_pos1, pieces[piece_i])
         board.new_player_pos(_player, r_pos1, pieces[rook_i])
 
+        board.old_player_pos(k_pos0)
+        board.old_player_pos(r_pos0)
+
 
     #Fallout from Move
     pieces[piece_i].modify_castling_property()
