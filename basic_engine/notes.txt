@@ -239,13 +239,13 @@ board should store edge cases:
         need a way to return game state data in  board, like in-check to tests
 
         BUGS
-            moving R or K after castling does not work
-            filter_copy_apply_4 is fast but doesnt pass 3 test
+            x moving R or K after castling does not work
+            x filter_copy_apply_4 is fast but doesnt pass 3 test
 
     2/12
 
         BUGS
-            can't use raw_input in git-bash or in vscode-python-debug (just hangs)
+            x can't use raw_input in git-bash or in vscode-python-debug (just hangs)
             fixed by loading root dir of exercises and picking up integrated shell settings?
             this way, python debug stdout loads in 'Terminal' tab under 'python debug' mode,
             otherwise it loads in 'Debug Console'

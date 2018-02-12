@@ -697,8 +697,6 @@ def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
         if b_regular:
             board = mutator.demutate_board(_board)
             pieces = mutator.demutate_pieces(_pieces, player)
-        
-        out.append(_move)
 
     return out
 
