@@ -40,13 +40,21 @@ def get_possible_check(pieces, board, player):
     return False    #no checks found
 
 
-def check_moves(moves, board, player):
+def check_endgame(moves, board, player):
     
     if len(moves) == 0:
-        return -1
-    #TODO - add lone-king-50-move-rule detector
-    #elif board.player_only_king_moves(player) == 50
-    #   return -2
+    
+        if board.b_in_check(player):
+            self.outcome = (player, 'LOSS', 'CHECKMATE')
+        else:    
+            self.outcome = (player, 'STALEMATE', 'NOMOVES')
+    
+    elif board.player_only_king_moves[1 - int(player)] == 50:   #TODO - player_i(player)
+        self.outcome = (player, 'WIN', '50MOVES')
+        #TODO - add increment_player_only_king_moves
+
+    #TODO - add stalemate check for not enough pieces
+    #self.outcome = (player, 'STALEMATE', 'NOPIECES')
     else:
         return 0
     

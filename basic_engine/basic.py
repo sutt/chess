@@ -52,7 +52,7 @@ class Board:
         self.data_by_player = copy.deepcopy(data)   #TODO - refactor as data
         self.player_in_check = [False, False]
         self.rooks_can_castle = [[True, True], [True, True]]
-        
+        self.player_only_king_moves = [0,0]
         #TODO - remove these
         self.annotate = None
         self.misc = None

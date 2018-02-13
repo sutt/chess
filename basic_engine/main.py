@@ -4,7 +4,7 @@ from basic import *
 from utils import *
 from datatypes import moveHolder
 from GameLog import GameLog
-from TurnStage import increment_turn, get_available_moves, check_moves, apply_move
+from TurnStage import increment_turn, get_available_moves, check_endgame, apply_move
 from TurnStage import filter_king_check
 from TurnStage import is_king_in_check
 from TurnStage import filter_king_check_test_copy   #temp
@@ -99,17 +99,16 @@ class Game():
         board = Board()
         
         if self.init_board is not None:
-            board.set_data(self.init_board)
+            board.set_data(self.init_board)     
             pieces = self.init_pieces
-            #note this has fresh king_can_castle property
         else:
             board, pieces = place_pieces(board)
         
-        player = False      #at increment_turn it will change to True
+        #These incremetent at top-of-turn-loop
+        self.i_turn = 0
+        player = False 
         if self.init_player is not None:
             player = not(self.init_player)
-
-        self.i_turn = 0     #at increment_turn it will change to 1
 
         game_going = True
         
@@ -154,17 +153,9 @@ class Game():
                 self.test_data['board'] = copy.deepcopy(board)
                 continue
 
-            check_code = check_moves(moves, board, player)  #TODO - rename check_endgame()
+            check_code = check_endgame(moves, board, player)
             
-            #TODO - move this into check_endgame
             if check_code < 0:
-                if check_code == -2:
-                    self.outcome = 'WIN'    #50 moves with only king
-                else:
-                    if board.b_in_check(player):
-                        self.outcome = 'LOSS'
-                    else:    
-                        self.outcome = 'STALEMATE' 
                 game_going = False
                 continue
 
@@ -406,7 +397,3 @@ if __name__ == "__main__":
 
     # game.play(king_in_check_on=False, king_in_check_test_copy_apply_4=True)
     
-
-    # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
-    # game = Game(s_instructions = ss, b_log_show_opponent = True)
-    # game.play(king_in_check_on=False, king_in_check_optimal=True)
