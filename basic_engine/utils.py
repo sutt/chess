@@ -9,14 +9,7 @@ Move = moveHolder()
 
 
 
-#TODO - move this to basic
-def en_passant_pos(pos1, _player):
-    upwards = -1 if _player else 1
-    return (pos1[0] - upwards, pos1[1])
 
-#TODO - move this to basic
-def two_advances(pos0, pos1):
-    return 2 == abs(pos0[0] - pos1[0])
 
 #TODO - better please
 def parse_instructions(s):
@@ -39,12 +32,7 @@ def parse_instructions(s):
     return moves
 
 
-def print_board_letters(board, pieces, b_lower_black = False):
-    
-    board.start_annotate()
-    for p in pieces:
-        board.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
-    board.print_board(b_annotate = True, b_show_grid = True)    
+
 
 
 def alphanum_to_pos(inp):
@@ -115,9 +103,9 @@ def instruction_input(board, moves, instructions, i_turn):
         for _m in moves:
             if the_move == (_m.pos0, _m.pos1):
                 return Move(_m.pos0, _m.pos1, _m.code)
-        return -1  # to demonstrate an error in instruction input
+        return None  # to demonstrate an error in instruction input
     else:
-        return -1  # to demonstrate an error in instruction input
+        return None  # to demonstrate an error in instruction input
 
 def moves_to_alphanum(list_inp):
     

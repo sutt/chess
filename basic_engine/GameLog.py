@@ -1,7 +1,5 @@
 import time, copy
 
-from utils import print_board_letters   #TODO - remove this
-
 class GameLog:
 
     ''' Holds all data collected within the game.
@@ -54,12 +52,4 @@ class GameLog:
         return copy.deepcopy(self.log_turn_time)
 
     
-    #TODO - remove this
-    def print_turn(self, board, pieces, player, **kwargs):
-
-        if (self.board_pre_turn and 
-            ((player in self.manual_control) or 
-                self.board_pre_turn_oppoenent)):
-
-            print_board_letters(board, pieces, True)
-
+  

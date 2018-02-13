@@ -91,7 +91,7 @@ def apply_move(move, board, pieces, _player):
         
         board.old_player_pos(pos0)
         
-        b_two_advances = two_advances(pos0,pos1)   #bool: will it be enpassant_vuln?
+        b_two_advances = board.two_advances(pos0,pos1)   #bool: will it be enpassant_vuln?
         
         board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)
         
@@ -130,7 +130,7 @@ def apply_move(move, board, pieces, _player):
 
     if kill_flag:
         
-        kill_pos = pos1 if not(b_enpassant) else en_passant_pos(pos1, _player)
+        kill_pos = pos1 if not(b_enpassant) else board.en_passant_pos(pos1, _player)
         
         #TODO - helper func
         killed_piece_i = filter(lambda _p: (_p[1].pos == kill_pos) and 

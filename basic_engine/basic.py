@@ -53,9 +53,7 @@ class Board:
         self.player_in_check = [False, False]
         self.rooks_can_castle = [[True, True], [True, True]]
         self.player_only_king_moves = [0,0]
-        #TODO - remove these
-        self.annotate = None
-        self.misc = None
+        
 
         #Notes:
         # data: 0=blank, 1=piece(of any player)
@@ -68,7 +66,7 @@ class Board:
     def set_data(self, data):
         self.data_by_player = data
 
-    #Position changes
+    #Position Data
 
     def get_data_pos(self, pos):
         return self.data_by_player[pos[0]][pos[1]]
@@ -145,53 +143,26 @@ class Board:
             return 'Black'
 
 
-    
-    #TODO - move these to Display / Utils -------
-    def start_annotate(self,**kwargs):
-        self.annotate = [["~" for i in range(self.width)] for j in range(self.width)]
-
-    def start_misc(self,**kwargs):
-        self.misc = [[0 for i in range(self.width)] for j in range(self.width)]
-
-    def mark_annotate(self,piece,**kwargs):
-        _pos = piece.pos
-        _symbol = str.upper(str(piece.__class__.__name__)[0])
-        
-        if kwargs.get('disambiguate', False): 
-            if str(piece.__class__.__name__) == "Knight":
-                _symbol = "N"
-        
-        if kwargs.get('b_lower_case', False):
-            if not(piece.white):
-                _symbol = str.lower(_symbol)
-        
-        self.annotate[_pos[0]][_pos[1]] = _symbol
-
-    def mark_misc(self,pos,**kwargs):
-        self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
-
-    def mark_all_misc(self,list_list_pos,**kwargs):
-        for list_pos in list_list_pos:
-            for pos in list_pos:
-                self.misc[pos[0]][pos[1]] = 1
-                
-
-    def mark_list_misc(self,list_pos,**kwargs):
-        for pos in list_pos:
-            self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
-    # -------------------------------------------------
-
     #Enpassant 
+
+    @staticmethod
+    def two_advances(pos0, pos1):
+        return 2 == abs(pos0[0] - pos1[0])
+
+    @staticmethod
+    def en_passant_pos(pos1, _player):
+        upwards = -1 if _player else 1
+        return (pos1[0] - upwards, pos1[1])
     
     def clear_enpassant_vulnerability(self, _player):
         player_mult = 1 if _player else -1
         for i in range(BOARD_WIDTH):
             for j in range(BOARD_WIDTH):
+                #TODO - get_pos / set_pos
                 if self.data_by_player[i][j] == 2 * player_mult:
                     self.data_by_player[i][j] = player_mult
-        #can also do this by scanning through pieces
                 
-    def player_relative_pos(self,player,row,col):
+    def player_relative_pos(self, player, row, col):
         """ returns pos based on player-relative row e.g. white's "back row" is row 7"""
         _row =  (self.width-1)*player +  -1*row if player else row
         _col = col
@@ -258,6 +229,7 @@ class Board:
         
         return pos1
 
+    #TODO - used?
     def get_castle_interspaces(self,player):
         """ input: player (bool)
             returns: list of list of pos tuples """
@@ -266,39 +238,6 @@ class Board:
         pos1.append( [(_row, i) for i in range(1,KING_COL)] )
         pos1.append( [(_row, i) for i in range(KING_COL + 1,    BOARD_WIDTH - 1)] )
         return pos1
-
-
-    #TODO - move this to Utils/ Display
-    def print_board(self,b_annotate = False ,b_misc = False
-                        ,b_player_data = False, b_show_grid = False
-                        ,b_abs = False):
-
-        p_data = self.data
-        if b_annotate: p_data = self.annotate
-        if b_misc: p_data = self.misc
-        if b_player_data: 
-            p_data = self.data_by_player
-            b_abs = True
-        
-        out = ""
-        
-        if b_show_grid:
-            out += "   " + " ".join(map(lambda i: str(i), range(1,9)))
-            out += "\n"
-            out += "\n"
-            row_grid = "ABCDEFGH"
-
-        for i,row in enumerate(p_data):
-            if b_abs:
-                s_row = map(lambda int_i: str(abs(int_i)),row)
-            else:
-                s_row = map(lambda int_i: str(int_i),row)
-            if b_show_grid:
-                out += row_grid[i]
-                out += "  "
-            out += " ".join(s_row)
-            out += "\n"        
-        print2(out)
 
 
 
@@ -558,8 +497,8 @@ class SuperKing(Piece):
 
 
 
-
-def place_pieces(board,**kwargs):
+#TODO - add to helper functions
+def place_pieces(board, **kwargs):
     """ input: board [blank]
         returns: (board, pieces) """
 
@@ -601,6 +540,7 @@ def place_pieces(board,**kwargs):
     return board, pieces
 
 
+#TODO - move these a centralized test file
 def tests():    
 
     board = Board()

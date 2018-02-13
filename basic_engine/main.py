@@ -4,6 +4,7 @@ from basic import *
 from utils import *
 from datatypes import moveHolder
 from GameLog import GameLog
+from Display import Display
 from TurnStage import increment_turn, get_available_moves, check_endgame, apply_move
 from TurnStage import filter_king_check
 from TurnStage import is_king_in_check
@@ -25,7 +26,7 @@ class Game():
         ,manual_control = () 
         ,instruction_control = () 
         ,s_instructions = ""
-        ,b_log_show_opponent = False
+        ,b_display_show_opponent = False
         ,init_board = None
         ,init_player = None
         ,init_pieces = None
@@ -53,8 +54,10 @@ class Game():
         self.init_board = copy.deepcopy(init_board)
         self.init_pieces = copy.deepcopy(init_pieces)
 
+        self.display = Display(b_show_opponent = b_display_show_opponent
+                                ,manual_control = self.manual_control)
+
         self.log = GameLog(manual_control = self.manual_control
-                          ,b_log_show_opponent = b_log_show_opponent 
                           ,b_log_move = b_log_move
                           ,b_turn_time = b_log_turn_time
                           ,b_num_available = b_log_num_available
@@ -82,8 +85,6 @@ class Game():
     def select_move(self, moves, player, board): 
     
         if int(player) in self.instruction_control:
-            #TODO - instruction.pop(0)
-            #       but move == -1 needs to be calc'd for wrong moves
             move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
             move = player_control_input(board, moves, self.log)
@@ -143,8 +144,7 @@ class Game():
             if kwargs.get('king_in_check_optimal_3', False):
                 moves = filter_king_check_optimal_3(board, pieces, moves, player)
             
-            #TODO - sepearate log from console-log
-            self.log.print_turn(board, pieces, player)
+            self.display.print_turn(board, pieces, player)
 
             if self.check_test_exit_moves():
                 self.b_test_exit = True
@@ -161,8 +161,7 @@ class Game():
 
             move = self.select_move(moves, player, board)
 
-            #Catch move which is not legal
-            if move == -1:      #TODO if the_move is None:
+            if move is None:                #Catch move which is not legal
                 self.b_test_exit = True
                 self.test_data = self.i_turn
                 continue
@@ -176,7 +175,7 @@ class Game():
                 self.test_data = copy.deepcopy(board)
                 continue
 
-        #True exit: only here check_endgame has been satisfied
+        #True exit: only here when check_endgame has been satisfied
         return self.outcome, self.log.get_log_move()
 
 
@@ -207,7 +206,7 @@ def test_enpassant_take():
     ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. d2 c3"
     game = Game(s_instructions = ss)
     board = game.play()
-    board.print_board(b_player_data=True)
+    # board.print_board(b_player_data=True)
     assert board.data_by_player[2][2] == 1
     assert board.data_by_player[3][2] == 0
     
@@ -381,8 +380,8 @@ def test_castling_disallowed_into_check():
 if __name__ == "__main__":
     
     #Interactive Setup
-    game = Game(manual_control = (1,0)
-                ,b_log_show_opponent = True
+    game = Game(manual_control = (1,)
+                ,b_display_show_opponent = True
                 ,b_log_move = True
                 )
     game.play()
@@ -391,7 +390,7 @@ if __name__ == "__main__":
     # ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '            
     # game = Game(s_instructions = ss_long
     #         ,test_exit_moves = None
-    #         ,b_log_show_opponent = True
+    #         ,b_display_show_opponent = True
     #         ,b_log_move = True
     #         )
 

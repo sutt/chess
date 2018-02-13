@@ -279,6 +279,8 @@ board should store edge cases:
             Does get_possible_check_optimal take into account pawns?
                 I think so because (movetype.diagonal, 1) in in Mirror.class_movements()
                     but how does this handle direction?
+
+            How does modify castling propert work for rooks?
             
             
         Takeaways
