@@ -1,10 +1,15 @@
 import time, copy
 
-from utils import print_board_letters
+from utils import print_board_letters   #TODO - remove this
 
 class GameLog:
+
+    ''' Holds all data collected within the game.
+        Used as data-structure when returned from a test. '''
+
     def __init__(self,**kwargs):
         
+        #TODO - remove these
         self.board_pre_turn = True
         self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())

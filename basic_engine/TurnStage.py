@@ -54,50 +54,58 @@ def check_moves(moves, board, player):
 
 def apply_move(move, board, pieces, _player):
     
+    '''This mutates board and pieces based on move. 
+        Mutator Class can handle half-turn ahead board/piece mutations on 
+        regular move codes, but this function can handle the exotic moves:
+        enpassant, castling, promotion. And also sets/clears the permission
+        properties to allow these moves.'''
+
     move_code = move.code
     move = (move.pos0, move.pos1)
-    
-    b_enpassant, b_castling = False, False
-    if move_code == MOVE_CODE['en_passant']: b_enpassant = True
-    if move_code == MOVE_CODE['castling']: b_castling = True
+
+    b_enpassant = (move_code == MOVE_CODE['en_passant'])
+    b_castling = (move_code == MOVE_CODE['castling'])
                 
-    pos0,pos1 = move[0], move[1]
+    pos0, pos1 = move[0], move[1]
+
+    #TODO - add helper func: piece_from_pos( index_=True)
     piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
+    #TODO - piece = pieces[piece_i]
 
     kill_flag = False   # before the move, check if opp's piece is there
-    #TODO - board.get_data(rc = pos1)
-    if (board.data_by_player[pos1[0]][pos1[1]] != 0 or b_enpassant) and \
-        not(b_castling):
+    if (board.get_data_pos(pos1) != 0 or b_enpassant) and not(b_castling):
         kill_flag = True
 
-    
     #Turn-Reset: clear previous before the move is applied
     board.clear_enpassant_vulnerability(_player)
-    #also "previous check has been cleared (but new check may apply)"
 
-    if not(move_code == MOVE_CODE['castling']):
+    if not(b_castling):
         
         board.old_player_pos(pos0)
-        b_two_advances = two_advances(pos0,pos1)   #if its enpassant_vulnerable
+        
+        b_two_advances = two_advances(pos0,pos1)   #bool: will it be enpassant_vuln?
+        
         board.new_player_pos(_player, pos1, pieces[piece_i], b_two_advances)
+        
         pieces[piece_i].pos = pos1
     
     else:
-        
-        #TODO - turn off castling moves when b_player_in_check upstream
 
         # is it a left castle or a right castle, from POV of white
         castle_absolute_left = True if (KING_COL > pos1[1]) else False
         
         r_pos0, r_pos1 = board.get_rook_castle_move(_player 
                                     ,left_side = castle_absolute_left)
+
         k_pos0, k_pos1 = board.get_king_castle_move(_player
                                     ,left_side = castle_absolute_left)
         
+        #TODO - helper func
         rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
-        
+        #TODO - rook = pieces[rook_i]
+
         pieces[rook_i].pos = r_pos1   
-        pieces[piece_i].pos = k_pos1   #already king
+        pieces[piece_i].pos = k_pos1   #piece_i already king
         
         board.new_player_pos(_player, k_pos1, pieces[piece_i])
         board.new_player_pos(_player, r_pos1, pieces[rook_i])
@@ -108,29 +116,33 @@ def apply_move(move, board, pieces, _player):
 
     #Fallout from Move
     pieces[piece_i].modify_castling_property()
+
     board.modify_castling_property( _player, pieces[piece_i], pos0)
 
 
     if kill_flag:
+        
         kill_pos = pos1 if not(b_enpassant) else en_passant_pos(pos1, _player)
         
+        #TODO - helper func
         killed_piece_i = filter(lambda _p: (_p[1].pos == kill_pos) and 
                                             not(_p[1].white == _player)
                                 ,enumerate(pieces))
         killed_piece_i = killed_piece_i[0][0]
         
-        pieces[killed_piece_i].alive = False
         #TODO - don't pop piece in hypothetical_pieces=True
+        # pieces[killed_piece_i].alive = False
+        
         pieces.pop(killed_piece_i)
         
         if (b_enpassant):
             board.old_player_pos(kill_pos)    
+            #otherwise, you already overwrote it's position on board
                 
     #TODO - any promotions here    
 
-    #TODO - we can't alter this property when considering hypotheticals
-    #Actually we can because only time this is done hypothetically is when
-    #board is deepcopied and discarded
+    # Unnec as it sets and acted upon at beginning of turn, 
+    # still nice to have it always being reset here.
     board.set_player_not_in_check(_player)   #based on previous validations
 
     return board, pieces
@@ -172,9 +184,10 @@ class Mirror():
         piece = filter(lambda piece: piece.pos == pos, pieces)[0]
         return piece.__class__.__name__
 
-    # not a static method
     def infer_move_type(self, move):
-        
+        # none of the three atomic move types overlap, thus deduce the
+        # move-type from the (pos0, pos1).
+
         pos0 = self.init_pos
         pos1 = move
         
@@ -229,14 +242,20 @@ class Mirror():
     def match(class_move_type, move_type, move_space):
         
         temp_class_move_type = map(lambda x: x[0], class_move_type)
+
         if move_type in temp_class_move_type:  
+
             max_spaces_ind = temp_class_move_type.index(move_type)
+            
             max_spaces = class_move_type[max_spaces_ind][1]
+            
             if move_space <= max_spaces:                
                 return True
+            
             # need this below if max_spaces for knight is not hard-coded to 2
             # if move_type == MOVE_TYPE['twobyone']:
             #     return True
+
         return False
         
 
@@ -253,31 +272,26 @@ class Mirror():
         self.calc_move_spaces()
         self.calc_classes()
         self.calc_class_move_types()
-        self.calc_move_type()       #added
+        self.calc_move_type()       
 
-        if len(self.moves) > 0:
-            self.calc_match()
-
-            return any(self.outcome)
-        else:
-            return False
-
+        self.calc_match()
+        return any(self.outcome)
 
 
 
 def get_possible_check_optimal(pieces, board, move, player):
     
-    ''' This optimized substitute for get_possible_check() (the niave func)
-     There are further optimization-tweaks in v _2, _3 '''
+    ''' An optimized substitute for get_possible_check() (the niave func).
+        It uses the SuperKing.get_available_moves(mirror_flag = True) 
+        to see if any other piece possibly move in a way to caputre it.
+        Then Mirror class to see if any of those threats is capable.'''
 
+    #Helper func: piece_by_class_player
     player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
     
     player_king_pos = player_king[0].pos 
-    
-    #maybe cancel this if castling?
-    #think we should be good as filter_king() has already apply_move a castling move
 
-    if move is not None:
+    if move is not None:    #when calling at beginning of turn
         if player_king_pos == move.pos0:
             player_king_pos == move.pos1
 
@@ -291,7 +305,9 @@ def get_possible_check_optimal(pieces, board, move, player):
                                                   ,mirror_flag=True
                                                   )
                                                   
-    #also can go back to naive_check with only opp_kill_moves opponent pieces
+    if len(opp_kill_moves) == 0:
+        return False        #optimization, bypass next section
+
     mirror = Mirror()   
     
     mirror.set_init_pos(player_king_pos)
@@ -302,83 +318,7 @@ def get_possible_check_optimal(pieces, board, move, player):
 
     return b_check
 
-_mirror = Mirror()
 
-def get_possible_check_optimal_2(pieces, board, move, player):
-    
-    ''' This build off _check_optimal and uses an already instatiated 
-        _mirror object.
-        This does not appear to out-perform at all.'''
-    
-    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
-    
-    player_king_pos = player_king[0].pos 
-    
-    #maybe cancel this if castling?
-
-    if player_king_pos == move.pos0:
-        player_king_pos == move.pos1
-
-    player_king_code = 3 if player else -3
-
-    hypo_king = SuperKing(b_white = player,pos = player_king_pos )
-
-    opp_kill_moves = hypo_king.get_available_moves(board
-                                                  ,move_type_flag=True
-                                                  ,check_flag=False
-                                                  ,mirror_flag=True
-                                                  )
-                                                  
-    #_mirror = Mirror()   #instatiated outside
-    
-    _mirror.set_init_pos(player_king_pos)
-    _mirror.set_moves(opp_kill_moves)
-    _mirror.set_pieces(pieces)
-    
-    b_check = _mirror.run_calc()
-
-    return b_check
-
-
-_mirror3 = Mirror() #For use in function below
-
-def get_possible_check_optimal_3(pieces, board, move, player):
-    
-    ''' This build off _2 and uses an already instatiated _mirror3 object.
-        Also it uses a quick return to not process mirror, when there are
-        "no threats in range".
-        These does not appear to out-perform at all.'''
-
-    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
-    
-    player_king_pos = player_king[0].pos 
-    
-    #maybe cancel this if castling?
-
-    if player_king_pos == move.pos0:
-        player_king_pos == move.pos1
-
-    player_king_code = 3 if player else -3
-
-    hypo_king = SuperKing(b_white = player,pos = player_king_pos )
-
-    opp_kill_moves = hypo_king.get_available_moves(board
-                                                  ,move_type_flag=True
-                                                  ,check_flag=False
-                                                  ,mirror_flag=True
-                                                  )
-                                                  
-    #_mirror = Mirror()   #instatiated outside
-    if len(opp_kill_moves) == 0:
-        return False
-    
-    _mirror3.set_init_pos(player_king_pos)
-    _mirror3.set_moves(opp_kill_moves)
-    _mirror3.set_pieces(pieces)
-    
-    b_check = _mirror3.run_calc()
-
-    return b_check
 
 def filter_king_check_optimal_2(board, pieces, moves, player):
     
@@ -494,18 +434,21 @@ class Mutator():
     
     '''Helper Class for preserving board state without deepcopying.'''
 
+    # Do not use this for move_code = enpassant, castling.
+    # move_code = promotion should be fine b/c your new piece class is irrelevant
+
     # mutate() consists of 
     #   (pos0, pos0-val) - always going to be 0 as new value
     #   (pos1, pos1-val) - either 0 or opponents enum
-
     
     def __init__(self):
         self.old_mutation = None
         self.new_mutation = None
+        self.mutation_king_piece = None
 
-    def mutate_board(self,board, move):
+    def mutate_board(self, board, move):
 
-        '''apply new board state and save the changes, or reapply old board state'''
+        '''apply new board state and save the changes to class data'''
 
         #can use methods on .data_by_player ?
         #this might need adjusting under promotion
@@ -534,6 +477,8 @@ class Mutator():
 
     def demutate_board(self,board):
         
+        '''pull changes from class data, and apply them to board state'''
+        
         pos = self.old_mutation[0]
         r, c = pos[0], pos[1]
         val = self.old_mutation[1]
@@ -548,10 +493,13 @@ class Mutator():
 
     def mutate_pieces(self, pieces, player):
             
-        #get_possible_check_optimal uses King's POS, otherwise does
-        #not use pieces.
-        #get_possible_check uses only opponents pieces, and board, 
-        # so you must eliminate captured piece.
+        ''' [possibly] apply spot changes to property of a piece[s] in pieces
+            and save those changes to class data. '''
+        
+        #get_possible_check_optimal(): uses King's POS, otherwise does
+        #                              not use pieces.
+        #get_possible_check_naive(): uses opponent's pieces, 
+        #                            so you must eliminate captured piece.
         
         self.mutation_king_piece = None
         
@@ -566,17 +514,24 @@ class Mutator():
             
             player_king.pos = new_pos
 
+        #TODO - have not set alive = False anywhere here
+
         return pieces
 
     def demutate_pieces(self, pieces, player):
         
+        ''' [possibly] pull saved piece-change-data from class data and apply those
+            to correct piece in pieces; resetting pieces to original state. '''
+        
         if self.mutation_king_piece is None:
             return pieces
         else:
+            #TODO - helper func
             player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
             old_pos = self.mutation_king_piece[0]
             player_king.pos = old_pos
             return pieces
+
 
 def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
     
@@ -672,14 +627,11 @@ def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
             _board = mutator.mutate_board(board, _move)
             _pieces = mutator.mutate_pieces(pieces, player)
         else:
+            #Non-Standard Board/Piece Mutation
             _board = copy.deepcopy(board)
             _pieces = copy.deepcopy(pieces)
+            _board, _pieces = apply_move(_move, _board, _pieces, player)
 
-
-        if not(b_regular):
-            _board, _pieces = apply_move(_move, _board, _pieces, player)    
-
-        #Added in actual function
         b_check = get_possible_check_optimal(_pieces, _board, _move, player)
         
         if not(b_check):
@@ -700,6 +652,9 @@ def is_king_in_check(board, pieces, player):
 
     #TODO - here construct cache_pos0_king_check_calc_needed list
     #       for downstream consumption by filter_king_check()
+
+        # 1st, if opp_kill_move == [], then only need to check king_moves
+        # 2nd , if 1st doesnt apply then check cache to see if calc_needed
 
     return get_possible_check_optimal(pieces, board, None, player)
 

@@ -1,12 +1,12 @@
 import sys, copy, time
 from datatypes import moveAHolder
 
-MoveA = moveAHolder()
+#Params and Enums ---------------------------
 
 BOARD_WIDTH = 8
 KING_COL = 4        #based on index0 and a White-POV
 
-MOVE_CODE = dict()
+MOVE_CODE = {}
 MOVE_CODE['regular'] = 0
 MOVE_CODE['en_passant'] = 1
 MOVE_CODE['castling'] = 2
@@ -17,14 +17,19 @@ MOVE_TYPE['diagonal'] = 1
 MOVE_TYPE['twobyone'] = 2
 
 
+#Helper Functions ---------------------------
+
+MoveA = moveAHolder()
+
 def move_tuple(b_append, move, move_type):
+    ''' if b_append: build MoveA namedtuple from argument data.'''
     move_code = MOVE_CODE[move_type]
     out = MoveA(move, move_code) if b_append else move
     return out
 
 
-#for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630
 def print2(data, arg1="", arg2="", arg3="",arg4=""):
+    '''for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630'''
     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
     try:
         print data
@@ -34,15 +39,23 @@ def print2(data, arg1="", arg2="", arg3="",arg4=""):
 
 class Board:
     
+    ''' Store all turn-to-turn Game State here.
+        This class also generates "on-board"-permissible moves given a:
+            an atomic-move-type ('updown', 'diagonal', 'twobyone') 
+            and a pos0 (r,c)
+        But does not account for blocking pieces along those permissible moves.'''
+
     def __init__(self):
         self.width = BOARD_WIDTH
         data = [[0 for i in range(self.width)] for j in range(self.width)]
         self.data = copy.deepcopy(data)
-        self.data_by_player = copy.deepcopy(data)
-        self.annotate = None
-        self.misc = None
+        self.data_by_player = copy.deepcopy(data)   #TODO - refactor as data
         self.player_in_check = [False, False]
         self.rooks_can_castle = [[True, True], [True, True]]
+        
+        #TODO - remove these
+        self.annotate = None
+        self.misc = None
 
         #Notes:
         # data: 0=blank, 1=piece(of any player)
@@ -50,10 +63,37 @@ class Board:
         # annotate, misc are for printing out human readable displays or testing
         # player_in_check: ind 0=white 1=black
         # rooks_can_castle: ind-outer 0=white, ind-inner 0=left-rook, 1=right-rook
-
+        # self.king_can_castle: is stored in the respective king pieces
+    
     def set_data(self, data):
         self.data_by_player = data
 
+    #Position changes
+
+    def get_data_pos(self, pos):
+        return self.data_by_player[pos[0]][pos[1]]
+
+    #TODO - rename old_pos()
+    def old_player_pos(self,pos):
+        self.data_by_player[pos[0]][pos[1]] = 0
+
+    #TODO - rename new_pos()
+    def new_player_pos(self, player, pos, piece, b_two_advances = False):
+        """ 0=blank, 1=generic-piece, 2=en-passant-vulnerable-pawn 3=king  
+            multiplied-by: -1 for black +1 for white """
+        piece_num = 1
+        if piece.__class__.__name__ == "Pawn": 
+            if b_two_advances:
+                piece_num = 2
+        if piece.__class__.__name__ == "King": piece_num = 3
+
+        player_mult = 1 if player else -1
+
+        self.data_by_player[pos[0]][pos[1]] = piece_num * player_mult
+
+    #Castling
+
+    #TODO - rewrite this piece of shit
     def modify_castling_property(self, player, piece, pos0):
         if piece.__class__.__name__ != "Rook":
             return 0
@@ -65,6 +105,7 @@ class Board:
         if rook_col == BOARD_WIDTH - 1: rook_side = 1
         if rook_side == -1:
             return 0
+        #HUH? this ever hit?
         self.rooks_can_castle[1- int(player)][rook_side] = False
 
     
@@ -80,8 +121,12 @@ class Board:
         col1 = KING_COL - 2 if left_side else KING_COL + 2
         return ((row,col0), (row,col1))
     
+    #TODO - add player_i(player) as function in 4 below:
+
     def get_rooks_castle(self,player):
         return self.rooks_can_castle[1 - int(player)][:]
+
+    #Check
 
     def set_player_in_check(self, player, b_check):
         self.player_in_check[1 - int(player)] = b_check
@@ -92,31 +137,16 @@ class Board:
     def b_in_check(self,_player):
         return self.player_in_check[1 - int(_player)]
 
-    def new_pos(self,row,col):
-        self.data[row][col] = 1
-
+    #TODO - add to utils
     def player_name_from_bool(self, bool_player):
         if bool_player:
             return 'White'
         else:
             return 'Black'
 
-    def new_player_pos(self, player, pos, piece, b_two_advances = False):
-        """ 0=blank, 1=generic-piece, 2=en-passant-vulnerable-pawn 3=king  
-            multiplied-by: -1 for black +1 for white """
-        piece_num = 1
-        if piece.__class__.__name__ == "Pawn": 
-            if b_two_advances:
-                piece_num = 2
-        if piece.__class__.__name__ == "King": piece_num = 3
 
-        player_mult = 1 if player else -1
-
-        self.data_by_player[pos[0]][pos[1]] = piece_num * player_mult
-
-    def old_player_pos(self,pos):
-        self.data_by_player[pos[0]][pos[1]] = 0
-
+    
+    #TODO - move these to Display / Utils -------
     def start_annotate(self,**kwargs):
         self.annotate = [["~" for i in range(self.width)] for j in range(self.width)]
 
@@ -149,7 +179,10 @@ class Board:
     def mark_list_misc(self,list_pos,**kwargs):
         for pos in list_pos:
             self.misc[pos[0]][pos[1]] = kwargs.get('val',1)
+    # -------------------------------------------------
 
+    #Enpassant 
+    
     def clear_enpassant_vulnerability(self, _player):
         player_mult = 1 if _player else -1
         for i in range(BOARD_WIDTH):
@@ -164,6 +197,7 @@ class Board:
         _col = col
         return _row, _col
 
+    #Atomic Move Types
 
     def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
         """ input: pos, [spaces (int > 0)] [only_direction (tuple)]
@@ -233,6 +267,8 @@ class Board:
         pos1.append( [(_row, i) for i in range(KING_COL + 1,    BOARD_WIDTH - 1)] )
         return pos1
 
+
+    #TODO - move this to Utils/ Display
     def print_board(self,b_annotate = False ,b_misc = False
                         ,b_player_data = False, b_show_grid = False
                         ,b_abs = False):
@@ -268,6 +304,10 @@ class Board:
 
 class Piece:
 
+    ''' This serves as a template for each piece class. Init sets all
+        move_types to false/0, and all propoerties to false. These are
+        overwritten as needed during inheritance by the specific piece class.'''
+
     def __init__(self,b_white, pos, **kwargs):
         self.white = b_white
         self.alive = True
@@ -279,7 +319,7 @@ class Piece:
         self.twobyone = False
         self.pawn_move = False
         self.king_can_castle = False
-        self.rook_can_castle = False
+        self.rook_can_castle = False    #TODO - remove
 
     def modify_castling_property(self,**kwargs):
         if self.__class__.__name__ == "King":
@@ -288,11 +328,14 @@ class Piece:
         #     self.rook_can_castle = False
 
     def filter_by_blocking_pieces(self,moves, board, b_pawn = False, **kwargs):
-        """input: moves (list of list of pos-tuples), each list-of-pos-tuples is 
-                        an ordered "move-set"
-                  board obj with current positions
+        
+        """input: moves: (list of list of pos-tuples), each list-of-pos-tuples is 
+                         an ordered "move-set".
+                  board: contains data
+        
             returns: list of pos-tuples that are valid moves 
-                    or, if check_flag=True that are opponent piece takes"""
+                     or, bool, if check_flag=True indicating one of opponent's
+                     pieces can capture king."""
 
         valids = []
         
@@ -307,7 +350,6 @@ class Piece:
         yours_enpassant_pawn = -2 if self.white else 2
 
         b_move_type = kwargs.get('move_type_flag', False)
-        
         mirror_flag = kwargs.get('mirror_flag', False)
         
         if mirror_flag:
@@ -322,6 +364,7 @@ class Piece:
             
             for move in moves[0]:  # advance, a list of len-1 or len-2
                 
+                #TODO - get_data_pos
                 there = board.data_by_player[move[0]][move[1]]
                 
                 if there in  mine:
@@ -403,18 +446,22 @@ class Piece:
         return valids
         
 
-    def get_available_moves(self, board, move_type_flag = False, check_flag = False
-                            ,mirror_flag = False):
-        """input: board (obj) current board
-                  move_type_flag (bool) appends MOVE_CODE to pos in temp2
-                  check_flag (bool) 
-                  mirror_flag (bool) 
+    def get_available_moves(self, board, move_type_flag=False, check_flag=False
+                            ,mirror_flag=False):
+        
+        ''' input:board (obj) current board
+                  move_type_flag (bool)  - appends MOVE_CODE to pos in temp2
+                  check_flag (bool)      - outputs b_check as boolean
+                  mirror_flag (bool)     - outputs mirrors instead of valids
 
-           returns: [check=F; move=F] list of pos-tuples (or empty list), or 
-                    [check=T]         bool for if opposing king-in-check, or
-                    [check=F, move=T] list of (pos-tuple, MOVE_CODE), or      
-                    [mirror=T]         bool for if own king-in-check
-                    """
+            returns:[check=F, move=F] list of pos-tuples (or empty list)
+                    [check=T]         bool for if opposing king-in-check
+                    [check=F, move=T] list of (pos-tuple, MOVE_CODE) (or empty list) 
+                                      representing spaces piece could move to.     
+                    [mirror=T,move=T] list of (pos-tuple, MOVE_CODE) (or empty list) 
+                                      representing pos of opponent piece which may
+                                      threaten the king.
+                    '''
         
         temp = []
         
@@ -439,18 +486,14 @@ class Piece:
                 temp.extend(temp_castle)
 
 
-        temp2 = self.filter_by_blocking_pieces(temp, board
+        temp2 = self.filter_by_blocking_pieces(temp
+                                                ,board
                                                 ,b_pawn = self.pawn_move
                                                 ,check_flag = check_flag
                                                 ,move_type_flag = move_type_flag
                                                 ,mirror_flag = mirror_flag
                                                 )
         
-        # if mirror_flag:
-            # note: upwards works under mirror_flag too because its 
-            # direction-reciprocal for opponent-pawn and player-king
-            # return temp2    #??
-
         if check_flag:
             if isinstance(temp2, bool) and temp2: 
                 return True
@@ -459,11 +502,12 @@ class Piece:
 
         return temp2
 
+
 class Pawn(Piece):
     
     def __init__(self,b_white,pos):
         Piece.__init__(self,b_white,pos)
-        self.en_passant_vulnerable = False
+        self.en_passant_vulnerable = False      #TODO - remove as un-needed (?)
         self.pawn_move = True
         
 
@@ -552,7 +596,6 @@ def place_pieces(board,**kwargs):
                 
                 pieces.append(piece)
                 
-                board.new_pos(row = _pos[0] ,col = _pos[1] )
                 board.new_player_pos( player = _player, pos = _pos, piece = piece)            
     
     return board, pieces
@@ -886,9 +929,5 @@ def test_castling_disallowed2():
 
 if __name__ == "__main__":
    tests()
-   #test_checkflag()
-   #test_castling_disallowed2()
-
-# run > pytest -v basic.py
 
     

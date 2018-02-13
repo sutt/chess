@@ -260,14 +260,26 @@ board should store edge cases:
                         'Python Terminal (external).
 
         TODO:
-            add in player-in-check
+            x add in player-in-check
             use piece.alive=False in naive-check-filter
             need to use a fork for filter_king_in_check when opponents pieces < 4 (?)
             x pass the pytest's that are broken 
                 (? they arent croken currently,turn of c_apply_4 by default ?)
             Better prettyprint for 'hint'
-            more tests for check
+            x more tests for check
             Find way to view size of memory of the python program
+
+            there is still not alive=False function in mutate_pieces
+                -> does this create errors?
+                It seems once the enum is no longer on the board, it won't
+                get picked up by mirror-king, so it should work except enpassant
+                which has already been ruled out.
+
+        Questions:
+            Does get_possible_check_optimal take into account pawns?
+                I think so because (movetype.diagonal, 1) in in Mirror.class_movements()
+                    but how does this handle direction?
+            
             
         Takeaways
 
