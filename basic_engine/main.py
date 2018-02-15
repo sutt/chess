@@ -27,11 +27,13 @@ class Game():
         ,manual_control = () 
         ,instruction_control = () 
         ,s_instructions = ""
-        ,b_display_show_opponent = False
         ,init_board = None
         ,init_player = None
         ,init_pieces = None
         ,test_exit_moves = None
+        ,b_display_show_opponent = False
+        ,b_display_always_print = False
+        ,b_display_never_print = False
         ,b_log_move = False
         ,b_log_turn_time = False
         ,b_log_num_available = False
@@ -56,7 +58,10 @@ class Game():
         self.init_pieces = copy.deepcopy(init_pieces)
 
         self.display = Display(b_show_opponent = b_display_show_opponent
-                                ,manual_control = self.manual_control)
+                               ,b_never_print = b_display_never_print
+                               ,b_always_print = b_display_always_print
+                               ,manual_control = self.manual_control
+                               )
 
         self.log = GameLog(manual_control = self.manual_control
                           ,b_log_move = b_log_move
@@ -145,7 +150,7 @@ class Game():
             if kwargs.get('king_in_check_optimal_3', False):
                 moves = filter_king_check_optimal_3(board, pieces, moves, player)
             
-            self.display.print_turn(board, pieces, player)
+            self.display.print_turn(pieces, player)
 
             if self.check_test_exit_moves():
                 self.b_test_exit = True
