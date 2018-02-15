@@ -97,13 +97,17 @@ class Board:
             return 0
         if not(any(self.rooks_can_castle[1- int(player)])):
             return 0
+        
         rook_col = pos0[1]
+        
         rook_side = -1
+        
         if rook_col == 0: rook_side = 0
         if rook_col == BOARD_WIDTH - 1: rook_side = 1
+        
         if rook_side == -1:
             return 0
-        #HUH? this ever hit?
+        
         self.rooks_can_castle[1- int(player)][rook_side] = False
 
     

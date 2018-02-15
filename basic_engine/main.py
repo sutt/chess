@@ -388,6 +388,18 @@ def test_castling_disallowed_into_check():
     exit_turn = game.play()
     assert exit_turn == 9  
 
+def test_castling_disallowed_when_dead():
+    
+    #Setup
+    ss = '1. h2 f3 2. b2 d2 3. g4 e4 4. d2 e2 5. h3 f5 6. e2 f3 7. h4 f4 8. f3 g2'
+
+    #Turn 10 capture rook, Turn 11 Castle
+    ss = '1. h2 f3 2. b2 d2 3. g4 e4 4. d2 e2 5. h3 f5 6. e2 f3 7. h4 f4 8. f3 g2 9. g8 e8 10. g2 h1 11. h5 h3 12. b8 d8'
+    
+    game = Game(s_instructions = ss)
+    exit_turn = game.play()
+    assert exit_turn == 11
+
 
 if __name__ == "__main__":
     

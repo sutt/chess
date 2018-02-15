@@ -143,11 +143,7 @@ def apply_move(move, board, pieces, _player):
                                     ,left_side = castle_absolute_left)
         
         #TODO - helper func
-        try:
-            rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
-        except:
-            pass
-        #TODO - rook = pieces[rook_i]
+        rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
 
         pieces[rook_i].pos = r_pos1   
         pieces[piece_i].pos = k_pos1   #piece_i already king
@@ -161,9 +157,7 @@ def apply_move(move, board, pieces, _player):
 
     #Fallout from Move
     pieces[piece_i].modify_castling_property()
-
     board.modify_castling_property( _player, pieces[piece_i], pos0)
-
 
     if kill_flag:
         
@@ -174,11 +168,11 @@ def apply_move(move, board, pieces, _player):
                                             not(_p[1].white == _player)
                                 ,enumerate(pieces))
         killed_piece_i = killed_piece_i[0][0]
-        
+
         #TODO - don't pop piece in hypothetical_pieces=True
         # pieces[killed_piece_i].alive = False
-        
-        pieces.pop(killed_piece_i)
+        killed_piece = pieces.pop(killed_piece_i)
+        board.modify_castling_property( not(_player), killed_piece, killed_piece.pos)
         
         if (b_enpassant):
             board.old_player_pos(kill_pos)    
