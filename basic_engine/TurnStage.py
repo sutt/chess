@@ -40,7 +40,7 @@ def get_possible_check(pieces, board, player):
     return False    #no checks found
 
 
-def check_endgame(moves, board, player):
+def check_endgame(moves, pieces, board, player):
     
     check_code = 0
     outcome = None
@@ -58,8 +58,37 @@ def check_endgame(moves, board, player):
         outcome = (player, 'WIN', '50MOVES')
         check_code = -3
 
-    #TODO - add stalemate check for not enough pieces
-    #   outcome = (player, 'STALEMATE', 'NOPIECES')
+    elif len(pieces) <= 3:
+        
+        if len(pieces) == 2:
+            
+            outcome = (player, 'STALEMATE', 'KINGVKING')
+            check_code = -4
+
+        else:
+            
+            white_pieces = filter(lambda p: p.white,  pieces)
+            black_pieces = filter(lambda p: not(p.white),  pieces)
+            
+            b_white_more = len(white_pieces) > len(black_pieces)
+
+            more_pieces = white_pieces if b_white_more else black_pieces
+            
+            more_piece_names = map(lambda p: p.__class__.__name__, more_pieces)
+
+            alive_pieces =  ("Pawn", "Queen", "Rook")
+            
+            alives_in_more = map(lambda ap: ap in more_piece_names, alive_pieces)
+
+            if not(any(alives_in_more)):
+                outcome = (player, 'STALEMATE', 'NOQUEENPAWNROOK')
+
+            # king versus king
+            # king and bishop versus king
+            # king and knight versus king
+            
+            # TODO - # king and bishop versus king and bishop with the bishops on the same colour.
+            
     
     return check_code, outcome
     
@@ -114,7 +143,10 @@ def apply_move(move, board, pieces, _player):
                                     ,left_side = castle_absolute_left)
         
         #TODO - helper func
-        rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
+        try:
+            rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
+        except:
+            pass
         #TODO - rook = pieces[rook_i]
 
         pieces[rook_i].pos = r_pos1   

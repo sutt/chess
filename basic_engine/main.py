@@ -159,7 +159,7 @@ class Game():
                 self.test_data['board'] = copy.deepcopy(board)
                 continue
 
-            check_code, outcome = check_endgame(moves, board, player)
+            check_code, outcome = check_endgame(moves, pieces, board, player)
             
             if check_code < 0:
                 self.outcome = outcome

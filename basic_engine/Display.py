@@ -73,7 +73,7 @@ class Display:
         print2(out)
 
     
-    def print_board_letters(self, pieces, b_lower_black = False):
+    def print_board_letters(self, pieces, b_lower_black = True):
         ''' Use pieces to display a graphical display to console.
             [b_lower_black]: black pieces in lower case.'''
 
