@@ -5,7 +5,8 @@ from utils import *
 from datatypes import moveHolder
 from GameLog import GameLog
 from Display import Display
-from TurnStage import increment_turn, get_available_moves, check_endgame, apply_move
+from TurnStage import increment_turn, get_available_moves, apply_move
+from TurnStage import check_endgame
 from TurnStage import filter_king_check
 from TurnStage import is_king_in_check
 from TurnStage import filter_king_check_test_copy   #temp
@@ -100,7 +101,7 @@ class Game():
         board = Board()
         
         if self.init_board is not None:
-            board.set_data(self.init_board)     
+            board.set_data(self.init_board)     #init_board represent data_by_player
             pieces = self.init_pieces
         else:
             board, pieces = place_pieces(board)
@@ -153,9 +154,10 @@ class Game():
                 self.test_data['board'] = copy.deepcopy(board)
                 continue
 
-            check_code = check_endgame(moves, board, player)
+            check_code, outcome = check_endgame(moves, board, player)
             
             if check_code < 0:
+                self.outcome = outcome
                 game_going = False
                 continue
 
@@ -172,11 +174,13 @@ class Game():
 
             if self.check_test_exit():
                 self.b_test_exit = True
-                self.test_data = copy.deepcopy(board)
+                self.test_data = {}
+                self.test_data['pieces'] = copy.deepcopy(pieces)
+                self.test_data['board'] = copy.deepcopy(board)
                 continue
 
         #True exit: only here when check_endgame has been satisfied
-        return self.outcome, self.log.get_log_move()
+        return self.outcome, board, pieces
 
 
 def test_castling_allowed_misc():
@@ -184,6 +188,7 @@ def test_castling_allowed_misc():
     ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
     game = Game(s_instructions = ss)
     board = game.play()
+    board = board['board']
     assert board.data_by_player[7][5] == 1
     assert board.data_by_player[7][6] == 3
 
@@ -206,6 +211,7 @@ def test_enpassant_take():
     ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. d2 c3"
     game = Game(s_instructions = ss)
     board = game.play()
+    board = board['board']
     # board.print_board(b_player_data=True)
     assert board.data_by_player[2][2] == 1
     assert board.data_by_player[3][2] == 0
@@ -326,6 +332,7 @@ def test_post_castling_move_rook():
     ss_post_castling = "1. h7 f8 2. b8 c8 3. g5 e5 4. b1 d1 5. h6 f4 6. b2 c2 7. h5 h7 8. a8 b8 9. h6 h5 10. a7 c6"    
     game = Game(s_instructions = ss_post_castling)
     board = game.play()
+    board = board['board']
     assert board.data_by_player[7][4] == 1
     assert board.data_by_player[7][5] == 0
 

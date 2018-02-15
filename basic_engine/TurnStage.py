@@ -42,21 +42,26 @@ def get_possible_check(pieces, board, player):
 
 def check_endgame(moves, board, player):
     
+    check_code = 0
+    outcome = None
+
     if len(moves) == 0:
     
         if board.b_in_check(player):
-            self.outcome = (player, 'LOSS', 'CHECKMATE')
+            outcome = (player, 'LOSS', 'CHECKMATE')
+            check_code = -1
         else:    
-            self.outcome = (player, 'STALEMATE', 'NOMOVES')
+            outcome = (player, 'STALEMATE', 'NOMOVES')
+            check_code = -2
     
     elif board.player_only_king_moves[1 - int(player)] == 50:   #TODO - player_i(player)
-        self.outcome = (player, 'WIN', '50MOVES')
-        #TODO - add increment_player_only_king_moves
+        outcome = (player, 'WIN', '50MOVES')
+        check_code = -3
 
     #TODO - add stalemate check for not enough pieces
-    #self.outcome = (player, 'STALEMATE', 'NOPIECES')
-    else:
-        return 0
+    #   outcome = (player, 'STALEMATE', 'NOPIECES')
+    
+    return check_code, outcome
     
 
 
@@ -301,7 +306,7 @@ def get_possible_check_optimal(pieces, board, move, player):
 
     if move is not None:    #when calling at beginning of turn
         if player_king_pos == move.pos0:
-            player_king_pos == move.pos1
+            player_king_pos = move.pos1
 
     player_king_code = 3 if player else -3
 
