@@ -26,7 +26,9 @@ class Game():
         self
         ,manual_control = () 
         ,instruction_control = () 
+        ,pgn_control = ()
         ,s_instructions = ""
+        ,s_pgn_instructions = ""
         ,init_board = None
         ,init_player = None
         ,init_pieces = None
@@ -45,6 +47,11 @@ class Game():
         if len(self.instructions) > 0:
             self.instruction_control = (0,1)
         
+        self.pgn_control = pgn_control
+        self.pgn_instructions = parse_pgn_instructions(s_pgn_instructions)
+        if len(self.pgn_instructions) > 0:
+            self.pgn_instructions = (0,1)
+
         self.i_turn = 0
         
         self.b_test_exit = False
@@ -94,6 +101,8 @@ class Game():
             move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
             move = player_control_input(board, moves, self.log)
+        elif int(player) in self.pgn_control:
+            move = pgn_deduction(board, moves, self.pgn_instructions, self.i_turn)
         else:
             move_i = random.sample(range(0,len(moves)),1)[0]
             move = moves[move_i]
