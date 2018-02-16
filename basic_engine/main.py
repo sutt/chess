@@ -50,7 +50,7 @@ class Game():
         self.pgn_control = pgn_control
         self.pgn_instructions = parse_pgn_instructions(s_pgn_instructions)
         if len(self.pgn_instructions) > 0:
-            self.pgn_instructions = (0,1)
+            self.pgn_control = (0,1)
 
         self.i_turn = 0
         
@@ -95,14 +95,14 @@ class Game():
         return False
         
     
-    def select_move(self, moves, player, board): 
+    def select_move(self, moves, player, pieces, board): 
     
         if int(player) in self.instruction_control:
             move = instruction_input(board, moves, self.instructions, self.i_turn)
         elif int(player) in self.manual_control:
             move = player_control_input(board, moves, self.log)
         elif int(player) in self.pgn_control:
-            move = pgn_deduction(board, moves, self.pgn_instructions, self.i_turn)
+            move = pgn_deduction(board, pieces, moves, self.pgn_instructions, self.i_turn)
         else:
             move_i = random.sample(range(0,len(moves)),1)[0]
             move = moves[move_i]
@@ -175,7 +175,7 @@ class Game():
                 game_going = False
                 continue
 
-            move = self.select_move(moves, player, board)
+            move = self.select_move(moves, player, pieces, board)
 
             if move is None:                #Catch move which is not legal
                 self.b_test_exit = True
@@ -413,11 +413,24 @@ def test_castling_disallowed_when_dead():
 if __name__ == "__main__":
     
     #Interactive Setup
-    game = Game(manual_control = (1,)
-                ,b_display_show_opponent = True
+    # game = Game(manual_control = (1,)
+    #             ,b_display_show_opponent = True
+    #             ,b_log_move = True
+    #             )
+    # game.play()
+
+    
+    #PGN Setup
+    ss_pgn = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 '
+    
+    game = Game(s_pgn_instructions = ss_pgn
+                ,pgn_control = (0,1)
                 ,b_log_move = True
+                ,test_exit_moves = 38
+                ,b_display_always_print = True
                 )
-    game.play()
+    ret = game.play()
+    print ret
     
     #Printout a game to observe it
     # ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '            

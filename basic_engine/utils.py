@@ -174,36 +174,117 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
         print 'failure in routine to parse user input.'
     return ret, data
 
-#TODO - add return_the_move() for common return function
+class PGN:
+    
+    ''' This handles figuring out the 'move' from PGN info'''
 
-def pgn_deduction(board, moves, instructions, i_turn):
-    pass
-    # #----------------------------
-    # pgn.set_moves(moves)
-    # pgn.set_destination(instruct[0]) 
-    # pgn.set_piece_class(instruct[1]) 
-    # pgn.set_disambig_info(instruct[2]) 
+    def __init__(self):
+        self.moves = None
+        self.s_destination = None
+        self.destination = None
+        self.piece_class = None
+        self.disambig_info = None
+        self.pieces = None
+        self.moves_destination = None
+        self.moves_pc = None
+        self.moves_final = None
 
-    # filtered_move = pgn.deduce()
-    # moves_destination = filter(lambda m: m.pos1 == pos_destination)
+    def set_moves(self, moves):
+        self.moves = moves
 
-    # moves_piece = filter(lambda m: piece_from_pos(m) == piece_class, moves_destination)
+    def set_pieces(self, pieces):
+        self.pieces = pieces
 
-    # if disambig_info is not None:
-    #     moves_disambig = filter(lambda: x, pos_to_alphanum )
-    # else:
-    #     moves_disambig = moves_piece
-    # #---------------------------------------
+    @staticmethod
+    def pgn_to_pos(s_pgn):
+        ''' example e2 -> (6,4) '''
+        letters = 'abcdefgh'
+        pgn_col = letters.index(s_pgn[0])
+        pgn_row = 8 - int(s_pgn[1])
+        return (pgn_row, pgn_col)
+
+    def set_destination(self, destination):
+        self.destination = self.pgn_to_pos(destination)
+
+    def set_piece_class(self, piece_class):
+        self.piece_class = piece_class
+    
+    def set_disambig_info(self, disambig_info):
+        self.disambig_info = disambig_info
+
+
+    @staticmethod
+    def piece_class_from_pos(pieces, pos0):
+        '''return first letter (Captialized) of piece name'''
+        p = filter(lambda p: p.pos == pos0, pieces)[0]
+        p_name = p.__class__.__name__
+        p_symbol = p_name[0] if p_name != 'Knight' else "N"
+        return p_symbol
+
+    @staticmethod
+    def disambig_meaning(_symbol):
+        ''' examples: e -> (1, 4), 2 -> (0, 6)'''
+        letters = 'abcdefgh'
+        if str.isdigit(_symbol):
+            row_col = 0     
+            val = 8 - int(_symbol)
+        else:
+            row_col = 1
+            val = letters.index(_symbol)
+        return (row_col, val)
+
+
+    def calc_destination(self):
+        self.moves_destination = [m for m in self.moves 
+                                    if m.pos1 == self.destination]
         
-    # if len(filtered_move) == 1:
+    def calc_piece_class(self):
+        self.moves_pc = [m for m in self.moves_destination
+                            if self.piece_class == 
+                                self.piece_class_from_pos(self.pieces, m.pos0)
+                        ]
+
+    def calc_disambig_info(self):
+        if self.disambig_info is None:
+            self.moves_final = self.moves_pc
+        else:
+            row_col, val = self.disambig_meaning(self.disambig_info)
         
-    #     the_move = filtered_move[0]
-    #     for _m in moves:
-    #         if the_move == (_m.pos0, _m.pos1):
-    #             return Move(_m.pos0, _m.pos1, _m.code)
-    #     return None  # to demonstrate an error in instruction input
-    # else:
-    #     return None  # to demonstrate an error in instruction input
+            self.moves_final = [m for m in self.moves_pc
+                                    if m.pos0[row_col] == val]
+
+    def deduce(self):
+        ''' continually filter down availables moves - 'moves' - using the
+            the three criteria in pgn-instruction-triplet. return as a list
+            and verify outside this class. '''
+        
+        self.calc_destination()     # moves_destination <- moves
+        self.calc_piece_class()     # moves_pc <- moves_destination
+        self.calc_disambig_info()   # moves_final <- moves_pc
+
+        return self.moves_final     #returning a list of Move
+
+
+def pgn_deduction(board, pieces, moves, instructions, i_turn):
+    
+    '''We will build a Move from a pgn-triplet-string here '''
+
+    # print instructions
+    instruct = instructions.pop(0)
+
+    pgn = PGN()    
+    pgn.set_moves(moves)
+    pgn.set_pieces(pieces)
+    pgn.set_destination(instruct[0]) 
+    pgn.set_piece_class(instruct[1]) 
+    pgn.set_disambig_info(instruct[2]) 
+
+    list_final_move = pgn.deduce()
+    
+    if len(list_final_move) == 1:
+        return list_final_move[0]
+    else:
+        return None  # we couldnt figure out only 1 move from pgn instruct
 
 
 def instruction_input(board, moves, instructions, i_turn):
