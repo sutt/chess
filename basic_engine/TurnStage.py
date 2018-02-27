@@ -372,32 +372,13 @@ def filter_king_check_optimal_2(board, pieces, moves, player):
 
         board2, pieces2 = apply_move(_move, _board, _pieces, player)
 
-        b_check = get_possible_check_optimal_2(pieces2, board2, _move, player)
+        b_check = get_possible_check_optimal(pieces2, board2, _move, player)
         
         if not(b_check):
             out.append(_move)
 
     return out
 
-def filter_king_check_optimal_3(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        #cant these just move outside the loop?
-        #The problem is apply_move mutates state piece, right?
-        _board = copy.deepcopy(board)   
-        _pieces = copy.deepcopy(pieces)
-
-        board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-        b_check = get_possible_check_optimal_3(pieces2, board2, _move, player)
-        
-        if not(b_check):
-            out.append(_move)
-
-    return out
 
 def filter_king_check_optimal(board, pieces, moves, player):
     

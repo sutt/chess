@@ -99,13 +99,13 @@ def select_function(s_function):
         game.play(king_in_check_on=False, king_in_check_optimal = True)    
         return game.get_gamelog()
     
-    if s_function == "optimal3_long":
+    if s_function == "optimal2_long":
 
         game = Game(s_instructions = ss_long
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(king_in_check_on=False, king_in_check_optimal_3 = True)    
+        game.play(king_in_check_on=False, king_in_check_optimal_2 = True)    
         return game.get_gamelog()
 
     if s_function == "check_optimal":
@@ -117,11 +117,6 @@ def select_function(s_function):
             
         game = Game(s_instructions = ss)
         game.play(king_in_check_on=False, king_in_check_optimal_2=True)
-
-    if s_function == "check_optimal_3":
-            
-        game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_optimal_3=True)
 
     return None     #to show that the function is no returning a test exit data
 
@@ -359,10 +354,9 @@ def perf_test(s_tests
     '''
 
     result = {}
-    xx = 0
 
     for i_test, s_test in enumerate(s_tests):
-        xx += 1
+        
         trial_time = []
         trial_turn_time = []
         trial_num_available = []
@@ -417,13 +411,12 @@ s_tests = [
     ,"test_c_apply_4"
     ,"check_optimal"
     ,"check_optimal_2"
-    ,"check_optimal_3"
     ]
 
-# s_tests = [
-#     "baseline_long"
-#     ,"naive_long"
-#     ]
+s_tests = [
+    "baseline_long"
+    ,"naive_long"
+    ]
 
 results = perf_test(s_tests, n=10, b_trial_time=True)
 
@@ -438,6 +431,8 @@ s_tests = [
     ,"naive_check_tt"
     ]
 
+# "long" refers to a game with longer instructions
+
 s_tests = [
     "baseline_long"
     ,"naive_long"
@@ -445,11 +440,12 @@ s_tests = [
 
 s_tests = [
     "optimal1_long"
-    ,"optimal3_long"
+    ,"optimal2_long"
     ]
 
-# results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
-# print_results(results, b_turn_time=True)
+results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
+print_results(results, b_turn_time=True)
+
 
 
 #2/9
