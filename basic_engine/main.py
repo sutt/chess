@@ -13,7 +13,6 @@ from TurnStage import filter_king_check_test_copy   #temp
 from TurnStage import filter_king_check_test_copy_apply   #temp
 from TurnStage import filter_king_check_optimal   #emp
 from TurnStage import filter_king_check_optimal_2   #temp
-from TurnStage import filter_king_check_optimal_3   #temp
 from TurnStage import filter_king_check_test_copy_apply_2   #temp
 from TurnStage import filter_king_check_test_copy_apply_3   #temp
 from TurnStage import filter_king_check_test_copy_apply_4   #temp
@@ -156,8 +155,6 @@ class Game():
                 moves = filter_king_check_optimal(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal_2', False):
                 moves = filter_king_check_optimal_2(board, pieces, moves, player)
-            if kwargs.get('king_in_check_optimal_3', False):
-                moves = filter_king_check_optimal_3(board, pieces, moves, player)
             
             self.display.print_turn(pieces, player)
 
@@ -412,7 +409,7 @@ def test_castling_disallowed_when_dead():
 
 if __name__ == "__main__":
     
-    #Interactive Setup
+    # Interactive Setup
     # game = Game(manual_control = (1,)
     #             ,b_display_show_opponent = True
     #             ,b_log_move = True
@@ -421,12 +418,17 @@ if __name__ == "__main__":
 
     
     #PGN Setup
-    ss_pgn = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 '
     
+    #a kasparov game
+    # ss_pgn = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 '
+
+    # My game witha  promotion on turn ~95, breaks turn 97?
+    ss_pgn = "1. e4 Nh6 2. d4 c5 3. c3 g6 4. Nf3 Ng4 5. h3 d5 6. hxg4 dxe4 7. Nfd2 e3 8. fxe3 cxd4 9. cxd4 Bxg4 10. Qxg4 f6 11. Qe4 Qd6 12. Qxb7 Qg3+ 13. Kd1 a5 14. Qxa8 Bg7 15. Ne4 Qc7 16. Bb5+ Kf7 17. Nbc3 Qb6 18. Qd5+ Qe6 19. Bc4 Qxd5 20. Bxd5+ e6 21. Nd6+ Ke7 22. Nde4 g5 23. Bb3 Kf8 24. Rf1 Nc6 25. Nxf6 Nb4 26. Nxh7+ Ke8 27. Nxg5 e5 28. Bf7+ Kd7 29. dxe5 Rh2 30. e6+ Kd8 31. a3 Bxc3 32. axb4 Bxb4 33. Bd2 Bxd2 34. Kxd2 Rxg2+ 35. Kd3 Rxg5 36. Rfd1 Rd5+ 37. Ke2 Rxd1 38. Rxd1+ Ke7 39. Rd7+ Kf6 40. e4 a4 41. Ke3 Kg7 42. e5 Kf8 43. Rd8+ Kg7 44. Kd4 a3 45. bxa3 Kh6 46. e7 Kh7 47. e8=Q Kh6 48. Rd6+ Kg5 49. Qg8+ Kf4 50. Qh8 Kf3 51. Qh5+ Kf2 52. Rf6+ Kg2 53. Qf3+ Kg1 54. Qf2+ Kh1 55. Rh6# 1-0"
+
     game = Game(s_pgn_instructions = ss_pgn
                 ,pgn_control = (0,1)
                 ,b_log_move = True
-                ,test_exit_moves = 38
+                ,test_exit_moves = 110
                 ,b_display_always_print = True
                 )
     ret = game.play()
