@@ -281,8 +281,39 @@ board should store edge cases:
                     but how does this handle direction?
 
             How does modify castling propert work for rooks?
-            
-            
+
+    2/15
+
+        TODO
+            record game outcome
+            checkmate bug
+                bring in board/pieces from an exit
+            build a unified Board+Pieces Data Structure
+
+            Build up a way to log when the check_cache is in use, use that
+            to compare perf in before vs. after:
+
+                e.g. 20% of the time the turn can use the cache, and in this time
+                it cuts down on average 75% of the turn time. Therefore average
+                per turn processing is lowered by 15%
+
+    2/16
+
+        TODO
+            PGN() class
+            alphanum_instructions <- str(log.get_log_move())  play() <- pgn_instructions
+
+
+    2/26
+
+        TODO
+
+            tests for perf_test.py 
+            promotion functionalities + tests
+            add promotion to log_move / parse_move
+            test for profile_test.py
+            remove test:basic or repair it
+
         Takeaways
 
             There is the notion of move or turn characteristics / features.
