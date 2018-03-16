@@ -107,6 +107,7 @@ def apply_move(move, board, pieces, _player):
 
     b_enpassant = (move_code == MOVE_CODE['en_passant'])
     b_castling = (move_code == MOVE_CODE['castling'])
+    b_promotion = (move_code == MOVE_CODE['promotion'])
                 
     pos0, pos1 = move[0], move[1]
 
@@ -179,6 +180,18 @@ def apply_move(move, board, pieces, _player):
             #otherwise, you already overwrote it's position on board
                 
     #TODO - any promotions here    
+    if b_promotion:
+        print 'a promotion here...'
+        
+        pro_piece_i = filter(lambda _p: _p[1].pos == pos1, enumerate(pieces))[0][0]
+        pro_piece = pieces.pop(pro_piece_i)
+
+        #new piece
+        new_queen = Queen(b_white = _player, pos = pos1)
+        #if rook, need to turn off castling
+
+        pieces.append(new_queen)
+
 
     # Unnec as it sets and acted upon at beginning of turn, 
     # still nice to have it always being reset here.

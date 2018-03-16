@@ -322,6 +322,10 @@ board should store edge cases:
             promotion in TurnStage
                 dy default it creates a queen, but you override to set a piece you want
 
+            i think b_pawn in mirror functions is still not handled appropriately
+
+            
+
         Takeaways
 
             There is the notion of move or turn characteristics / features.

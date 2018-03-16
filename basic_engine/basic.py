@@ -10,6 +10,7 @@ MOVE_CODE = {}
 MOVE_CODE['regular'] = 0
 MOVE_CODE['en_passant'] = 1
 MOVE_CODE['castling'] = 2
+MOVE_CODE['promotion'] = 3
 
 MOVE_TYPE = {}
 MOVE_TYPE['upacross'] = 0
@@ -305,6 +306,13 @@ class Piece:
         
         if b_pawn:
             
+            #check if you move forward, will you cause a promotion?
+            one_away = board.player_relative_pos( player = not(self.white)
+                                                    ,row = 1
+                                                    ,col = 1
+                                                    )
+            s_reg_or_pro = 'promotion' if (one_away[0] == self.pos[0]) else 'regular'
+            
             for move in moves[0]:  # advance, a list of len-1 or len-2
                 
                 #TODO - get_data_pos
@@ -315,7 +323,7 @@ class Piece:
                 if there in yours:
                     break
                 if there == 0:
-                    valids.append(move_tuple(b_move_type, move, 'regular'))
+                    valids.append(move_tuple(b_move_type, move, s_reg_or_pro)) 
                 
             for list_move in moves[1:]:   # a list of len-1 or len-2
                 for move in list_move:  # attacks is a list of len-1
@@ -328,7 +336,7 @@ class Piece:
                     if there in  mine:
                         break
                     if there in yours:
-                        valids.append(move_tuple(b_move_type, move, 'regular'))
+                        valids.append(move_tuple(b_move_type, move, s_reg_or_pro))
                         if mirror_flag: 
                             mirrors.append(move)
                         if there == yours_king:
