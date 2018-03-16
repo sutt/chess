@@ -163,6 +163,7 @@ class Game():
                 self.test_data = {}
                 self.test_data['moves'] = copy.deepcopy(moves)
                 self.test_data['board'] = copy.deepcopy(board)
+                self.test_data['pieces'] = copy.deepcopy(pieces)
                 continue
 
             check_code, outcome = check_endgame(moves, pieces, board, player)
@@ -406,15 +407,57 @@ def test_castling_disallowed_when_dead():
     exit_turn = game.play()
     assert exit_turn == 11
 
+def test_promotion_on_advance():
+    
+    #Test for pawn gone
+    #Test for queen there
+    #Test for putting king in check with promoted piece
+
+    #pawn promoted causing check
+    ss = '1. g1 e1 2. b2 d2 3. e1 d2 4. b4 d4 5. d2 c2 6. a3 c1 7. c2 b3 8. a4 c4 9. b3 a3 10. b8 d8'
+
+    
+    
+    game = Game(s_instructions = ss, test_exit_moves = 10)
+    test_data = game.play()
+    
+    board = test_data['board']
+    pieces = test_data['pieces']
+    moves = test_data['moves']
+    
+    #Test a white piece is there
+    assert board.data_by_player[0][2] == 1
+    
+    #Test there is no pawn at that pos
+    back_row_pawns = filter(lambda p: p.white and p.__class__.__name__ == "Pawn"
+                              and p.pos == (0,2) ,pieces)
+    assert len(back_row_pawns) == 0
+
+    #Test there is a queen there
+    queen_at_pos = filter(lambda p: p.__class__.__name__ == "Queen" 
+                            and p.pos == (0,2) ,pieces)
+
+    assert len(queen_at_pos) == 1
+    
+    #Test there are two queens total
+    white_queens = filter(lambda p: p.__class__.__name__ == "Queen" 
+                            and p.white,pieces)
+
+    assert len(white_queens) == 2
+
+    #Test that black is incheck by the limited moves available to him
+    assert moves == [Move(pos0=(2, 0), pos1=(0, 2), code=0), Move(pos0=(2, 3), pos1=(0, 3), code=0)]
+    
+    
 
 if __name__ == "__main__":
     
     # Interactive Setup
-    # game = Game(manual_control = (1,)
-    #             ,b_display_show_opponent = True
-    #             ,b_log_move = True
-    #             )
-    # game.play()
+    game = Game(manual_control = (0,1)
+                ,b_display_show_opponent = True
+                ,b_log_move = True
+                )
+    game.play()
 
     
     #PGN Setup
@@ -428,14 +471,14 @@ if __name__ == "__main__":
     #Heres where the problems start...Kf4 (for black) isn't available from my in_check() module. Prolly because it sees pawn diagonally attacking backwards?
     #47. e8=Q Kh6 48. Rd6+ Kg5 49. Qg8+ ... !!! Kf4 !!! 50. Qh8 Kf3 51. Qh5+ Kf2 52. Rf6+ Kg2 53. Qf3+ Kg1 54. Qf2+ Kh1 55. Rh6# 1-0"
 
-    game = Game(s_pgn_instructions = ss_pgn
-                ,pgn_control = (0,1)
-                ,b_log_move = True
-                ,test_exit_moves = 110
-                ,b_display_always_print = True
-                )
-    ret = game.play()
-    print ret
+    # game = Game(s_pgn_instructions = ss_pgn
+    #             ,pgn_control = (0,1)
+    #             ,b_log_move = True
+    #             ,test_exit_moves = 110
+    #             ,b_display_always_print = True
+    #             )
+    # ret = game.play()
+    # print ret
     
     #Printout a game to observe it
     # ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '            

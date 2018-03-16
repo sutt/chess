@@ -324,6 +324,8 @@ board should store edge cases:
 
             i think b_pawn in mirror functions is still not handled appropriately
 
+            first add a test for succesful promotion under advance and capture
+
             
 
         Takeaways

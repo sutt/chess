@@ -181,7 +181,6 @@ def apply_move(move, board, pieces, _player):
                 
     #TODO - any promotions here    
     if b_promotion:
-        print 'a promotion here...'
         
         pro_piece_i = filter(lambda _p: _p[1].pos == pos1, enumerate(pieces))[0][0]
         pro_piece = pieces.pop(pro_piece_i)
