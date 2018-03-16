@@ -545,193 +545,194 @@ def place_pieces(board, **kwargs):
 
 
 #TODO - move these a centralized test file
-def tests():    
 
-    board = Board()
-    board.print_board()
-    board, pieces = place_pieces(board)
-    board.print_board()
+# def tests():    
 
-    # for p in pieces:
-    #     print str(p.white) + " " + str(p.__class__.__name__) + " " + str(p.pos)
+#     board = Board()
+#     board.print_board()
+#     board, pieces = place_pieces(board)
+#     board.print_board()
 
-    board.start_annotate()
-    for p in pieces:
-        board.mark_annotate(p)
-    board.print_board(b_annotate = True)
+#     # for p in pieces:
+#     #     print str(p.white) + " " + str(p.__class__.__name__) + " " + str(p.pos)
 
-
-
-    pawn = Pawn(True,(1,1))
-    print2(pawn.pos)
-    print2(pawn.en_passant_vulnerable)
-    print2(pawn.__class__.__name__)
-
-    blackbishop = pieces[2]
-    print2(str(blackbishop.__class__.__name__)  + " " + str(blackbishop.pos))
-    bishop_pos = blackbishop.pos
-    bishops_diags = board.get_diagonals(bishop_pos)
-    print2(bishops_diags)
-    board.start_misc()
-    for diags in bishops_diags:
-        for _pos in diags:
-            board.mark_misc(_pos)
-    board.print_board(b_misc = True)
-
-    board.start_misc()
-    diags = board.get_diagonals((4,4))
-    print2(diags)
-    board.mark_all_misc(diags)
-    board.print_board(b_misc = True)
-
-    blackrook = pieces[0]
-    print2(str(blackrook.__class__.__name__)  + " " + str(blackrook.pos))
-    rook_pos = blackrook.pos
-    rook_moves = board.get_upacross(rook_pos)
-    print2(rook_moves)
-    board.start_misc()
-    board.mark_all_misc(rook_moves)
-    board.print_board(b_misc = True)
-
-    POS = (3,4)
-    rook_moves = board.get_upacross(POS)
-    print2(rook_moves)
-    board.start_misc()
-    board.mark_all_misc(rook_moves)
-    board.print_board(b_misc = True)
-
-    POS = (3,3)
-    print2('Kngiht at: ', str(POS))
-    knight_moves = board.get_two_by_ones(POS)
-    print2(knight_moves)
-    board.start_misc()
-    board.mark_all_misc(knight_moves)
-    board.print_board(b_misc = True)
-
-    POS = (0,7)
-    print2('Kngiht at: ', str(POS))
-    knight_moves = board.get_two_by_ones(POS)
-    print2(knight_moves)
-    board.start_misc()
-    board.mark_all_misc(knight_moves)
-    board.print_board(b_misc = True)
+#     board.start_annotate()
+#     for p in pieces:
+#         board.mark_annotate(p)
+#     board.print_board(b_annotate = True)
 
 
-    print2('Unobstructed Bishop at 4,4')
-    board2 = Board()
-    bishop = Bishop(b_white = True,pos=(4,4))
-    board.data_by_player[4][4] = 0
-    moves = bishop.get_available_moves(board2)
-    print2(moves)
-    board.start_misc()
-    board.mark_list_misc(moves)
-    board.print_board(b_misc = True)
 
-    print2('Obstructed White Bishop at 4,4 inital pieces')
-    board2 = Board()
-    bishop = Bishop(b_white = True,pos=(4,4))
-    board2.data_by_player[4][4] = 1
+#     pawn = Pawn(True,(1,1))
+#     print2(pawn.pos)
+#     print2(pawn.en_passant_vulnerable)
+#     print2(pawn.__class__.__name__)
 
-    board2.data_by_player[3][5] = 1
-    board2.data_by_player[2][2] = -2
-    board2.data_by_player[6][6] = 1
+#     blackbishop = pieces[2]
+#     print2(str(blackbishop.__class__.__name__)  + " " + str(blackbishop.pos))
+#     bishop_pos = blackbishop.pos
+#     bishops_diags = board.get_diagonals(bishop_pos)
+#     print2(bishops_diags)
+#     board.start_misc()
+#     for diags in bishops_diags:
+#         for _pos in diags:
+#             board.mark_misc(_pos)
+#     board.print_board(b_misc = True)
+
+#     board.start_misc()
+#     diags = board.get_diagonals((4,4))
+#     print2(diags)
+#     board.mark_all_misc(diags)
+#     board.print_board(b_misc = True)
+
+#     blackrook = pieces[0]
+#     print2(str(blackrook.__class__.__name__)  + " " + str(blackrook.pos))
+#     rook_pos = blackrook.pos
+#     rook_moves = board.get_upacross(rook_pos)
+#     print2(rook_moves)
+#     board.start_misc()
+#     board.mark_all_misc(rook_moves)
+#     board.print_board(b_misc = True)
+
+#     POS = (3,4)
+#     rook_moves = board.get_upacross(POS)
+#     print2(rook_moves)
+#     board.start_misc()
+#     board.mark_all_misc(rook_moves)
+#     board.print_board(b_misc = True)
+
+#     POS = (3,3)
+#     print2('Kngiht at: ', str(POS))
+#     knight_moves = board.get_two_by_ones(POS)
+#     print2(knight_moves)
+#     board.start_misc()
+#     board.mark_all_misc(knight_moves)
+#     board.print_board(b_misc = True)
+
+#     POS = (0,7)
+#     print2('Kngiht at: ', str(POS))
+#     knight_moves = board.get_two_by_ones(POS)
+#     print2(knight_moves)
+#     board.start_misc()
+#     board.mark_all_misc(knight_moves)
+#     board.print_board(b_misc = True)
+
+
+#     print2('Unobstructed Bishop at 4,4')
+#     board2 = Board()
+#     bishop = Bishop(b_white = True,pos=(4,4))
+#     board.data_by_player[4][4] = 0
+#     moves = bishop.get_available_moves(board2)
+#     print2(moves)
+#     board.start_misc()
+#     board.mark_list_misc(moves)
+#     board.print_board(b_misc = True)
+
+#     print2('Obstructed White Bishop at 4,4 inital pieces')
+#     board2 = Board()
+#     bishop = Bishop(b_white = True,pos=(4,4))
+#     board2.data_by_player[4][4] = 1
+
+#     board2.data_by_player[3][5] = 1
+#     board2.data_by_player[2][2] = -2
+#     board2.data_by_player[6][6] = 1
     
-    board2.print_board(b_player_data = True)
+#     board2.print_board(b_player_data = True)
     
-    print2('Moves available to that bishop')
-    moves = bishop.get_available_moves(board2)
-    print2(moves)
-    board.start_misc()
-    board.mark_list_misc(moves)
-    board.mark_misc((4,4), val = "B")
-    board.print_board(b_misc = True)
+#     print2('Moves available to that bishop')
+#     moves = bishop.get_available_moves(board2)
+#     print2(moves)
+#     board.start_misc()
+#     board.mark_list_misc(moves)
+#     board.mark_misc((4,4), val = "B")
+#     board.print_board(b_misc = True)
 
     
-    board2 = Board()
-    print2('Obstructed White Pawn at inital position col 2')
-    POS = (6,2)
-    pawn = Pawn(b_white = True,pos=POS)
-    board2.data_by_player[6][2] = 1
-    board2.print_board(b_player_data = True)
+#     board2 = Board()
+#     print2('Obstructed White Pawn at inital position col 2')
+#     POS = (6,2)
+#     pawn = Pawn(b_white = True,pos=POS)
+#     board2.data_by_player[6][2] = 1
+#     board2.print_board(b_player_data = True)
 
-    print2('Pawns available moves')
-    moves = pawn.get_available_moves(board2)
-    print2(moves)
-    board2.start_misc()
-    board2.mark_list_misc(moves)
-    board2.mark_misc(POS, val = "P")
-    board2.print_board(b_misc = True)
+#     print2('Pawns available moves')
+#     moves = pawn.get_available_moves(board2)
+#     print2(moves)
+#     board2.start_misc()
+#     board2.mark_list_misc(moves)
+#     board2.mark_misc(POS, val = "P")
+#     board2.print_board(b_misc = True)
 
-    board2.data_by_player[5][3] = -2
-    board2.data_by_player[5][1] = 1
-    board2.data_by_player[4][2] = -2
+#     board2.data_by_player[5][3] = -2
+#     board2.data_by_player[5][1] = 1
+#     board2.data_by_player[4][2] = -2
 
-    print2("Obstructed white pawn situation:")
-    board2.print_board(b_player_data = True)
-    print2("available moves to the pawn")
-    moves = pawn.get_available_moves(board2)
-    print moves
-    board2.start_misc()
-    board2.mark_list_misc(moves)
-    board2.mark_misc(POS, val = "P")
-    board2.print_board(b_misc = True)
+#     print2("Obstructed white pawn situation:")
+#     board2.print_board(b_player_data = True)
+#     print2("available moves to the pawn")
+#     moves = pawn.get_available_moves(board2)
+#     print moves
+#     board2.start_misc()
+#     board2.mark_list_misc(moves)
+#     board2.mark_misc(POS, val = "P")
+#     board2.print_board(b_misc = True)
 
-    # print2('opening moves available')
-    # board = Board()
-    # board, pieces = place_pieces(board)
-    # board.print_board(b_player_data = True)
+#     # print2('opening moves available')
+#     # board = Board()
+#     # board, pieces = place_pieces(board)
+#     # board.print_board(b_player_data = True)
 
-    # pawn_moves = []
-    # knight_moves = []
-    # other_moves = []
-    # for p in pieces:
-    #     if p.__class__.__name__ == "Pawn":
-    #         pawn_moves.extend(p.get_available_moves(board))
-    #     elif p.__class__.__name__ == "Knight":
-    #         knight_moves.extend(p.get_available_moves(board))
-    #     else:
-    #         other_moves.extend(p.get_available_moves(board))
+#     # pawn_moves = []
+#     # knight_moves = []
+#     # other_moves = []
+#     # for p in pieces:
+#     #     if p.__class__.__name__ == "Pawn":
+#     #         pawn_moves.extend(p.get_available_moves(board))
+#     #     elif p.__class__.__name__ == "Knight":
+#     #         knight_moves.extend(p.get_available_moves(board))
+#     #     else:
+#     #         other_moves.extend(p.get_available_moves(board))
 
-    # board.start_misc()
-    # board.mark_list_misc(pawn_moves, val = 1)
-    # board.mark_list_misc(knight_moves, val = 5)
-    # board.mark_list_misc(other_moves, val = 4)
-    # board.print_board(b_misc = True)
+#     # board.start_misc()
+#     # board.mark_list_misc(pawn_moves, val = 1)
+#     # board.mark_list_misc(knight_moves, val = 5)
+#     # board.mark_list_misc(other_moves, val = 4)
+#     # board.print_board(b_misc = True)
     
-    board = Board()
-    out = board.get_castle_interspaces(True)
-    print 'white castling moves'
-    print out
-    out = board.get_castle_interspaces(False)
-    print 'black castling moves'
-    print out
+#     board = Board()
+#     out = board.get_castle_interspaces(True)
+#     print 'white castling moves'
+#     print out
+#     out = board.get_castle_interspaces(False)
+#     print 'black castling moves'
+#     print out
 
-    king = King(b_white = True,pos = (7,3))
-    moves = king.get_available_moves(board, move_type_flag = True)
-    print 'white king all moves'
-    print moves
+#     king = King(b_white = True,pos = (7,3))
+#     moves = king.get_available_moves(board, move_type_flag = True)
+#     print 'white king all moves'
+#     print moves
 
-    print2(board.width)
+#     print2(board.width)
 
-    board2 = Board()
-    print2('Obstructed White Pawn at inital position col 2')
-    POS = (6,2)
-    pawn = Pawn(b_white = True,pos=POS)
-    board2.data_by_player[6][2] = 1
-    board2.print_board(b_player_data = True)
+#     board2 = Board()
+#     print2('Obstructed White Pawn at inital position col 2')
+#     POS = (6,2)
+#     pawn = Pawn(b_white = True,pos=POS)
+#     board2.data_by_player[6][2] = 1
+#     board2.print_board(b_player_data = True)
 
-    #Test Castling
-    board = Board() #can_castle is init true
-    POS = (7,4)
-    white_king = King(b_white = True,pos=POS)
-    moves = white_king.get_available_moves(board,move_type_flag = True)
-    moves2 = white_king.get_available_moves(board,move_type_flag = False)
-    print moves
+#     #Test Castling
+#     board = Board() #can_castle is init true
+#     POS = (7,4)
+#     white_king = King(b_white = True,pos=POS)
+#     moves = white_king.get_available_moves(board,move_type_flag = True)
+#     moves2 = white_king.get_available_moves(board,move_type_flag = False)
+#     print moves
 
-    board.start_misc()
-    board.mark_list_misc(moves2)
-    board.mark_misc(POS, val = "K")
-    board.print_board(b_misc = True)
+#     board.start_misc()
+#     board.mark_list_misc(moves2)
+#     board.mark_misc(POS, val = "K")
+#     board.print_board(b_misc = True)
 
 
 def test_bishop_moves():

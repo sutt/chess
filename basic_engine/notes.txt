@@ -314,6 +314,14 @@ board should store edge cases:
             test for profile_test.py
             remove test:basic or repair it
 
+
+    3/16
+
+        TODO
+
+            promotion in TurnStage
+                dy default it creates a queen, but you override to set a piece you want
+
         Takeaways
 
             There is the notion of move or turn characteristics / features.
