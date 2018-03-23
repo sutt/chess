@@ -326,7 +326,45 @@ board should store edge cases:
 
             first add a test for succesful promotion under advance and capture
 
-            
+    3/19
+
+        Notes
+
+            To copy/paste in git/mingw:
+                Copy: Shift + PgDn  (note: need to turn off 'fn')
+                Paste: Shift + Ins  (note: need to turn off 'fn')
+
+            How to mark, though?
+        
+        Questions
+
+            x is move_type=promotion marker ahead of filter_king_in_check() ?
+            x if so how do we filter it out?
+            x Yes, it's ok: filter_by_blocking_move handles this
+
+        Takeaways
+
+            based on previous bug with castling, where king castled with an already
+            captured rook, the promotion test finds multiple ways to probe the state
+            and see if everything checks out.
+
+        TODO
+
+            Main need: handle pawns in king_in_check properly, build tests for that
+
+
+    3/23
+
+        TODO
+
+            Fix pawn bug in king_in_check
+
+            Setup tests to find any other ways that king_in_check_optimal is different
+            from naive version
+
+            Fix letter-numbers to conform to pgn: 
+                in printout display and in interactive instructions
+
 
         Takeaways
 

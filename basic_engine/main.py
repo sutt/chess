@@ -416,8 +416,6 @@ def test_promotion_on_advance():
     #pawn promoted causing check
     ss = '1. g1 e1 2. b2 d2 3. e1 d2 4. b4 d4 5. d2 c2 6. a3 c1 7. c2 b3 8. a4 c4 9. b3 a3 10. b8 d8'
 
-    
-    
     game = Game(s_instructions = ss, test_exit_moves = 10)
     test_data = game.play()
     
@@ -447,11 +445,69 @@ def test_promotion_on_advance():
 
     #Test that black is incheck by the limited moves available to him
     assert moves == [Move(pos0=(2, 0), pos1=(0, 2), code=0), Move(pos0=(2, 3), pos1=(0, 3), code=0)]
+
+
+def test_init_midgame_1():
     
+    # A long game
+    ss_pgn = "1. e4 Nh6 2. d4 c5 3. c3 g6 4. Nf3 Ng4 5. h3 d5 6. hxg4 dxe4 7. Nfd2 e3 8. fxe3 cxd4 9. cxd4 Bxg4 10. Qxg4 f6 11. Qe4 Qd6 12. Qxb7 Qg3+ 13. Kd1 a5 14. Qxa8 Bg7 15. Ne4 Qc7 16. Bb5+ Kf7 17. Nbc3 Qb6 18. Qd5+ Qe6 19. Bc4 Qxd5 20. Bxd5+ e6 21. Nd6+ Ke7 22. Nde4 g5 23. Bb3 Kf8 24. Rf1 Nc6 25. Nxf6 Nb4 26. Nxh7+ Ke8 27. Nxg5 e5 28. Bf7+ Kd7 29. dxe5 Rh2 30. e6+ Kd8 31. a3 Bxc3 32. axb4 Bxb4 33. Bd2 Bxd2 34. Kxd2 Rxg2+ 35. Kd3 Rxg5 36. Rfd1 Rd5+ 37. Ke2 Rxd1 38. Rxd1+ Ke7 39. Rd7+ Kf6 40. e4 a4 41. Ke3 Kg7 42. e5 Kf8 43. Rd8+ Kg7 44. Kd4 a3 45. bxa3 Kh6 46. e7 Kh7 47. e8=Q Kh6 48. Rd6+ Kg5 49. Qg8+ Kf4 50. Qh8 Kf3 51. Qh5+ Kf2 52. Rf6+ Kg2 53. Qf3+ Kg1 54. Qf2+ Kh1 55. Rh6# 1-0"
     
+    display = Display()
+
+    # OK, here's what happens with test_exit_moves:
+    #   play:
+    #       get_available_moves()
+    #       print_board (before move is made or even selected)
+    #       check_test_exit_moves
+    #           continue -> top-of-loop (wihtout increment) and exit
+    # So, to get board on black move (i_turn=2) use test_exit_moves = 2
+    # Even though you would think exiting on an even number turn would 
+    # cause you to start at an odd turn (therefore white turn), that's not
+    # true because the final move in terst_exit_moves isnt applied,
+    # it exits during consideration phase. 
+    # Another tricky thing is a turn's printout corresponds to the board
+    # under consideration, the move you select and execute only printsout
+    # next turn, during opponents consideration phase.
+
+    game = Game(s_pgn_instructions = ss_pgn
+                ,pgn_control = (0,1)
+                ,b_log_move = True
+                ,test_exit_moves = 98   #exiting during black's consideration in pgn 49
+                ,b_display_always_print = False
+                )
+    ret_data = game.play()
+    
+    moves = ret_data['moves']
+    print moves
+    
+    my_board = ret_data['board']
+    my_pieces = ret_data['pieces']    
+    display.print_board_letters(my_pieces)
+
+    #by test_exit_moves = 1, you never advance the game just
+    #consider the current board
+    game2 = Game(init_board = my_board.data_by_player   #note
+                ,init_pieces = my_pieces
+                ,init_player = False     #black has first play
+                ,test_exit_moves = 1    #moves have reset
+                )
+    ret_data2 = game2.play()
+
+    my_pieces2 = ret_data2['pieces']
+    display.print_board_letters(my_pieces2)
+    
+    moves2 = ret_data2['moves']
+    print moves2
+
+    my_board2 = ret_data2['board']
+
+    assert moves2 == moves
+    assert my_board.data_by_player == my_board2.data_by_player
+
+
 
 if __name__ == "__main__":
-    
+
     # Interactive Setup
     game = Game(manual_control = (0,1)
                 ,b_display_show_opponent = True
