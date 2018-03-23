@@ -349,6 +349,11 @@ class Piece:
                         break
             
             # return pawn moves
+            if kwargs.get('check_flag', False):
+                return b_check
+
+            #TODO - add mirror_flag return here?
+            
             return valids
         
         # Handling king castling here, check for clear back row, all other conditions satisfied

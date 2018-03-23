@@ -555,16 +555,230 @@ def test_filter_check_pawn_1():
     #More generally, they should always match
     assert generic_check_moves == opt_check_moves
 
+
+def test_filter_check_pawn_2():
+    
+    #Based off check_pawn_1, 
+    # here we move pawn (manually) to make sure its accounted for and prevents 
+    # black king's move to (4,5)
+    
+    display = Display()
+
+    s_test = """
+   1 2 3 4 5 6 7 8
+
+A  ~ ~ ~ ~ ~ ~ Q ~
+B  ~ ~ ~ ~ ~ B ~ ~
+C  ~ ~ ~ R ~ ~ ~ ~
+D  ~ ~ ~ ~ ~ ~ k ~
+E  ~ ~ ~ K ~ ~ ~ ~
+F  P ~ ~ ~ P ~ ~ ~
+G  ~ ~ ~ ~ ~ ~ ~ ~
+H  ~ ~ ~ ~ ~ ~ ~ ~
+"""    
+    my_board, my_pieces = printout_to_data(s_test)
+
+    game2a = Game(init_board = copy.deepcopy(my_board.data_by_player)
+                ,init_pieces = copy.deepcopy(my_pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+    ret_data2a = game2a.play(king_in_check_test_copy_apply_4 = False
+                            ,king_in_check_on = True
+                            )
+    generic_check_moves = ret_data2a['moves']
+
+    game2b = Game(init_board = copy.deepcopy(my_board.data_by_player)
+                ,init_pieces = copy.deepcopy(my_pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+    ret_data2b = game2b.play(king_in_check_test_copy_apply_4 = True
+                            ,king_in_check_on = False
+                            )
+    opt_check_moves = ret_data2b['moves']
+    
+    
+    #This is the move that the pawn should stop
+    assert not(Move(pos0=(3, 6), pos1=(4, 5), code=0) in opt_check_moves)
+
+    #This was originally wrong untill check_flag return added to pawn section 
+    # filter_by_blocking_pieces().
+    #That's why you don't split up your returns within a function.
+    assert generic_check_moves == opt_check_moves
+
+def test_filter_forward_diagonal_1():
+    
+    """This is looking at MOVE_TYPE['forward-diagonal'] used in Mirror.
+        It looks to see that optimzed_check_filter views non-pawn pieces
+        which attack by diagonal are viewed the same from "in front" and "behind".
+        """
+    
+    s_test = """
+    A  B ~ ~ ~ ~ ~ ~ ~
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ k ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ ~ ~
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ ~ ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = copy.deepcopy(board.data_by_player)
+                ,init_pieces = copy.deepcopy(pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
+                                ,king_in_check_on = True
+                                )
+    generic_check_moves = ret_data_generic['moves']
+
+    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
+                                ,king_in_check_on = False
+                                )
+    opt_check_moves = ret_data_opt['moves']
+
+    print generic_check_moves
+    print opt_check_moves
+
+    assert opt_check_moves == generic_check_moves
+
+    assert not(Move(pos0=(2, 2), pos1=(1, 1), code=0) in opt_check_moves)
+
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ ~
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ k ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ ~ ~
+    E  ~ ~ ~ ~ B ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ ~ ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = copy.deepcopy(board.data_by_player)
+                ,init_pieces = copy.deepcopy(pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
+                                ,king_in_check_on = True
+                                )
+    generic_check_moves = ret_data_generic['moves']
+
+    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
+                                ,king_in_check_on = False
+                                )
+    opt_check_moves = ret_data_opt['moves']
+
+    print generic_check_moves
+    print opt_check_moves
+
+    assert opt_check_moves == generic_check_moves
+
+    assert not(Move(pos0=(2, 2), pos1=(3, 3), code=0) in opt_check_moves)
+
+
+def test_filter_forward_diagonal_2():
+    
+    """This continues tests for forward-diagonal when right next to the piece.
+        Also it tests the idea of moving king to capture and eliminate an
+        unprotected opponent piece. Can opt do this?
+        """
+        
+
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ ~
+    B  ~ B ~ ~ ~ ~ ~ ~
+    C  ~ ~ k ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ ~ ~
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ ~ ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = copy.deepcopy(board.data_by_player)
+                ,init_pieces = copy.deepcopy(pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
+                                ,king_in_check_on = True
+                                )
+    generic_check_moves = ret_data_generic['moves']
+
+    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
+                                ,king_in_check_on = False
+                                )
+    opt_check_moves = ret_data_opt['moves']
+
+    print generic_check_moves
+    print opt_check_moves
+
+    assert opt_check_moves == generic_check_moves
+
+    assert Move(pos0=(2, 2), pos1=(1, 1), code=0) in opt_check_moves
+
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ ~
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ k ~ ~ ~ ~ ~
+    D  ~ ~ ~ B ~ ~ ~ ~
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ ~ ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = copy.deepcopy(board.data_by_player)
+                ,init_pieces = copy.deepcopy(pieces)
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
+                                ,king_in_check_on = True
+                                )
+    generic_check_moves = ret_data_generic['moves']
+
+    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
+                                ,king_in_check_on = False
+                                )
+    opt_check_moves = ret_data_opt['moves']
+
+    print generic_check_moves
+    print opt_check_moves
+
+    assert opt_check_moves == generic_check_moves
+
+    assert Move(pos0=(2, 2), pos1=(3, 3), code=0) in opt_check_moves
+
+
 if __name__ == "__main__":
 
-    test_filter_check_pawn_1()
+    # test_filter_forward_diagonal_1()
+    # test_filter_check_pawn_2()
 
     # Interactive Setup
-    # game = Game(manual_control = (0,1)
-    #             ,b_display_show_opponent = True
-    #             ,b_log_move = True
-    #             )
-    # game.play()
+    game = Game(manual_control = (0,1)
+                ,b_display_show_opponent = True
+                ,b_log_move = True
+                )
+    game.play()
 
     
     #PGN Setup
@@ -581,7 +795,7 @@ if __name__ == "__main__":
     # game = Game(s_pgn_instructions = ss_pgn
     #             ,pgn_control = (0,1)
     #             ,b_log_move = True
-    #             ,test_exit_moves = 110
+    #             ,test_exit_moves = 98
     #             ,b_display_always_print = True
     #             )
     # ret = game.play()
