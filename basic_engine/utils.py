@@ -447,6 +447,30 @@ H  ~ ~ ~ ~ ~ ~ ~ ~
     display = Display()
     display.print_board_letters(pieces)
 
+def test_printout_to_data_2():
+    
+    '''tests for indenting the printout'''
+
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ Q ~
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ R ~ ~ ~ B
+    D  ~ ~ ~ ~ P ~ k ~
+    E  ~ ~ ~ K ~ ~ ~ ~
+    F  P ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ ~ ~ ~ ~ ~
+    """
+    
+    board, pieces = printout_to_data(s_test)
+
+    white_king = filter(lambda p: p.white == True and 
+                        p.__class__.__name__ == "King", pieces)[0]
+    assert white_king.pos == (4,3)
+    
+    display = Display()
+    display.print_board_letters(pieces)
+
 # def test_printout_to_data_2():
 #     """test castline property"""
 
@@ -459,4 +483,4 @@ def test_pgn_parse():
     assert out == [('c4', 'P', None), ('f6', 'N', None), ('c3', 'N', None), ('g6', 'P', None), ('g3', 'P', None), ('c5', 'P', None), ('g2', 'B', None), ('c6', 'N', None), ('f3', 'N', None), ('d6', 'P', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'N', None), ('d7', 'B', None), ('g1', 'K', None), ('g7', 'B', None), ('c6', 'N', None), ('c6', 'B', None), ('e4', 'P', None), ('g8', 'K', None), ('e3', 'B', None), ('a6', 'P', None), ('c1', 'R', None), ('d7', 'N', None), ('e2', 'Q', None), ('b5', 'P', None), ('b4', 'P', None), ('e5', 'N', None), ('b5', 'P', 'c'), ('b5', 'P', 'a'), ('b5', 'N', None), ('b5', 'B', None), ('b5', 'Q', None), ('b8', 'Q', None), ('a4', 'P', None), ('b5', 'Q', None), ('b5', 'P', 'a'), ('b8', 'R', 'f'), ('b6', 'P', None), ('g4', 'N', None)]
 
 if __name__ == "__main__":
-    test_printout_to_data_1()
+    test_printout_to_data_2()
