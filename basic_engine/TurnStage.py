@@ -208,6 +208,7 @@ class Mirror():
     threatened by capture of any other piece '''
 
     def __init__(self):
+        self.white = None
         self.init_pos = None
         self.moves = None
         self.pieces = None
@@ -219,6 +220,9 @@ class Mirror():
 
         self.outcome = None
 
+    def set_white(self, white):
+        self.white = white      #adding for pawn forward-diag
+    
     def set_init_pos(self, init_pos):
         self.init_pos = init_pos
 
@@ -239,6 +243,8 @@ class Mirror():
         # none of the three atomic move types overlap, thus deduce the
         # move-type from the (pos0, pos1).
 
+        white = self.white
+
         pos0 = self.init_pos
         pos1 = move
         
@@ -247,8 +253,14 @@ class Mirror():
         
         if (row0 == row1) or (col0 == col1):
             return MOVE_TYPE['upacross']
+            
         elif abs(row0 - row1) == abs(col0 - col1):
-            return MOVE_TYPE['diagonal']
+            
+            if not( white ^ ((row0 - row1) > 0) ):
+                return MOVE_TYPE['forward-diagonal']
+            else:
+                return MOVE_TYPE['diagonal']
+        
         else:
             return MOVE_TYPE['twobyone']
 
@@ -262,7 +274,7 @@ class Mirror():
         #or make this reflective?
         #TODO - remove hard coded 8's
         if _class == "Pawn":
-            return [(MOVE_TYPE['diagonal'], 1)]
+            return [(MOVE_TYPE['forward-diagonal'], 1)]
         if _class == "King":
             return [(MOVE_TYPE['diagonal'], 1), (MOVE_TYPE['upacross'], 1)]
         if _class == "Queen":
@@ -361,6 +373,7 @@ def get_possible_check_optimal(pieces, board, move, player):
 
     mirror = Mirror()   
     
+    mirror.set_white(player)
     mirror.set_init_pos(player_king_pos)
     mirror.set_moves(opp_kill_moves)
     mirror.set_pieces(pieces)

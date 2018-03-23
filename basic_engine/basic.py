@@ -14,8 +14,9 @@ MOVE_CODE['promotion'] = 3
 
 MOVE_TYPE = {}
 MOVE_TYPE['upacross'] = 0
-MOVE_TYPE['diagonal'] = 1
-MOVE_TYPE['twobyone'] = 2
+MOVE_TYPE['twobyone'] = 1
+MOVE_TYPE['diagonal'] = 2
+MOVE_TYPE['forward-diagonal'] = 3
 
 
 #Helper Functions ---------------------------
