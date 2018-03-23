@@ -1,6 +1,7 @@
 import sys
 from basic import *
 from datatypes import moveHolder
+from Display import Display
 Move = moveHolder()
 
 # example
@@ -344,6 +345,111 @@ def player_control_input(board, moves_player, log, **kwargs):
             print 'could not recognize move ', str(raw), ". Try again:"
 
 
+def _find_blank(list_str, find_str):
+    return list_str.find(find_str)
+
+def _remove_spaces(list_str):
+    return list_str.replace(" ","")
+
+def printout_to_data(s_printout, b_king_can_castle = False):
+    ''' output: board, pieces
+        input: [multi-line] string of the printout
+    converts a printout to a board and pieces data structure'''
+
+    s_blank = "~"
+
+    lines = s_printout.split("\n")
+    lines = [_remove_spaces(x) for x in lines]
+
+    #this doesnt work if all rows in leftmost col have pieces
+    #or if there are stray blank marks within the string/graphic
+
+    blank_ind = [_find_blank(x, s_blank) for x in lines]
+    first_blank = filter(lambda ind: ind[1] >= 0, enumerate(blank_ind))
+    top_line = first_blank[0][0]
+    left_side = min(filter(lambda ind: ind >= 0, blank_ind))
+    
+    board_lines = lines[top_line:top_line + 8]
+    
+    s_board = [line[left_side:left_side + 8] for line in board_lines]
+    
+    pieces = []
+    board = Board()    
+    
+    for row in range(8):
+        for col in range(8):
+            
+            pos = (row,col)
+            s_piece = s_board[row][col]
+
+            if s_piece == "~":
+                board.data_by_player[row][col] = 0
+                continue
+            else:
+                
+                b_white = s_piece.isupper()
+                
+                _piece_val = 1
+
+                upper_piece = s_piece.upper()
+                
+                if upper_piece == "P":
+                    _piece = Pawn(b_white = b_white, pos = pos)
+                elif upper_piece == "N":
+                    _piece = Knight(b_white = b_white, pos = pos)
+                elif upper_piece == "B":
+                    _piece = Bishop(b_white = b_white, pos = pos)
+                elif upper_piece == "R":
+                    _piece = Rook(b_white = b_white, pos = pos)
+                elif upper_piece == "Q":
+                    _piece = Queen(b_white = b_white, pos = pos)
+                elif upper_piece == "K":
+                    _piece = King(b_white = b_white
+                                    ,pos = pos
+                                    ,b_can_castle=b_king_can_castle
+                                    )
+                    _piece_val = 3
+                else:
+                    print 'could not determine piece in board.'
+                    continue
+                
+                pieces.append(_piece)
+
+                player_mult = 1 if b_white else -1
+                by_player_val = player_mult * _piece_val
+
+                board.data_by_player[row][col] = by_player_val
+
+    return board, pieces
+
+
+def test_printout_to_data_1():
+    
+    s_test = """
+   1 2 3 4 5 6 7 8
+
+A  ~ ~ ~ ~ ~ ~ Q ~
+B  ~ ~ ~ ~ ~ ~ ~ ~
+C  ~ ~ ~ R ~ ~ ~ B
+D  ~ ~ ~ ~ P ~ k ~
+E  ~ ~ ~ K ~ ~ ~ ~
+F  P ~ ~ ~ ~ ~ ~ ~
+G  ~ ~ ~ ~ ~ ~ ~ ~
+H  ~ ~ ~ ~ ~ ~ ~ ~
+"""
+    
+    board, pieces = printout_to_data(s_test)
+
+    white_king = filter(lambda p: p.white == True and 
+                        p.__class__.__name__ == "King", pieces)[0]
+    assert white_king.pos == (4,3)
+    
+    display = Display()
+    display.print_board_letters(pieces)
+
+# def test_printout_to_data_2():
+#     """test castline property"""
+
 def test_pgn_parse():
 
     s = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7'
@@ -351,3 +457,6 @@ def test_pgn_parse():
     out = parse_pgn_instructions(s)
 
     assert out == [('c4', 'P', None), ('f6', 'N', None), ('c3', 'N', None), ('g6', 'P', None), ('g3', 'P', None), ('c5', 'P', None), ('g2', 'B', None), ('c6', 'N', None), ('f3', 'N', None), ('d6', 'P', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'N', None), ('d7', 'B', None), ('g1', 'K', None), ('g7', 'B', None), ('c6', 'N', None), ('c6', 'B', None), ('e4', 'P', None), ('g8', 'K', None), ('e3', 'B', None), ('a6', 'P', None), ('c1', 'R', None), ('d7', 'N', None), ('e2', 'Q', None), ('b5', 'P', None), ('b4', 'P', None), ('e5', 'N', None), ('b5', 'P', 'c'), ('b5', 'P', 'a'), ('b5', 'N', None), ('b5', 'B', None), ('b5', 'Q', None), ('b8', 'Q', None), ('a4', 'P', None), ('b5', 'Q', None), ('b5', 'P', 'a'), ('b8', 'R', 'f'), ('b6', 'P', None), ('g4', 'N', None)]
+
+if __name__ == "__main__":
+    test_printout_to_data_1()

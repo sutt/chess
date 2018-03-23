@@ -465,9 +465,9 @@ class Pawn(Piece):
 
 class King(Piece):
     
-    def __init__(self,b_white,pos):
+    def __init__(self,b_white,pos,b_can_castle=True):
         Piece.__init__(self,b_white,pos)
-        self.king_can_castle = True
+        self.king_can_castle = b_can_castle     #for mid-game init
         self.upacross = 1
         self.diagonal = 1
 
