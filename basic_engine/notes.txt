@@ -365,6 +365,21 @@ board should store edge cases:
             Fix letter-numbers to conform to pgn: 
                 in printout display and in interactive instructions
 
+        In the Future:
+
+            Start testing end-game return codes
+            Start testing more pgn's 
+
+    3/26
+
+        TODOs
+            basecamp
+            test with pawns threatening king
+            how to run tests with/without castling
+            test with castling
+                eg castling into check by pawn
+            
+        
 
         Takeaways
 
