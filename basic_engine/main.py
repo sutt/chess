@@ -192,7 +192,11 @@ class Game():
                 continue
 
         #True exit: only here when check_endgame has been satisfied
-        return self.outcome, board, pieces
+        ret_data = {}
+        ret_data['outcome'] = self.outcome
+        ret_data['board'] = board
+        ret_data['pieces'] = pieces
+        return ret_data
 
 
 def test_castling_allowed_misc():
@@ -1130,6 +1134,61 @@ def test_checkmate_simple_1():
     moves = ret['moves']
 
     assert len(moves) > 0
+
+
+def test_checkmate_returncode_1():
+    
+    """Check return codes from play() a checkmate."""
+        
+    #Black is checkmated
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ k
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ R R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = copy.deepcopy(board.data_by_player)
+                ,init_pieces = pieces
+                ,init_player = False     
+                )
+
+    ret = game.play()
+
+    assert ret['outcome'] == (False, 'LOSS', 'CHECKMATE')
+
+    assert len(ret['pieces']) == 4
+
+    assert board.data_by_player == ret['board'].data_by_player
+
+    #White is checkmated (note this is all backwards on purpose)
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ K
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ r r
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ k ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = True
+                )
+
+    ret = game.play()
+
+    assert ret['outcome'] == (True, 'LOSS', 'CHECKMATE')
     
 
 if __name__ == "__main__":
