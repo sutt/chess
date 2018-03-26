@@ -955,7 +955,6 @@ def test_cant_castle_into_check_1():
     """    
 
     board, pieces = printout_to_data(s_test, b_king_can_castle=True)
-    board.rooks_can_castle[1][0] = False
 
     game = Game(init_board = board.data_by_player
                 ,init_pieces = pieces
@@ -1025,6 +1024,113 @@ def test_cant_castle_into_check_1():
 
     assert Move(pos0=(0, 4), pos1=(0, 3), code=0) in moves
     assert not(Move(pos0=(0, 4), pos1=(0, 2), code=2) in moves)
+
+def test_checkmate_simple_1():
+    
+    """Basic Checkmate test: that there are no moves remaining unfiltered,
+        after filter_check has been applied. This doesn't look forn plays()
+        return codes, only the test_exit_moves() return data."""
+        
+    #CONTROL case: not checkmate
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ k
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ ~ R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+    moves = ret['moves']
+
+    assert len(moves) > 0
+
+    #TEST case: checkmate
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ k
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ R R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+    moves = ret['moves']
+
+    assert len(moves) == 0
+
+    #TEST case2: no moves of other pieces either
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ k
+    B  p ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ R R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+    moves = ret['moves']
+
+    assert len(moves) == 0
+
+    #TEST case3: you can block check
+    s_test = """
+    A  ~ ~ ~ ~ ~ ~ ~ k
+    B  r ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ R R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+    moves = ret['moves']
+
+    assert len(moves) > 0
+    
 
 if __name__ == "__main__":
 

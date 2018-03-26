@@ -375,14 +375,29 @@ board should store edge cases:
         TODOs
             x basecamp
             x test with pawns threatening king
-            how to run tests with/without castling
-            test with castling
-                eg castling into check by pawn
-            cleanup main and move seperate function calls to misc-script.py
+            x how to run tests with/without castling
+            x test with castling
+                x eg castling into check by pawn
+            x cleanup main and move seperate function calls to misc-script.py
+            
             start testing end-game conditions
+            
             need to test in_check more, not just filter_check
+            
             also think about ways [standard] checkmate is ever different than
             len(filter_check(moves)) == 0?
+
+            need to account for #1-0 comment in pgn
+
+            need to test stalemate vs checkmate more
+
+
+        Takeaways 
+
+            Use a positive control when testing for negative results:
+                e.g. when testing that you can't castle for test and verify
+                that you can castle in other conditions and that you're verifying
+                that is happening as seen in test_cant_castle_into_check_1()
 
             
         
