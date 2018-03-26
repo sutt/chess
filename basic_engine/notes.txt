@@ -373,14 +373,17 @@ board should store edge cases:
     3/26
 
         TODOs
-            basecamp
-            test with pawns threatening king
+            x basecamp
+            x test with pawns threatening king
             how to run tests with/without castling
             test with castling
                 eg castling into check by pawn
             cleanup main and move seperate function calls to misc-script.py
-            start testing end game conditions
-            
+            start testing end-game conditions
+            need to test in_check more, not just filter_check
+            also think about ways [standard] checkmate is ever different than
+            len(filter_check(moves)) == 0?
+
             
         
 

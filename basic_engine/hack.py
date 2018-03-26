@@ -3,7 +3,8 @@ from main import Game
 from main import *
 
 
-test_pawn_check_true_positive_1()
+test_cant_castle_into_check_1()
+# test_pawn_check_true_positive_1()
 
 #PGN Setup
 

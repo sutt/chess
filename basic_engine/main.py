@@ -936,6 +936,96 @@ def test_pawn_check_negative_1():
     assert Move(pos0=(3, 2), pos1=(2, 1), code=0) in opt_check_moves
     assert Move(pos0=(3, 2), pos1=(2, 3), code=0) in opt_check_moves
 
+
+def test_cant_castle_into_check_1():
+    
+    """Do filter_check() functions correctly not identify pawn's rear-diagonal 
+        attack as threatening king?"""
+        
+    #control case: can castle
+    s_test = """
+    A  r ~ ~ ~ k ~ ~ r
+    B  p ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ ~ R
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test, b_king_can_castle=True)
+    board.rooks_can_castle[1][0] = False
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+
+    moves = ret['moves']
+
+    print "\n".join(map(lambda s:str(s), moves))
+
+    assert Move(pos0=(0, 4), pos1=(0, 5), code=0) in moves
+    assert Move(pos0=(0, 4), pos1=(0, 6), code=2) in moves
+
+    #test case: cant castle
+    s_test = """
+    A  r ~ ~ ~ k ~ ~ r
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ ~ ~ ~ ~ R ~
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test, b_king_can_castle=True)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+
+    moves = ret['moves']
+
+    assert Move(pos0=(0, 4), pos1=(0, 5), code=0) in moves
+    assert not(Move(pos0=(0, 4), pos1=(0, 6), code=2) in moves)
+
+#test case: cant castle
+    s_test = """
+    A  r ~ ~ ~ k ~ ~ r
+    B  ~ ~ ~ ~ ~ ~ ~ ~
+    C  ~ ~ ~ ~ ~ ~ ~ ~
+    D  ~ ~ R ~ ~ ~ ~ ~
+    E  ~ ~ ~ ~ ~ ~ ~ ~
+    F  ~ ~ ~ ~ ~ ~ ~ ~
+    G  ~ ~ ~ ~ ~ ~ ~ ~
+    H  ~ ~ ~ K ~ ~ ~ ~
+    """    
+
+    board, pieces = printout_to_data(s_test, b_king_can_castle=True)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = False     
+                ,test_exit_moves = 1    
+                )
+
+    ret = game.play()
+
+    moves = ret['moves']
+
+    assert Move(pos0=(0, 4), pos1=(0, 3), code=0) in moves
+    assert not(Move(pos0=(0, 4), pos1=(0, 2), code=2) in moves)
+
 if __name__ == "__main__":
 
 
