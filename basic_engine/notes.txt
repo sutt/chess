@@ -378,6 +378,9 @@ board should store edge cases:
             how to run tests with/without castling
             test with castling
                 eg castling into check by pawn
+            cleanup main and move seperate function calls to misc-script.py
+            start testing end game conditions
+            
             
         
 
