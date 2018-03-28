@@ -62,7 +62,16 @@ def parse_pgn_instructions(s):
 
     s_dot = s.split('.')
     s_space = [x.split(' ') for x in s_dot[1:]]
-    s_moves = [(x[1], x[2]) for x in s_space[:-1]]    
+    s_moves = [(x[1], x[2]) for x in s_space[:-1]]
+    
+    s_last_move = s_space[::-1][0]
+    if len(s_last_move) > 1:
+        s_white_move = s_last_move[1]
+        if len(s_last_move) > 2:
+            s_black_move = s_last_move[2]
+        else:
+            s_black_move = ''
+        s_moves.append( (s_white_move, s_black_move) )
 
     cntr = 0
 
@@ -74,6 +83,12 @@ def parse_pgn_instructions(s):
 
             _s = _s.lstrip()
             _s = _s.rstrip()
+
+            if _s ==  '':
+                continue
+                #therefore move is never appended
+                #TODO - exit entire loop
+                #break? 
 
             #Castling
             if _s[0] == 'O':
@@ -480,7 +495,7 @@ def test_pgn_parse():
     
     out = parse_pgn_instructions(s)
 
-    assert out == [('c4', 'P', None), ('f6', 'N', None), ('c3', 'N', None), ('g6', 'P', None), ('g3', 'P', None), ('c5', 'P', None), ('g2', 'B', None), ('c6', 'N', None), ('f3', 'N', None), ('d6', 'P', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'N', None), ('d7', 'B', None), ('g1', 'K', None), ('g7', 'B', None), ('c6', 'N', None), ('c6', 'B', None), ('e4', 'P', None), ('g8', 'K', None), ('e3', 'B', None), ('a6', 'P', None), ('c1', 'R', None), ('d7', 'N', None), ('e2', 'Q', None), ('b5', 'P', None), ('b4', 'P', None), ('e5', 'N', None), ('b5', 'P', 'c'), ('b5', 'P', 'a'), ('b5', 'N', None), ('b5', 'B', None), ('b5', 'Q', None), ('b8', 'Q', None), ('a4', 'P', None), ('b5', 'Q', None), ('b5', 'P', 'a'), ('b8', 'R', 'f'), ('b6', 'P', None), ('g4', 'N', None)]
+    assert out == [('c4', 'P', None), ('f6', 'N', None), ('c3', 'N', None), ('g6', 'P', None), ('g3', 'P', None), ('c5', 'P', None), ('g2', 'B', None), ('c6', 'N', None), ('f3', 'N', None), ('d6', 'P', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'N', None), ('d7', 'B', None), ('g1', 'K', None), ('g7', 'B', None), ('c6', 'N', None), ('c6', 'B', None), ('e4', 'P', None), ('g8', 'K', None), ('e3', 'B', None), ('a6', 'P', None), ('c1', 'R', None), ('d7', 'N', None), ('e2', 'Q', None), ('b5', 'P', None), ('b4', 'P', None), ('e5', 'N', None), ('b5', 'P', 'c'), ('b5', 'P', 'a'), ('b5', 'N', None), ('b5', 'B', None), ('b5', 'Q', None), ('b8', 'Q', None), ('a4', 'P', None), ('b5', 'Q', None), ('b5', 'P', 'a'), ('b8', 'R', 'f'), ('b6', 'P', None), ('g4', 'N', None), ('b7', 'P', None)]
 
 if __name__ == "__main__":
     test_printout_to_data_2()

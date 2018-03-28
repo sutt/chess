@@ -48,6 +48,7 @@ class Game():
         
         self.pgn_control = pgn_control
         self.pgn_instructions = parse_pgn_instructions(s_pgn_instructions)
+        self.pgn_num_insturctions = len(self.pgn_instructions)
         if len(self.pgn_instructions) > 0:
             self.pgn_control = (0,1)
 
@@ -91,6 +92,10 @@ class Game():
         if len(self.instruction_control) > 0:
             if self.i_turn == len(self.instructions):
                 return True
+        if len(self.pgn_control) > 0:
+            if self.i_turn == self.pgn_num_insturctions:
+                return True
+            
         return False
         
     
@@ -187,6 +192,7 @@ class Game():
             if self.check_test_exit():
                 self.b_test_exit = True
                 self.test_data = {}
+                self.test_data['last_player'] = player
                 self.test_data['pieces'] = copy.deepcopy(pieces)
                 self.test_data['board'] = copy.deepcopy(board)
                 continue
@@ -1190,6 +1196,44 @@ def test_checkmate_returncode_1():
 
     assert ret['outcome'] == (True, 'LOSS', 'CHECKMATE')
     
+
+def test_multi_pgn_games_1():
+    
+    num_games = 5
+
+    f = open('data/GarryKasparovGames.txt', 'r')
+    lines = f.readlines()
+    f.close()
+
+    s_games = lines[:num_games]
+
+    for i, s_game in enumerate(s_games):
+        
+        game = Game(s_pgn_instructions = s_game)
+        ret = game.play()
+        
+        #Printout
+        print 'Line Num: ', str(i + 1)
+
+        if isinstance(ret, dict):
+            s_last_player = str(ret.get('last_player', 'N/A: no last_player'))
+            print 'last player to move: ', s_last_player
+        if isinstance(ret, int):
+            print 'exited from move incompatiability'            
+            print 'game.i_turn: ', str(ret)
+            
+            b_whites_move = ((ret % 2) == 1)
+
+            pgn_turn = (ret + int(b_whites_move)) / 2
+            s_player = 'White' if b_whites_move else 'Black'
+
+            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
+            print '\n'
+            print s_game
+    
+
+#pgn_turn white second move(2a) = i_turn(3)
+#pgn*2 - 1 (if white)
 
 if __name__ == "__main__":
 
