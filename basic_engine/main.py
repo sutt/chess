@@ -1199,6 +1199,8 @@ def test_checkmate_returncode_1():
 
 def test_multi_pgn_games_1():
     
+    '''test if we can load some pgn's and run them thru the final move'''
+
     num_games = 5
 
     f = open('data/GarryKasparovGames.txt', 'r')
@@ -1230,10 +1232,26 @@ def test_multi_pgn_games_1():
             print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
             print '\n'
             print s_game
-    
 
-#pgn_turn white second move(2a) = i_turn(3)
-#pgn*2 - 1 (if white)
+
+def test_kasparov_game_10_pgn_err():
+    
+    '''This particular game caused a problem due to disambig pgn (turn 33 white) 
+        info not included. From the parse. Using this mostly as regression test.'''
+    
+    problem_game_ind = 9
+    
+    f = open('data/GarryKasparovGames.txt', 'r')
+    lines = f.readlines()
+    f.close()
+
+    s_game = lines[problem_game_ind]
+
+    game = Game(s_pgn_instructions = s_game)
+    ret = game.play()
+
+    assert ret['last_player'] == True
+    
 
 if __name__ == "__main__":
 

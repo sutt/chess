@@ -431,20 +431,35 @@ board should store edge cases:
 
     3/28
 
-        Get Kasparov games to run in batch:
-            fix pgn_instruct pop() bug
-            make sure the last move is included in pgn_instructs
-            when exiting play() before an endgame occurs, note the final player to have moved, its likely he won b/c the other guy resigned
-            finally, write and pass the batch_play test
+        x Get Kasparov games to run in batch:
+            x fix pgn_instruct pop() bug
+            x make sure the last move is included in pgn_instructs
+            x when exiting play() before an endgame occurs, note the final player to have moved, its likely he won b/c the other guy resigned
+            x finally, write and pass the batch_play test
 
-        Fix Game on Line 10 bug
+        x Fix Game on Line 10 bug
+
+        Add some unit tests for parse_pgn
 
         Would be nice to not return data calling play as function
         but from the game object itself.
 
+        Fix A-G 1-8
+            
+        Nice to have a 0-7, 0-7 display as an option for debugging
         
+        Then fix the A1 insturctions to 1A insturctions
 
-        
+        How to port tests to new style? an extra arg of b_legacy?
+
+        Why don't my conditional break points work!!?
+            but sometimes do?
+
+        We can add "check indicator" to pgn_parse and verify our check that way
+
+        Utlimately need a new dataset which plays the games thru mate for
+        better testing
+
 
         Takeaways
 

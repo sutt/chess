@@ -53,7 +53,11 @@ def parse_pgn_instructions(s):
     
     #TODO 
     #   add in appendix
-    #   this cuts off the final move
+
+    #NOTE:
+    # pgn_turn white second move(2a) = i_turn(3)
+    # Formula: i_turn = pgn_turn*2 - (1 if white 0 if black)
+    
     
     moves = []
 
@@ -87,8 +91,8 @@ def parse_pgn_instructions(s):
             if _s ==  '':
                 continue
                 #therefore move is never appended
-                #TODO - exit entire loop
-                #break? 
+                #TODO - exit entire loop, break?
+          
 
             #Castling
             if _s[0] == 'O':
@@ -120,17 +124,22 @@ def parse_pgn_instructions(s):
             disambig_info = None
             
             if i_first_digit - 3 >= 0:
+               
+                #Disambig is Digit
+                if str.isdigit(_s[i_first_digit - 3]):    
+                    disambig_info = _s[i_first_digit - 3]
+                else:
+                    if i_first_digit - 4 >= 0:
+                        if str.isdigit(_s[i_first_digit - 4]):
+                            disambig_info = _s[i_first_digit - 4]
+                
+                #Disambig is letter (but not x which is used for capture)
                 if str.islower(_s[i_first_digit - 3]):
-                    
                     if _s[i_first_digit - 3] != "x":
-                    
                         disambig_info = _s[i_first_digit - 3]
-                    
                     else:
-                        
                         if i_first_digit - 4 >= 0:
-                            if str.islower(_s[i_first_digit - 4]):
-                                
+                            if str.islower(_s[i_first_digit - 4]):                
                                 disambig_info = _s[i_first_digit - 4]
 
             triplet = (destination_a1, piece_letter, disambig_info)
@@ -496,6 +505,21 @@ def test_pgn_parse():
     out = parse_pgn_instructions(s)
 
     assert out == [('c4', 'P', None), ('f6', 'N', None), ('c3', 'N', None), ('g6', 'P', None), ('g3', 'P', None), ('c5', 'P', None), ('g2', 'B', None), ('c6', 'N', None), ('f3', 'N', None), ('d6', 'P', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'N', None), ('d7', 'B', None), ('g1', 'K', None), ('g7', 'B', None), ('c6', 'N', None), ('c6', 'B', None), ('e4', 'P', None), ('g8', 'K', None), ('e3', 'B', None), ('a6', 'P', None), ('c1', 'R', None), ('d7', 'N', None), ('e2', 'Q', None), ('b5', 'P', None), ('b4', 'P', None), ('e5', 'N', None), ('b5', 'P', 'c'), ('b5', 'P', 'a'), ('b5', 'N', None), ('b5', 'B', None), ('b5', 'Q', None), ('b8', 'Q', None), ('a4', 'P', None), ('b5', 'Q', None), ('b5', 'P', 'a'), ('b8', 'R', 'f'), ('b6', 'P', None), ('g4', 'N', None), ('b7', 'P', None)]
+
+def test_pgn_parse_2():
+    
+    '''This pgn insturction set includes a digit disambig in turn 33'''
+
+    s = '1. Nf3 e6 2. c4 b6 3. g3 Bb7 4. Bg2 c5 5. O-O Nf6 6. Nc3 Be7 7. d4 cxd4 8. Qxd4 Nc6 9. Qf4 O-O 10. Rd1 Qb8 11. e4 d6 12. b3 a6 13. Bb2 Rd8 14. Qe3 Qa7 15. Ba3 Bf8 16. h3 b5 17. Qxa7 Nxa7 18. e5 dxe5 19. Bxf8 Kxf8 20. Nxe5 Bxg2 21. Kxg2 bxc4 22. bxc4 Ke8 23. Rab1 Rxd1 24. Nxd1 Ne4 25. Rb7 Nd6 26. Rc7 Nac8 27. c5 Ne4 28. Rxf7 Ra7 29. Rf4 Nf6 30. Ne3 Rc7 31. Rc4 Ne7 32. f4 Nc6 33. N3g4 Nd5 34. Nxc6 Rxc6 35. Kf3 Rc7 36. Ne5 Kd8 37. c6 Ke7 38. Ra4 Ra7 39. Kf2 Kd6 40. h4 a5 41. Kf3 Nc3 42. Rd4+ Nd5 43. Ke4 g6 44. g4 Kc7 45. Rd2 a4 46. f5 Nf6+ 47. Kf4 exf5 48. gxf5 Ra5 49. fxg6 hxg6 50. Rb2 Nd5+ 51. Ke4 Nb6 52. Rf2 a3 53. Rf7+ Kc8 54. Nxg6 Ra4+ 55. Ke5 Rb4 56. Ne7+ Kd8 57. c7+ Ke8 58. Rh7 Rc4 59. Nd5 Rc5 60. Rh8+ Kd7 61. Rd8+'
+    
+    out = parse_pgn_instructions(s)
+
+    print out
+
+    assert out == [('f3', 'N', None), ('e6', 'P', None), ('c4', 'P', None), ('b6', 'P', None), ('g3', 'P', None), ('b7', 'B', None), ('g2', 'B', None), ('c5', 'P', None), ('g1', 'K', None), ('f6', 'N', None), ('c3', 'N', None), ('e7', 'B', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'Q', None), ('c6', 'N', None), ('f4', 'Q', None), ('g8', 'K', None), ('d1', 'R', None), ('b8', 'Q', None), ('e4', 'P', None), ('d6', 'P', None), ('b3', 'P', None), ('a6', 'P', None), ('b2', 'B', None), ('d8', 'R', None), ('e3', 'Q', None), ('a7', 'Q', None), ('a3', 'B', None), ('f8', 'B', None), ('h3', 'P', None), ('b5', 'P', None), ('a7', 'Q', None), ('a7', 'N', None), ('e5', 'P', None), ('e5', 'P', 'd'), ('f8', 'B', None), ('f8', 'K', None), ('e5', 'N', None), ('g2', 'B', None), ('g2', 'K', None), ('c4', 'P', 'b'), ('c4', 'P', 'b'), ('e8', 'K', None), ('b1', 'R', 'a'), ('d1', 'R', None), ('d1', 'N', None), ('e4', 'N', None), ('b7', 'R', None), ('d6', 'N', None), ('c7', 'R', None), ('c8', 'N', 'a'), ('c5', 'P', None), ('e4', 'N', None), ('f7', 'R', None), ('a7', 'R', None), ('f4', 'R', None), ('f6', 'N', None), ('e3', 'N', None), ('c7', 'R', None), ('c4', 'R', None), ('e7', 'N', None), ('f4', 'P', None), ('c6', 'N', None), ('g4', 'N', '3'), ('d5', 'N', None), ('c6', 'N', None), ('c6', 'R', None), ('f3', 'K', None), ('c7', 'R', None), ('e5', 'N', None), ('d8', 'K', None), ('c6', 'P', None), ('e7', 'K', None), ('a4', 'R', None), ('a7', 'R', None), ('f2', 'K', None), ('d6', 'K', None), ('h4', 'P', None), ('a5', 'P', None), ('f3', 'K', None), ('c3', 'N', None), ('d4', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('g6', 'P', None), ('g4', 'P', None), ('c7', 'K', None), ('d2', 'R', None), ('a4', 'P', None), ('f5', 'P', None), ('f6', 'N', None), ('f4', 'K', None), ('f5', 'P', 'e'), ('f5', 'P', 'g'), ('a5', 'R', None), ('g6', 'P', 'f'), ('g6', 'P', 'h'), ('b2', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('b6', 'N', None), ('f2', 'R', None), ('a3', 'P', None), ('f7', 'R', None), ('c8', 'K', None), ('g6', 'N', None), ('a4', 'R', None), ('e5', 'K', None), ('b4', 'R', None), ('e7', 'N', None), ('d8', 'K', None), ('c7', 'P', None), ('e8', 'K', None), ('h7', 'R', None), ('c4', 'R', None), ('d5', 'N', None), ('c5', 'R', None), ('h8', 'R', None), ('d7', 'K', None), ('d8', 'R', None)]
+
+
+    
 
 if __name__ == "__main__":
     test_printout_to_data_2()
