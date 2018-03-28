@@ -380,9 +380,9 @@ board should store edge cases:
                 x eg castling into check by pawn
             x cleanup main and move seperate function calls to misc-script.py
             
-            start testing end-game conditions
+            x start testing end-game conditions
             
-            need to test in_check more, not just filter_check
+            x need to test in_check more, not just filter_check
             
             also think about ways [standard] checkmate is ever different than
             len(filter_check(moves)) == 0?
@@ -391,7 +391,6 @@ board should store edge cases:
 
             need to test stalemate vs checkmate more
 
-
         Takeaways 
 
             Use a positive control when testing for negative results:
@@ -399,7 +398,52 @@ board should store edge cases:
                 that you can castle in other conditions and that you're verifying
                 that is happening as seen in test_cant_castle_into_check_1()
 
+    3/27
+        
+        TODOs
             
+            refactor play() and kwargs names
+                naive_check_filter
+                dummy_deepcopy_filter
+                opt_mutate_naive_check
+                naive_mutate_opt_check
+                opt_check_filter
+
+        Grand Projets
+
+            Analyze the perf-tradeoff of mirror vs naive in late game "low piece" situations
+                to do this, you need to run a batch of games
+                can look at a random-play game vs expert game
+
+            Build the "cache" of opp_kill_moves
+                analyze the perf-boost (or loss) as probability and a net
+
+            Add numpy / str as board data Structure
+
+            Add a combined piece+board data structure
+
+            Score each move based on extensibly-definable-characteristics
+
+            Build a pondering tree
+
+            Analyze the size of each node
+                can these be compressed?
+
+    3/28
+
+        Get Kasparov games to run in batch:
+            fix pgn_instruct pop() bug
+            make sure the last move is included in pgn_instructs
+            when exiting play() before an endgame occurs, note the final player to have moved, its likely he won b/c the other guy resigned
+            finally, write and pass the batch_play test
+
+        Fix Game on Line 10 bug
+
+        Would be nice to not return data calling play as function
+        but from the game object itself.
+
+        
+
         
 
         Takeaways
