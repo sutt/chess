@@ -103,7 +103,7 @@ def parse_pgn_instructions(s):
                 if _s == 'O-O-O':
                     m = local_board.get_king_castle_move(_player, left_side=True)
                     triplet = (move_to_pgn_a1(m[1]),'K', None)
-                    moves.append(m)
+                    moves.append(triplet)
                 continue
             
 
