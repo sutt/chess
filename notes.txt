@@ -578,6 +578,29 @@ board should store edge cases:
                 >git pull origin master
                 (now youre good)
 
+            
+            How to split up a git repo:
+
+                https://help.github.com/articles/splitting-a-subfolder-out-into-a-new-repository/
+
+                clone repo locally into a temp
+                run git prune
+                git init remotely
+                change local's remote to new init'd repo
+                push the change to new remote(with -u)
+                now locally, clone that new remote repo into a fresh local dir
+
+
+            Also helpful, git cheatsheet
+            https://gist.github.com/hofmannsven/6814451
+
+                git mv filename newfilname
+                git mv folder1 folder2
+                (all file system cp / del is included)
+
+                rm -f .git/index.lock   (when you can't add anything)
+                
+
 
         Takeaways
 
