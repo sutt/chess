@@ -479,6 +479,21 @@ board should store edge cases:
 
         need to import results from meta-data in GarryKasparov
 
+        need to add check - '+' - in pgn's into data available for testing
+        
+        Really need to cleanup the git folder
+            make sure to get your .vscode folder too
+
+        Ultimately, refactoring will come with a little better test coverage,
+        cleaner git, cleaner repo, and more structured repo, and maybe some unit tests.
+
+            Also well want to know how to use git to rename files
+
+            Well rename the functions and kwargs for algo
+
+            As we move into pondering, well need to restructre some helper classes
+            like Mirror.
+
         Another optimization is to break out of move-set when the
         first move in that move-set is invalid. E.g. moving the knight
         anywhere puts your king in check then moving him anywhere puts you incheck.
@@ -553,8 +568,15 @@ board should store edge cases:
                 >git rm -r failing-tests.py
 
                 commit this into branch
+                >git push origin fix-test-and-engine-bug
 
                 merge branch into master:
+                on github, do merge pull request through UI
+                now, on git client
+                >git checkout master
+                >git status  (seems like youre good but youre not)
+                >git pull origin master
+                (now youre good)
 
 
         Takeaways
