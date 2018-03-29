@@ -502,6 +502,55 @@ board should store edge cases:
                 invoke function:
                 >display.print_board_letters(pieces)
 
+            
+            use git stashing/branching for this repair:
+
+                stash changes (made on master)
+                >git stash save
+                >git stash list
+                stash@{0}: WIP on master: 39adbe1 notes basecamp for bug fixing stashes and commits
+                
+                build a new branch 'fix-test-and-engine-bug'
+                git checkout -b fix-test-and-engine-bug
+
+                switch to branch
+                (already done)
+
+                verify all tests are (incorrectly) passing
+                (yes)
+                
+                pop stash changes to get fix for test bug
+                >git stash apply
+
+                also copy stash changes in notes to notes in branch
+                (manually)
+
+                manually apply fix into indv test cases
+                adding game.reset_test() into tests
+
+                run tests to reveal which tests break
+                >pytest -vv main.py
+
+                break these tests into a separate file
+                >failing-tests.py
+
+                verify you can run just those tests with test-runner
+                >pytest -vv failing-tests.py
+
+                make a commit here to identify which tests were incorrect
+                >git add main.py failing-tests.py notes.txt
+
+                now go into engine and fix bug
+
+                verify all tests pass after fix: both ones that were broken
+                and ones working before - "that you didnt cause a regression"
+
+                remove separate test file
+
+                commit this into branch
+
+                merge branch into master:
+
 
         Takeaways
 

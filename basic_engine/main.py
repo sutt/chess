@@ -79,6 +79,8 @@ class Game():
     def get_gamelog(self):
         return self.log
 
+    def reset_test(self):
+        self.b_test_exit = False
 
     def check_test_exit_moves(self, **kwargs):
         '''bool: exit after 'moves' is calcd / before check_enggame() in play().'''
@@ -648,6 +650,7 @@ def test_filter_forward_diagonal_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -684,6 +687,7 @@ def test_filter_forward_diagonal_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -729,6 +733,7 @@ def test_filter_forward_diagonal_2():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -765,6 +770,7 @@ def test_filter_forward_diagonal_2():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -806,6 +812,7 @@ def test_pawn_check_true_positive_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -847,6 +854,7 @@ def test_pawn_check_true_positive_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -892,6 +900,7 @@ def test_pawn_check_negative_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -932,6 +941,7 @@ def test_pawn_check_negative_1():
                                 )
     generic_check_moves = ret_data_generic['moves']
 
+    game.reset_test()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -1252,7 +1262,7 @@ def test_kasparov_game_10_pgn_err():
 
     assert ret['last_player'] == True
     
-def batchtest_multi_pgn_games_1():
+def batchtest_multi_pgn_games_1(**kwargs):
     
     '''Function naming disables running by default. 
         This runs through all the games to see if play() can parse them.'''
@@ -1273,11 +1283,18 @@ def batchtest_multi_pgn_games_1():
     t = time.time()
     err_cntr = 0
 
+    b_naive_check = kwargs.get('naive_check', False)
+    print b_naive_check
+
     for i, s_game in enumerate(s_games):
         
         try:
             game = Game(s_pgn_instructions = s_game)
-            ret = game.play()
+            if b_naive_check:
+                ret = game.play(king_in_check_on = True
+                                ,king_in_check_test_copy_apply_4 = False)
+            else:
+                ret = game.play()
         except Exception as e:
             print 'Error in play() | line_i: ', str(i + 1)
             print str(e)
