@@ -460,6 +460,14 @@ board should store edge cases:
         Utlimately need a new dataset which plays the games thru mate for
         better testing
 
+        RANDOM:
+            can you solve hinomaru with soduku like data structure?
+        
+    3/29
+
+        iron out errors found in batch_run
+
+        need to import results from meta-data in GarryKasparov
 
         Takeaways
 

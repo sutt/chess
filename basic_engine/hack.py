@@ -1,9 +1,49 @@
 from main import Game
-
+from utils import test_pgn_parse_2
 from main import *
 
+batchtest_multi_pgn_games_1()
 
-test_cant_castle_into_check_1()
+# game_i = 19
+# data_path = 'data/GarryKasparovGames.txt'
+# f = open(data_path, 'r')
+# lines = f.readlines()
+# f.close()
+# s_game = lines[game_i]
+# s_game = '1. d4 d5 2. c4 Nf6 3. cxd5 Nxd5 4. Nf3 Bg4 5. Ne5 Bh5 6. Qb3 Nb6 7. Qh3 Bg6 8. Nxg6 fxg6 9. e3 Qd7 10. Qf3 Qc6 11. Nc3 Qxf3 12. gxf3 c6 13. f4 N8d7 14. Bh3 O-O 15. Be6 Kb8 16. Ne4 h6 17. Rg1 Nf6 18. Nc5 Nbd5 19. Rxg6 b6 20. Nd3 Nc7 21. f5 c5 22. Ne5 Nxe6 23. fxe6 Rc8 24. Bd2 cxd4 25. exd4 Kb7 26. Rc1 Rxc1+ 27. Bxc1 h5 28. h4 Ng4 29. Nf7 Rh7 30. d5 Nf6 31. Rg5 g6 32. Ke2 Bh6 33. Nxh6 Rxh6 34. Kd3 Rh8 35. d6 exd6 36. Rxg6 Ng4 37. f4 Kc6 38. Ke4 Nf2+ 39. Kf5 Nd3 40. Be3 Kd5 41. e7 Re8 42. Kf6 Nc5 43. Kf7'
+# print s_game
+# game = Game(s_pgn_instructions = s_game)
+# ret = game.play()
+# print ret
+
+# line_i:  1   secs:  0
+# Move Incompatibility | line_i:  14
+# game.i_turn:  9
+# On PGN turn:  5  Player:  White
+# Move Incompatibility | line_i:  17
+# game.i_turn:  13
+# On PGN turn:  7  Player:  White
+# Error in play() | line_i:  20
+# expected a string or other character buffer object
+# line_i:  21   secs:  3
+# Error in play() | line_i:  24
+# expected a string or other character buffer object
+# line_i:  41   secs:  3
+# Error in play() | line_i:  43
+# expected a string or other character buffer object
+# Error in play() | line_i:  49
+# expected a string or other character buffer object
+# Error in play() | line_i:  52
+# expected a string or other character buffer object
+# Error in play() | line_i:  59
+# expected a string or other character buffer object
+
+# test_pgn_parse_2()
+# test_pgn_parse()
+# test_multi_pgn_games_1()
+# test_checkmate_returncode_1()
+# test_checkmate_simple_1()
+# test_cant_castle_into_check_1()
 # test_pawn_check_true_positive_1()
 
 #PGN Setup

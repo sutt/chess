@@ -1252,6 +1252,64 @@ def test_kasparov_game_10_pgn_err():
 
     assert ret['last_player'] == True
     
+def batchtest_multi_pgn_games_1():
+    
+    '''Function naming disables running by default. 
+        This runs through all the games to see if play() can parse them.'''
+
+    max_games = 200
+    modulo_print = 20
+    data_path = 'data/GarryKasparovGames.txt'
+
+    f = open(data_path, 'r')
+    lines = f.readlines()
+    f.close()
+
+    if max_games is not None:
+        s_games = lines[:max_games]
+    else:
+        s_games = lines
+
+    t = time.time()
+    err_cntr = 0
+
+    for i, s_game in enumerate(s_games):
+        
+        try:
+            game = Game(s_pgn_instructions = s_game)
+            ret = game.play()
+        except Exception as e:
+            print 'Error in play() | line_i: ', str(i + 1)
+            print str(e)
+            err_cntr += 1
+            continue
+            
+        if i % modulo_print == 0:
+            s_secs = str(time.time() - t).split(".")[0]
+            t = time.time()
+            print 'line_i: ', str(i + 1), '  secs: ', s_secs
+        
+        
+        if isinstance(ret, dict):
+            s_last_player = str(ret.get('last_player', None))
+            if s_last_player is None:
+                print 'No Last Player | line_i: ', str(i + 1)
+                print ret
+                err_cntr += 1
+            
+        if isinstance(ret, int):
+            print 'Move Incompatibility | line_i: ', str(i + 1)
+            print 'game.i_turn: ', str(ret)    
+            b_whites_move = ((ret % 2) == 1)
+            pgn_turn = (ret + int(b_whites_move)) / 2
+            s_player = 'White' if b_whites_move else 'Black'
+            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
+            err_cntr += 1
+            # print '\n'
+            # print s_game
+
+    print 'err_cntr: ', str(err_cntr)
+
 
 if __name__ == "__main__":
 
