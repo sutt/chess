@@ -1267,8 +1267,8 @@ def batchtest_multi_pgn_games_1(**kwargs):
     '''Function naming disables running by default. 
         This runs through all the games to see if play() can parse them.'''
 
-    max_games = 200
-    modulo_print = 20
+    max_games = kwargs.get('max_games', None)
+    modulo_print = kwargs.get('modulo_print', 100)
     data_path = 'data/GarryKasparovGames.txt'
 
     f = open(data_path, 'r')
