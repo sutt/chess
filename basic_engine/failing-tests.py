@@ -1,4 +1,7 @@
 from main import Game
+from utils import printout_to_data
+from datatypes import moveHolder
+Move = moveHolder()
 
 def test_filter_forward_diagonal_1():
     
