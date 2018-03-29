@@ -1327,6 +1327,35 @@ def batchtest_multi_pgn_games_1(**kwargs):
 
     print 'err_cntr: ', str(err_cntr)
 
+def test_filter_check_pinned_piece_1():
+    
+    #dont let white-knight at (5,2) move; it's pinned to king.
+
+    s_test = """    
+       1 2 3 4 5 6 7 8
+    A  r ~ b q k ~ ~ r
+    B  p p p p ~ p p p
+    C  ~ ~ n ~ ~ n ~ ~
+    D  ~ ~ ~ ~ p ~ ~ ~
+    E  ~ b B ~ P ~ ~ ~
+    F  ~ ~ N P ~ ~ ~ ~
+    G  P P P ~ ~ P P P
+    H  R ~ B Q K ~ N R
+    """
+
+    board, pieces = printout_to_data(s_test)
+
+    game = Game(init_board = board.data_by_player
+                ,init_pieces = pieces
+                ,init_player = True
+                ,test_exit_moves = 1    
+                )
+
+    # ret = game.play(king_in_check_on=True)
+    ret = game.play(king_in_check_on=False)
+    moves = ret['moves']
+
+    assert not(Move(pos0=(5, 2), pos1=(6, 4), code=0) in moves)
 
 if __name__ == "__main__":
 

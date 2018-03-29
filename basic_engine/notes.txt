@@ -549,6 +549,8 @@ board should store edge cases:
                 and ones working before - "that you didnt cause a regression"
 
                 remove separate test file
+                >rm failing-tests.py
+                >git rm -r failing-tests.py
 
                 commit this into branch
 
