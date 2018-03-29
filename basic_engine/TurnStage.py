@@ -306,7 +306,7 @@ class Mirror():
         
         temp_class_move_type = map(lambda x: x[0], class_move_type)
 
-        if move_type in temp_class_move_type:  
+        if move_type in temp_class_move_type:
 
             max_spaces_ind = temp_class_move_type.index(move_type)
             
@@ -314,10 +314,22 @@ class Mirror():
             
             if move_space <= max_spaces:                
                 return True
-            
+
             # need this below if max_spaces for knight is not hard-coded to 2
             # if move_type == MOVE_TYPE['twobyone']:
             #     return True
+        
+        if (move_type == MOVE_TYPE['forward-diagonal']) \
+        and (MOVE_TYPE['diagonal'] in temp_class_move_type):
+
+            max_spaces_ind = temp_class_move_type.index(MOVE_TYPE['diagonal'])
+        
+            max_spaces = class_move_type[max_spaces_ind][1]
+            
+            if move_space <= max_spaces:
+                return True
+
+
 
         return False
         

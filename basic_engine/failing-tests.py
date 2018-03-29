@@ -1,3 +1,4 @@
+import copy
 from main import Game
 from utils import printout_to_data
 from datatypes import moveHolder

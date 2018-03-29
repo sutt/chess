@@ -539,8 +539,11 @@ board should store edge cases:
 
                 make a commit here to identify which tests were incorrect
                 >git add main.py failing-tests.py notes.txt
+                >git commit -m '[message]'
+                >git push origin fix-test-and-engine-bug
 
                 now go into engine and fix bug
+                (done)
 
                 verify all tests pass after fix: both ones that were broken
                 and ones working before - "that you didnt cause a regression"
