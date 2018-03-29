@@ -462,12 +462,46 @@ board should store edge cases:
 
         RANDOM:
             can you solve hinomaru with soduku like data structure?
+                
+                this creates an almost closed-form / 'one-fell-swoop' /
+                strict-computational-upper-bound form of search,
+                compared to a randomly selecting, and pruning a tree.
+
+                This has to do with "spacial-constraints"-space introduced by 
+                soduku where rows,cols,9-squares form [exclusion] relationships between
+                various squares, and thus means iterating across them less times.
+
+
         
     3/29
 
         iron out errors found in batch_run
 
         need to import results from meta-data in GarryKasparov
+
+        Another optimization is to break out of move-set when the
+        first move in that move-set is invalid. E.g. moving the knight
+        anywhere puts your king in check then moving him anywhere puts you incheck.
+        
+        
+        Takeaways
+            A lot of these recent bugs could have been fixed with unit-testing
+            e.g. 
+                pgn_parse disambig isdigit
+                pgn_parse queen side castling carries wrong move data structure
+                king_check_optimal doesnt shield
+            I'm saved by having a wealth of already-QA'd example cases to test against
+            but this won't always be the case.
+
+        HOWTOs
+
+            to view the board while debugging:
+                do into play() on stack
+                create a Display class: 
+                >display = Display()
+                invoke function:
+                >display.print_board_letters(pieces)
+
 
         Takeaways
 
