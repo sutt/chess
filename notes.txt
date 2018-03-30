@@ -475,7 +475,7 @@ board should store edge cases:
         
     3/29
 
-        iron out errors found in batch_run
+        x iron out errors found in batch_run
 
         need to import results from meta-data in GarryKasparov
 
@@ -507,6 +507,18 @@ board should store edge cases:
                 king_check_optimal doesnt shield
             I'm saved by having a wealth of already-QA'd example cases to test against
             but this won't always be the case.
+
+    3/30
+
+        TODOs
+        10-11:30 do some misc bugs
+
+            A1 -> 1A
+                rebench tests?
+
+            meta-data in .pgn
+
+            check '+' from pgn
 
         HOWTOs
 

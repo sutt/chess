@@ -47,7 +47,7 @@ class Display:
 
     def print_board(self,b_annotate = False ,b_misc = False
                         ,b_player_data = False, b_show_grid = False
-                        ,b_abs = False):
+                        ,b_abs = False, b_grid_pos = False):
 
         if b_annotate: 
             p_data = self.annotate
@@ -55,25 +55,35 @@ class Display:
         out = ""
         
         if b_show_grid:
-            out += "   " + " ".join(map(lambda i: str(i), range(1,9)))
+            
+            col_letters = [str(i) for i in "ABCDEFGH"]
+            if b_grid_pos:
+                col_letters = [str(i) for i in "01234567"]
+            out += "   " + " ".join(col_letters)
             out += "\n"
             out += "\n"
-            row_grid = "ABCDEFGH"
+            
+            row_grid = "12345678"
+            if b_grid_pos:
+                row_grid = "01234567"
 
         for i,row in enumerate(p_data):
             if b_abs:
                 s_row = map(lambda int_i: str(abs(int_i)),row)
             else:
                 s_row = map(lambda int_i: str(int_i),row)
+            
             if b_show_grid:
                 out += row_grid[i]
                 out += "  "
             out += " ".join(s_row)
             out += "\n"        
-        print2(out)
+        
+        print out
+        return out
 
     
-    def print_board_letters(self, pieces, b_lower_black = True):
+    def print_board_letters(self, pieces, b_lower_black = True, b_grid_pos = False):
         ''' Use pieces to display a graphical display to console.
             [b_lower_black]: black pieces in lower case.'''
 
@@ -82,7 +92,10 @@ class Display:
         for p in pieces:
             self.mark_annotate(p, disambiguate = True, b_lower_case = b_lower_black)
         
-        self.print_board(b_annotate = True, b_show_grid = True)    
+        return self.print_board(b_annotate = True
+                                ,b_show_grid = True
+                                ,b_grid_pos = b_grid_pos
+                                )    
 
 
     def print_turn(self, pieces, player, **kwargs):

@@ -153,16 +153,16 @@ def parse_pgn_instructions(s):
 
 
 def alphanum_to_pos(inp):
-    letter_data = 'ABCDEFGH'
-    pos0 = letter_data.index(str.upper(inp[0]))
-    pos1 = int(inp[1]) - 1
-    return (pos0,pos1)
+    col_letters = 'ABCDEFGH'
+    row = int(inp[1]) - 1
+    col = col_letters.index(str.upper(inp[0]))
+    return (row, col)
 
 def pos_to_alphanum(inp):
     letter_data = 'abcdefgh'
     number_data = [i+1 for i in range(8)]
-    s1 = letter_data[inp[0]]
-    s2 = str(number_data[inp[1]])
+    s1 = letter_data[inp[1]]
+    s2 = str(number_data[inp[0]])
     return s1 + s2
 
 def alphamove_to_posmove(inp):
@@ -187,13 +187,15 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
     if raw == 'out_log':
         return 2, []
     try:
+        # if input_type == 'alphanum_legacy':
+        #     out = alphamove_to_posmove(raw, b_legacy=True)
         if input_type == 'alphanum':
             out = alphamove_to_posmove(raw)
-            if out == -1:
-                return -1,[]
-            else:
-                ret = 0
-                data = out
+        if out == -1:
+            return -1,[]
+        else:
+            ret = 0
+            data = out
     except:
         data = []
         print 'failure in routine to parse user input.'
@@ -313,7 +315,7 @@ def pgn_deduction(board, pieces, moves, instructions, i_turn):
 
 
 def instruction_input(board, moves, instructions, i_turn):
-    ret, the_move = parse_player_input(instructions[i_turn - 1], board)
+    ret, the_move = parse_player_input(instructions[i_turn - 1], board, 'alphanum')
     if ret == 0:
         #TODO - call common return function
         for _m in moves:
@@ -325,7 +327,6 @@ def instruction_input(board, moves, instructions, i_turn):
 
 def moves_to_alphanum(list_inp):
     
-    # return [(i,v) for i, v in enumerate(list_inp)]
     temp = [
         str(i + 1) +
         ". " +
@@ -353,7 +354,7 @@ def player_control_input(board, moves_player, log, **kwargs):
     msg += "\n"
     while(True):
         raw = raw_input(msg)    #example: >1,1 | 2,2
-        ret, the_move = parse_player_input(raw, board)
+        ret, the_move = parse_player_input(raw, board, 'alphanum')
         if ret == 0:
             #TODO - call common return function
             for _m in moves_player:
@@ -518,7 +519,23 @@ def test_pgn_parse_2():
 
     assert out == [('f3', 'N', None), ('e6', 'P', None), ('c4', 'P', None), ('b6', 'P', None), ('g3', 'P', None), ('b7', 'B', None), ('g2', 'B', None), ('c5', 'P', None), ('g1', 'K', None), ('f6', 'N', None), ('c3', 'N', None), ('e7', 'B', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'Q', None), ('c6', 'N', None), ('f4', 'Q', None), ('g8', 'K', None), ('d1', 'R', None), ('b8', 'Q', None), ('e4', 'P', None), ('d6', 'P', None), ('b3', 'P', None), ('a6', 'P', None), ('b2', 'B', None), ('d8', 'R', None), ('e3', 'Q', None), ('a7', 'Q', None), ('a3', 'B', None), ('f8', 'B', None), ('h3', 'P', None), ('b5', 'P', None), ('a7', 'Q', None), ('a7', 'N', None), ('e5', 'P', None), ('e5', 'P', 'd'), ('f8', 'B', None), ('f8', 'K', None), ('e5', 'N', None), ('g2', 'B', None), ('g2', 'K', None), ('c4', 'P', 'b'), ('c4', 'P', 'b'), ('e8', 'K', None), ('b1', 'R', 'a'), ('d1', 'R', None), ('d1', 'N', None), ('e4', 'N', None), ('b7', 'R', None), ('d6', 'N', None), ('c7', 'R', None), ('c8', 'N', 'a'), ('c5', 'P', None), ('e4', 'N', None), ('f7', 'R', None), ('a7', 'R', None), ('f4', 'R', None), ('f6', 'N', None), ('e3', 'N', None), ('c7', 'R', None), ('c4', 'R', None), ('e7', 'N', None), ('f4', 'P', None), ('c6', 'N', None), ('g4', 'N', '3'), ('d5', 'N', None), ('c6', 'N', None), ('c6', 'R', None), ('f3', 'K', None), ('c7', 'R', None), ('e5', 'N', None), ('d8', 'K', None), ('c6', 'P', None), ('e7', 'K', None), ('a4', 'R', None), ('a7', 'R', None), ('f2', 'K', None), ('d6', 'K', None), ('h4', 'P', None), ('a5', 'P', None), ('f3', 'K', None), ('c3', 'N', None), ('d4', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('g6', 'P', None), ('g4', 'P', None), ('c7', 'K', None), ('d2', 'R', None), ('a4', 'P', None), ('f5', 'P', None), ('f6', 'N', None), ('f4', 'K', None), ('f5', 'P', 'e'), ('f5', 'P', 'g'), ('a5', 'R', None), ('g6', 'P', 'f'), ('g6', 'P', 'h'), ('b2', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('b6', 'N', None), ('f2', 'R', None), ('a3', 'P', None), ('f7', 'R', None), ('c8', 'K', None), ('g6', 'N', None), ('a4', 'R', None), ('e5', 'K', None), ('b4', 'R', None), ('e7', 'N', None), ('d8', 'K', None), ('c7', 'P', None), ('e8', 'K', None), ('h7', 'R', None), ('c4', 'R', None), ('d5', 'N', None), ('c5', 'R', None), ('h8', 'R', None), ('d7', 'K', None), ('d8', 'R', None)]
 
+def test_alphanum_legacy_conversion_1():
+    
+    # assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
+    assert (0,6) == alphanum_to_pos('g1')
 
+    # assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
+    assert (4,0) == alphanum_to_pos('a5')
+
+    # assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
+    assert 'f4' == pos_to_alphanum((3,5))
+
+    # assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
+    assert 'h8' == pos_to_alphanum((7,7))
+
+def test_alphanum_legacy_conversion_2():
+    
+    pass
     
 
 if __name__ == "__main__":

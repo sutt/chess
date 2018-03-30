@@ -209,7 +209,7 @@ class Game():
 
 def test_castling_allowed_misc():
     
-    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h7"
+    ss = "1. g8 h6 2. a2 a3 3. e7 e5 4. b2 b3 5. f8 d6 6. c2 c3 7. e8 g8"
     game = Game(s_instructions = ss)
     board = game.play()
     board = board['board']
@@ -218,21 +218,21 @@ def test_castling_allowed_misc():
 
 def test_castling_disallowed_rook():
     
-    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h8 h7 8. b4 c4 9. h7 h8 10. b5 c5 11. h5 h7"
+    ss = "1. g8 h6 2. a2 a3 3. e7 e5 4. b2 b3 5. f8 d6 6. c2 c3 7. h8 g8 8. d2 d3 9. g8 h8 10. e2 e3 11. e8 g8"
     game = Game(s_instructions = ss)
     break_turn = game.play()
     assert break_turn == 11
 
 def test_castling_disallowed_king():
     
-    ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5 11. h5 h7"
+    ss = "1. g8 h6 2. a2 a3 3. e7 e5 4. b2 b3 5. f8 d6 6. c2 c3 7. e8 f8 8. d2 d3 9. f8 e8 10. e2 e3 11. e8 g8"
     game = Game(s_instructions = ss)
     break_turn = game.play()
     assert break_turn == 11
 
 def test_enpassant_take():
     
-    ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. d2 c3"
+    ss = "1. b7 b5 2. h2 h3 3. b5 b4 4. c2 c4 5. b4 c3"
     game = Game(s_instructions = ss)
     board = game.play()
     board = board['board']
@@ -243,7 +243,7 @@ def test_enpassant_take():
 
 def test_enpassant_disallowed():
     
-    ss = "1. g2 e2 2. b8 c8 3. e2 d2 4. b3 d3 5. g8 e8 6. b1 c1 7. d2 c3"
+    ss = "1. b7 b5 2. h2 h3 3. b5 b4 4. c2 c4 5. h7 h5 6. a2 a3 7. b4 c3"
     game = Game(s_instructions = ss)
     break_turn = game.play()
     assert break_turn == 7
@@ -353,7 +353,7 @@ def test_king_in_check3():
 
 def test_post_castling_move_rook():
 
-    ss_post_castling = "1. h7 f8 2. b8 c8 3. g5 e5 4. b1 d1 5. h6 f4 6. b2 c2 7. h5 h7 8. a8 b8 9. h6 h5 10. a7 c6"    
+    ss_post_castling = "1. g8 h6 2. h2 h3 3. e7 e5 4. a2 a4 5. f8 d6 6. b2 b3 7. e8 g8 8. h1 h2 9. f8 e8 10. g1 f3"
     game = Game(s_instructions = ss_post_castling)
     board = game.play()
     board = board['board']
@@ -363,7 +363,7 @@ def test_post_castling_move_rook():
 def test_player_in_and_out_of_check():
     
     #Black is checked on 7th move
-    ss = "1. g4 e4 2. b5 d5 3. h2 f1 4. d5 e4 5. h4 e4 6. b8 d8 7. e4 e5 8. a6 b5 9. e5 d5 10. b1 c1"
+    ss = "1. d7 d5 2. e2 e4 3. b8 a6 4. e4 d5 5. d8 d5 6. h2 h4 7. d5 e5 8. f1 e2 9. e5 e4 10. a2 a3"
     _i_exit_moves = 8
     _b_current_player = False
     
@@ -394,7 +394,7 @@ def test_player_in_and_out_of_check():
 def test_castling_disallowed_in_check():    
 
     #Black queen has King in check on turn 8
-    ss = "1. h7 f8 2. b4 d4 3. g5 e5 4. a4 c4 5. h6 f4 6. b1 d1 7. e5 d5 8. c4 d5 9. h5 h7 10.g1 e1"
+    ss = "1. g8 h6 2. d2 d4 3. e7 e5 4. d1 d3 5. f8 d6 6. a2 a4 7. e5 e4 8. d3 e4 9. e8 g8 10.a7 a5"
     game = Game(s_instructions = ss)
     exit_turn = game.play()
     assert exit_turn == 9
@@ -402,7 +402,7 @@ def test_castling_disallowed_in_check():
 def test_castling_disallowed_into_check():  
 
     #Black queen has King-Castling destination in check on turn 8, try to castle turn 9
-    ss = "1. h7 f8 2. b4 d4 3. g5 e5 4. a4 c4 5. h6 e3 6. c4 f7 7. g1 e1 8. f7 g7 9. h5 h7 10. g2 e2"
+    ss = "1. g8 h6 2. d2 d4 3. e7 e5 4. d1 d3 5. f8 c5 6. d3 g6 7. a7 a5 8. g6 g7 9. e8 g8 10. b7 b5"
     game = Game(s_instructions = ss)
     exit_turn = game.play()
     assert exit_turn == 9  
@@ -410,10 +410,10 @@ def test_castling_disallowed_into_check():
 def test_castling_disallowed_when_dead():
     
     #Setup
-    ss = '1. h2 f3 2. b2 d2 3. g4 e4 4. d2 e2 5. h3 f5 6. e2 f3 7. h4 f4 8. f3 g2'
+    ss = "1. b8 c6 2. b2 b4 3. d7 d5 4. b4 b5 5. c8 e6 6. b5 c6 7. d8 d6 8. c6 b7"
 
     #Turn 10 capture rook, Turn 11 Castle
-    ss = '1. h2 f3 2. b2 d2 3. g4 e4 4. d2 e2 5. h3 f5 6. e2 f3 7. h4 f4 8. f3 g2 9. g8 e8 10. g2 h1 11. h5 h3 12. b8 d8'
+    ss = "1. b8 c6 2. b2 b4 3. d7 d5 4. b4 b5 5. c8 e6 6. b5 c6 7. d8 d6 8. c6 b7 9. h7 h5 10. b7 a8 11. e8 c8 12. h2 h4"
     
     game = Game(s_instructions = ss)
     exit_turn = game.play()
@@ -426,8 +426,7 @@ def test_promotion_on_advance():
     #Test for putting king in check with promoted piece
 
     #pawn promoted causing check
-    ss = '1. g1 e1 2. b2 d2 3. e1 d2 4. b4 d4 5. d2 c2 6. a3 c1 7. c2 b3 8. a4 c4 9. b3 a3 10. b8 d8'
-
+    ss = "1. a7 a5 2. b2 b4 3. a5 b4 4. d2 d4 5. b4 b3 6. c1 a3 7. b3 c2 8. d1 d3 9. c2 c1 10. h2 h4"
     game = Game(s_instructions = ss, test_exit_moves = 10)
     test_data = game.play()
     
@@ -1356,6 +1355,49 @@ def test_filter_check_pinned_piece_1():
     moves = ret['moves']
 
     assert not(Move(pos0=(5, 2), pos1=(6, 4), code=0) in moves)
+
+def test_printout_grid():
+    
+    ''' pretty printouts baselined here.
+        b_grid_pos: view pos (row_num, col_num) [index-0]'''
+
+    game = Game(test_exit_moves=1)
+    ret = game.play()
+    pieces = ret['pieces']
+
+    display = Display()
+    ret = display.print_board_letters(pieces)
+    
+    #note trailing \n on row 8
+    s_benchmark = \
+"""   A B C D E F G H
+
+1  r n b q k b n r
+2  p p p p p p p p
+3  ~ ~ ~ ~ ~ ~ ~ ~
+4  ~ ~ ~ ~ ~ ~ ~ ~
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  ~ ~ ~ ~ ~ ~ ~ ~
+7  P P P P P P P P
+8  R N B Q K B N R
+"""
+    assert ret == s_benchmark
+
+
+    ret2 = display.print_board_letters(pieces, b_grid_pos=True)
+    s_benchmark2 = \
+"""   0 1 2 3 4 5 6 7
+
+0  r n b q k b n r
+1  p p p p p p p p
+2  ~ ~ ~ ~ ~ ~ ~ ~
+3  ~ ~ ~ ~ ~ ~ ~ ~
+4  ~ ~ ~ ~ ~ ~ ~ ~
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  P P P P P P P P
+7  R N B Q K B N R
+"""
+    assert ret2 == s_benchmark2
 
 if __name__ == "__main__":
 
