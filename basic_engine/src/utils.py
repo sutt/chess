@@ -152,45 +152,45 @@ def parse_pgn_instructions(s):
 
 
 
-def alphanum_to_pos(inp, b_legacy=True):
+def alphanum_to_pos(inp):
     col_letters = 'ABCDEFGH'
     row = int(inp[1]) - 1
     col = col_letters.index(str.upper(inp[0]))
     return (row, col)
 
-def pos_to_alphanum(inp, b_legacy=True):
+def pos_to_alphanum(inp):
     letter_data = 'abcdefgh'
     number_data = [i+1 for i in range(8)]
     s1 = letter_data[inp[1]]
     s2 = str(number_data[inp[0]])
     return s1 + s2
 
-def alphamove_to_posmove(inp, b_legacy=True):
+def alphamove_to_posmove(inp):
     
     try:
         inputs = inp.split(" ")
         if len(inputs) != 2:
             print 'could not parse alphanumeric move'
         else:
-            pos0 = alphanum_to_pos(inputs[0], b_legacy=b_legacy)
-            pos1 = alphanum_to_pos(inputs[1], b_legacy=b_legacy)
+            pos0 = alphanum_to_pos(inputs[0])
+            pos1 = alphanum_to_pos(inputs[1])
             return (pos0,pos1)
     except:
         print 'exception while parsing input.'
         return -1
         
 
-def parse_player_input(raw, board, input_type = 'alphanum_legacy'):
+def parse_player_input(raw, board, input_type = 'alphanum'):
     ret = -1
     if raw == "hint":
         return 1, []
     if raw == 'out_log':
         return 2, []
     try:
-        if input_type == 'alphanum_legacy':
-            out = alphamove_to_posmove(raw, b_legacy=True)
+        # if input_type == 'alphanum_legacy':
+        #     out = alphamove_to_posmove(raw, b_legacy=True)
         if input_type == 'alphanum':
-            out = alphamove_to_posmove(raw, b_legacy=False)
+            out = alphamove_to_posmove(raw)
         if out == -1:
             return -1,[]
         else:
@@ -325,14 +325,14 @@ def instruction_input(board, moves, instructions, i_turn):
     else:
         return None  # to demonstrate an error in instruction input
 
-def moves_to_alphanum(list_inp, b_legacy=False):
+def moves_to_alphanum(list_inp):
     
     temp = [
         str(i + 1) +
         ". " +
-        pos_to_alphanum(v[0], b_legacy=b_legacy) +
+        pos_to_alphanum(v[0]) +
         " " +
-        pos_to_alphanum(v[1], b_legacy=b_legacy) +
+        pos_to_alphanum(v[1]) +
         " "
 
         for i, v in enumerate(list_inp)
@@ -522,16 +522,16 @@ def test_pgn_parse_2():
 def test_alphanum_legacy_conversion_1():
     
     # assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
-    assert (0,6) == alphanum_to_pos('g1', b_legacy = False)
+    assert (0,6) == alphanum_to_pos('g1')
 
     # assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
-    assert (4,0) == alphanum_to_pos('a5', b_legacy = False)
+    assert (4,0) == alphanum_to_pos('a5')
 
     # assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
-    assert 'f4' == pos_to_alphanum((3,5), b_legacy=False)
+    assert 'f4' == pos_to_alphanum((3,5))
 
     # assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
-    assert 'h8' == pos_to_alphanum((7,7), b_legacy=False)
+    assert 'h8' == pos_to_alphanum((7,7))
 
 def test_alphanum_legacy_conversion_2():
     
