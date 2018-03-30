@@ -338,14 +338,14 @@ def instruction_input(board, moves, instructions, i_turn):
     else:
         return None  # to demonstrate an error in instruction input
 
-def moves_to_alphanum(list_inp):
+def moves_to_alphanum(list_inp, b_legacy=True):
     
     temp = [
         str(i + 1) +
         ". " +
-        pos_to_alphanum(v[0]) +
+        pos_to_alphanum(v[0], b_legacy=b_legacy) +
         " " +
-        pos_to_alphanum(v[1]) +
+        pos_to_alphanum(v[1], b_legacy=b_legacy) +
         " "
 
         for i, v in enumerate(list_inp)
