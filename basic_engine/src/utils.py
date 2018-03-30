@@ -153,30 +153,17 @@ def parse_pgn_instructions(s):
 
 
 def alphanum_to_pos(inp, b_legacy=True):
-    if b_legacy:
-        letter_data = 'ABCDEFGH'
-        pos0 = letter_data.index(str.upper(inp[0]))
-        pos1 = int(inp[1]) - 1
-        return (pos0,pos1)
-    else:
-        col_letters = 'ABCDEFGH'
-        row = int(inp[1]) - 1
-        col = col_letters.index(str.upper(inp[0]))
-        return (row, col)
+    col_letters = 'ABCDEFGH'
+    row = int(inp[1]) - 1
+    col = col_letters.index(str.upper(inp[0]))
+    return (row, col)
 
 def pos_to_alphanum(inp, b_legacy=True):
-    if b_legacy:
-        letter_data = 'abcdefgh'
-        number_data = [i+1 for i in range(8)]
-        s1 = letter_data[inp[0]]
-        s2 = str(number_data[inp[1]])
-        return s1 + s2
-    else:
-        letter_data = 'abcdefgh'
-        number_data = [i+1 for i in range(8)]
-        s1 = letter_data[inp[1]]
-        s2 = str(number_data[inp[0]])
-        return s1 + s2
+    letter_data = 'abcdefgh'
+    number_data = [i+1 for i in range(8)]
+    s1 = letter_data[inp[1]]
+    s2 = str(number_data[inp[0]])
+    return s1 + s2
 
 def alphamove_to_posmove(inp, b_legacy=True):
     
@@ -534,16 +521,16 @@ def test_pgn_parse_2():
 
 def test_alphanum_legacy_conversion_1():
     
-    assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
+    # assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
     assert (0,6) == alphanum_to_pos('g1', b_legacy = False)
 
-    assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
+    # assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
     assert (4,0) == alphanum_to_pos('a5', b_legacy = False)
 
-    assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
+    # assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
     assert 'f4' == pos_to_alphanum((3,5), b_legacy=False)
 
-    assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
+    # assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
     assert 'h8' == pos_to_alphanum((7,7), b_legacy=False)
 
 def test_alphanum_legacy_conversion_2():
