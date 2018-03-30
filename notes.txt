@@ -496,7 +496,7 @@ board should store edge cases:
 
         Another optimization is to break out of move-set when the
         first move in that move-set is invalid. E.g. moving the knight
-        anywhere puts your king in check then moving him anywhere puts you incheck.
+        somewhere puts your king in check then moving him anywhere puts you incheck.
         
         
         Takeaways
@@ -515,10 +515,48 @@ board should store edge cases:
 
             A1 -> 1A
                 rebench tests?
+                add a pos type annotations; 0-7 on rows and cols
 
             meta-data in .pgn
 
             check '+' from pgn
+
+            fix global find in vscode
+            
+            final cleanup:
+            Move Incompatibility | line_i:  1456
+            game.i_turn:  15
+            On PGN turn:  8  Player:  White
+            Move Incompatibility | line_i:  1457
+            game.i_turn:  2
+            On PGN turn:  1  Player:  Black
+            Move Incompatibility | line_i:  1458
+            game.i_turn:  19
+            On PGN turn:  10  Player:  White
+
+        Grand Projects
+
+            BatchTests module (separate file):
+                 - verify move permissibility
+                (this only verifies were not overly liberal
+                but we still might be too conservative)
+                 - verify check by turn
+                 - verify checkmate
+                 - verfiy stalemate
+                
+                need to find more data-sources, esp. for checkmate
+
+            Computational Cost of various move-scoring routines
+                e.g. to know if your move puts opponent in check
+                you need to perform calc and this make them 10% more
+                expensive than the baseline
+
+            Need to sample existing games to do stats on computation-time
+            in "real game" scenarios.
+
+            Are doublet_instructions faster to run than pgn_instructions?
+
+
 
         HOWTOs
 
