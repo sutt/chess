@@ -2,8 +2,10 @@ import sys, random, time
 
 from basic import *
 from utils import *
+from GameLog import *
 from datatypes import moveHolder
 from GameLog import GameLog
+from GameLog import GameSchema
 from Display import Display
 from TurnStage import increment_turn, get_available_moves, apply_move
 from TurnStage import check_endgame

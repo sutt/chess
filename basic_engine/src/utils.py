@@ -43,23 +43,26 @@ def move_to_pgn_a1(move):
 
 local_board = Board()
 
-def parse_pgn_instructions(s):
+def parse_pgn_instructions( s
+                            ,b_check_schedule=False
+                            ,b_capture_schedule=False
+                            ,b_mate_turn=False
+                            ):
     
-    ''' input: s, a string 
-        return: a list of tuples( destination
+    ''' input: s (str)
+        return: (list) of tuples( destination
                                  ,piece_class
                                  ,disambig_symbol [or None]
-                                 )'''
-    
-    #TODO 
-    #   add in appendix
-
-    #NOTE:
-    # pgn_turn white second move(2a) = i_turn(3)
-    # Formula: i_turn = pgn_turn*2 - (1 if white 0 if black)
-    
+                                 )
+        b_check_schedule - returns (list) of bool if opposing player in check
+        b_capture_Schedule - returns (list) of bool if capture occurs that move
+        b_mate_turn - returns (int) i_turn of checkmate marker 
+        [only one b_flag can be set to true at once]
+    '''
     
     moves = []
+    appendix = []
+    mate_i_turn = None
 
     if len(s) == 0:
         return moves
@@ -93,6 +96,18 @@ def parse_pgn_instructions(s):
                 #therefore move is never appended
                 #TODO - exit entire loop, break?
           
+            #Appendix
+            if b_check_schedule:
+                b_check = (_s.find('+') > 0)
+                appendix.append(b_check)
+                
+            if b_capture_schedule:
+                b_capture = (_s.find('x') > 0)
+                appendix.append(b_capture)
+
+            if b_mate_turn:
+                mate_i_turn = cntr
+            
 
             #Castling
             if _s[0] == 'O':
@@ -145,6 +160,13 @@ def parse_pgn_instructions(s):
             triplet = (destination_a1, piece_letter, disambig_info)
             
             moves.append(triplet)
+
+    #Return Appendix or Moves
+    if b_check_schedule or b_capture_schedule:
+        return appendix
+
+    if b_mate_turn:
+        return mate_i_turn
 
     return moves
 
