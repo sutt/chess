@@ -55,16 +55,20 @@ class Display:
         out = ""
         
         if b_show_grid:
-            out += "   " + " ".join(map(lambda i: str(i), range(1,9)))
+            
+            col_letters = [str(i) for i in "ABCDEFGH"]
+            out += "   " + " ".join(col_letters)
             out += "\n"
             out += "\n"
-            row_grid = "ABCDEFGH"
+            
+            row_grid = "12345678"
 
         for i,row in enumerate(p_data):
             if b_abs:
                 s_row = map(lambda int_i: str(abs(int_i)),row)
             else:
                 s_row = map(lambda int_i: str(int_i),row)
+            
             if b_show_grid:
                 out += row_grid[i]
                 out += "  "
