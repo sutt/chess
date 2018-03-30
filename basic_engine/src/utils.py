@@ -338,7 +338,7 @@ def instruction_input(board, moves, instructions, i_turn):
     else:
         return None  # to demonstrate an error in instruction input
 
-def moves_to_alphanum(list_inp, b_legacy=True):
+def moves_to_alphanum(list_inp, b_legacy=False):
     
     temp = [
         str(i + 1) +
@@ -367,7 +367,7 @@ def player_control_input(board, moves_player, log, **kwargs):
     msg += "\n"
     while(True):
         raw = raw_input(msg)    #example: >1,1 | 2,2
-        ret, the_move = parse_player_input(raw, board, 'alphanum_legacy')
+        ret, the_move = parse_player_input(raw, board, 'alphanum')
         if ret == 0:
             #TODO - call common return function
             for _m in moves_player:
