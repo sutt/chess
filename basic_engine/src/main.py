@@ -1356,6 +1356,49 @@ def test_filter_check_pinned_piece_1():
 
     assert not(Move(pos0=(5, 2), pos1=(6, 4), code=0) in moves)
 
+def test_printout_grid():
+    
+    ''' pretty printouts baselined here.
+        b_grid_pos: view pos (row_num, col_num) [index-0]'''
+
+    game = Game(test_exit_moves=1)
+    ret = game.play()
+    pieces = ret['pieces']
+
+    display = Display()
+    ret = display.print_board_letters(pieces)
+    
+    #note trailing \n on row 8
+    s_benchmark = \
+"""   A B C D E F G H
+
+1  r n b q k b n r
+2  p p p p p p p p
+3  ~ ~ ~ ~ ~ ~ ~ ~
+4  ~ ~ ~ ~ ~ ~ ~ ~
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  ~ ~ ~ ~ ~ ~ ~ ~
+7  P P P P P P P P
+8  R N B Q K B N R
+"""
+    assert ret == s_benchmark
+
+
+    ret2 = display.print_board_letters(pieces, b_grid_pos=True)
+    s_benchmark2 = \
+"""   0 1 2 3 4 5 6 7
+
+0  r n b q k b n r
+1  p p p p p p p p
+2  ~ ~ ~ ~ ~ ~ ~ ~
+3  ~ ~ ~ ~ ~ ~ ~ ~
+4  ~ ~ ~ ~ ~ ~ ~ ~
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  P P P P P P P P
+7  R N B Q K B N R
+"""
+    assert ret2 == s_benchmark2
+
 if __name__ == "__main__":
 
 
