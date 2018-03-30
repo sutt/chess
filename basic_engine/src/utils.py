@@ -328,7 +328,7 @@ def pgn_deduction(board, pieces, moves, instructions, i_turn):
 
 
 def instruction_input(board, moves, instructions, i_turn):
-    ret, the_move = parse_player_input(instructions[i_turn - 1], board, 'alphanum_legacy')
+    ret, the_move = parse_player_input(instructions[i_turn - 1], board, 'alphanum')
     if ret == 0:
         #TODO - call common return function
         for _m in moves:
