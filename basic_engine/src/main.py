@@ -40,6 +40,7 @@ class Game():
         ,b_log_move = False
         ,b_log_turn_time = False
         ,b_log_num_available = False
+        ,b_log_check_schedule = False
         ):
 
         self.manual_control = manual_control
@@ -76,6 +77,7 @@ class Game():
                           ,b_log_move = b_log_move
                           ,b_turn_time = b_log_turn_time
                           ,b_num_available = b_log_num_available
+                          ,b_check_schedule = b_log_check_schedule
                            )
         
     def get_gamelog(self):
@@ -191,7 +193,7 @@ class Game():
 
             board, pieces = apply_move(move, board, pieces, player)
                         
-            self.log.add_turn_log(move, len(moves))
+            self.log.add_turn_log(move, len(moves), b_player_in_check)
 
             if self.check_test_exit():
                 self.b_test_exit = True
@@ -1400,6 +1402,36 @@ def test_printout_grid():
 7  R N B Q K B N R
 """
     assert ret2 == s_benchmark2
+
+def test_log_schema_check_schedule_1():
+    
+    ''' Use GameSchema to record all the [alleged] checks in the pgn, and
+        Use GameLog to record all checks in play(), verify they match up. 
+    '''
+    
+    s_pgn = '1. Nf3 e6 2. c4 b6 3. g3 Bb7 4. Bg2 c5 5. O-O Nf6 6. Nc3 Be7 7. d4 cxd4 8. Qxd4 Nc6 9. Qf4 O-O 10. Rd1 Qb8 11. e4 d6 12. b3 a6 13. Bb2 Rd8 14. Qe3 Qa7 15. Ba3 Bf8 16. h3 b5 17. Qxa7 Nxa7 18. e5 dxe5 19. Bxf8 Kxf8 20. Nxe5 Bxg2 21. Kxg2 bxc4 22. bxc4 Ke8 23. Rab1 Rxd1 24. Nxd1 Ne4 25. Rb7 Nd6 26. Rc7 Nac8 27. c5 Ne4 28. Rxf7 Ra7 29. Rf4 Nf6 30. Ne3 Rc7 31. Rc4 Ne7 32. f4 Nc6 33. N3g4 Nd5 34. Nxc6 Rxc6 35. Kf3 Rc7 36. Ne5 Kd8 37. c6 Ke7 38. Ra4 Ra7 39. Kf2 Kd6 40. h4 a5 41. Kf3 Nc3 42. Rd4+ Nd5 43. Ke4 g6 44. g4 Kc7 45. Rd2 a4 46. f5 Nf6+ 47. Kf4 exf5 48. gxf5 Ra5 49. fxg6 hxg6 50. Rb2 Nd5+ 51. Ke4 Nb6 52. Rf2 a3 53. Rf7+ Kc8 54. Nxg6 Ra4+ 55. Ke5 Rb4 56. Ne7+ Kd8 57. c7+ Ke8 58. Rh7 Rc4 59. Nd5 Rc5 60. Rh8+ Kd7 61. Rd8+'
+    
+    schema = GameSchema()
+    schema.set_pgn_instructions(s_pgn)
+    schema.all_parse_pgn_instructions()
+    pgn_check_schedule = schema.get_check_schedule()
+
+    game = Game(s_pgn_instructions = s_pgn
+                ,b_log_check_schedule=True
+                )
+    ret = game.play()
+
+    log_check_schedule = game.get_gamelog().get_log_check_schedule()
+
+    #they're off by one b/c pgn records play who checks
+    #but log records who is checked, thus one behind.
+
+    assert pgn_check_schedule == [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True, False, False, False, False, False, False, False, False, True, False, False, False, False, False, False, False, True, False, False, False, False, True, False, False, True, False, False, True, False, True, False, False, False, False, False, True, False, True]
+
+    assert log_check_schedule == [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True, False, False, False, False, False, False, False, False, True, False, False, False, False, False, False, False, True, False, False, False, False, True, False, False, True, False, False, True, False, True, False, False, False, False, False, True, False]
+
+    assert log_check_schedule[1:] == pgn_check_schedule[:-1]
+
 
 if __name__ == "__main__":
 

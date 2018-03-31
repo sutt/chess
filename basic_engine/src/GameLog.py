@@ -24,6 +24,9 @@ class GameSchema:
     def set_pgn_instructions(self, s_instructions):
         self.pgn_instructions = s_instructions
 
+    def get_pgn_parsed(self):
+        return copy.copy(self.pgn_parsed)
+
     def get_check_schedule(self):
         return copy.copy(self.pgn_check_schedule)
         
@@ -178,6 +181,9 @@ class GameLog:
         self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())
         
+        self.b_check_schedule = kwargs.get('b_check_schedule', False)
+        self.log_check_schedule = []
+        
         self.b_log_move = kwargs.get('b_log_move', False)
         self.log_move = []
         
@@ -192,6 +198,7 @@ class GameLog:
     def add_turn_log(self
                      ,move
                      ,num_available = 0
+                     ,b_check = False
                      ):
         
         '''each turn append a data element on to each of these logs'''
@@ -201,6 +208,9 @@ class GameLog:
         
         if self.b_num_available:
             self.log_num_available.append(num_available)
+
+        if self.b_check_schedule:
+            self.log_check_schedule.append(b_check)
         
         if self.b_turn_time:
             _time = time.time() - self.t0
@@ -216,6 +226,9 @@ class GameLog:
 
     def get_log_turn_time(self):
         return copy.deepcopy(self.log_turn_time)
+
+    def get_log_check_schedule(self):
+        return copy.copy(self.log_check_schedule)
 
     
   
