@@ -264,7 +264,7 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
                         game_replay = Game(s_pgn_instructions = s_pgn
                                             ,test_exit_moves = _i_turn + 2)
                         
-                        ret = game.play( king_in_check_on = b_naive_check
+                        ret = game_replay.play( king_in_check_on = b_naive_check
                                         ,king_in_check_test_copy_apply_4 = not(b_naive_check)
                                         )
 
@@ -273,6 +273,8 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
                         print 'Board State pre-move at i_turn: ', str(_i_turn + 2), '\n'
                         display = Display()
                         ret = display.print_board_letters(replay_pieces)
+                        print 'PGN: \n'
+                        print s_pgn
                     except:
                         print 'could not replay the game to the move desired.\n'
 
@@ -321,16 +323,16 @@ def kickouts_details():
         >python hack.py > ../data/tests/kickouts_check_schedule1.txt  
 
     Current Discrepancies: 
-    76 | GarryKasparov.pgn-2827
-    63 | GarryKasparov.pgn-17019
-    61 | GarryKasparov.pgn-18587
-    7 | GarryKasparov.pgn-22523
-    55 | GarryKasparov.pgn-23291
-    56 | GarryKasparov.pgn-23307
-    57 | GarryKasparov.pgn-23323
-    34 | GarryKasparov.pgn-24555
-    2 | GarryKasparov.pgn-25643
-    7 | GarryKasparov.pgn-25723
+    76 | GarryKasparov.pgn-2827 - caused by promotion=N causing an immediate check
+    63 | GarryKasparov.pgn-17019 - queen side castling causes check
+    61 | GarryKasparov.pgn-18587 - queen side castling causes check
+    7 | GarryKasparov.pgn-22523 - queen side castling causes check
+    55 | GarryKasparov.pgn-23291 - not a check_schedule discrepancy; some other err
+    56 | GarryKasparov.pgn-23307 - not a check_schedule discrepancy; some other err 
+    57 | GarryKasparov.pgn-23323 - not a check_schedule discrepancy; some other err
+    34 | GarryKasparov.pgn-24555  - queen side castling causes check
+    2 | GarryKasparov.pgn-25643  - queen side castling causes check
+    7 | GarryKasparov.pgn-25723 - queen side castling causes check
     # done.
 
     '''
