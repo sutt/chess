@@ -1,7 +1,8 @@
-import sys
+import sys, time, json
 from basic import *
 from datatypes import moveHolder
 from Display import Display
+
 Move = moveHolder()
 
 # example
@@ -225,7 +226,25 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
 
 class PGN:
     
-    ''' This handles figuring out the 'move' from PGN info'''
+    ''' This handles figuring out the 'move' from PGN info
+    
+    https://en.wikipedia.org/wiki/Portable_Game_Notation
+
+    Notes
+        castling king side: O-O
+        castling queen side: O-O-O
+
+        First letter (Capitalized): Piece Class, (ommitted = Pawn)
+        [optinal second letter (lower case)]:
+        row(letter)column(number)
+        Appendix:
+
+            +: checking
+            #: checkmating 
+            =: promotion [Q / B / N / R]
+
+            ; / {} :comments
+    '''
 
     def __init__(self):
         self.moves = None
@@ -469,6 +488,161 @@ def printout_to_data(s_printout, b_king_can_castle = False):
 
     return board, pieces
 
+#Hack for now to avoid circular import reference
+from GameLog import GameSchema
+
+def pgn_to_xpgn(pgn_fn
+                ,xpgn_fn
+                ,pgn_path = '../data/'
+                ,xpgn_path = '../data/'
+                ,b_silent = False
+                ,max_lines = None
+                ):
+    
+    """
+
+    .pgn -> .xpgn { meta-data:
+                    {
+                        parse-time
+                    }
+                    data:
+                        [
+                            { source-id, GameSchema-json {} }
+                            { source-id, GameSchema-json {} }
+                            ...
+                        ]
+                    }
+
+    """
+
+    game_schemas = []
+    source_keys = []
+    
+    with open(pgn_path + pgn_fn, 'r') as f:
+        lines = f.readlines()
+
+    if max_lines is not None:
+        lines = lines[:max_lines]
+
+    #Load data from .pgn
+    for i, line in enumerate(lines):
+        
+        if line[:2] != '1.':
+            continue
+
+        #Found an instruction line   
+        instr_ind = i
+        game_schema = GameSchema()
+        game_schema.set_pgn_instructions(line)
+
+        #Find Results line
+        try:
+            b_result_found = False
+            result_ind = i - 2
+            result_line = lines[result_ind]
+            s_find_result = '[Results'
+            if result_line[:len(s_result)] == s_find_result:
+                quote_inds = [i for i,s in enumerate(result_line) if s == '"']
+                if len(quote_inds) == 2:
+                    b_result_found = True
+            
+            if b_result_found:
+                s_outcome = result_line[quote_inds[0] + 1: quote_inds[1]]
+                game_schema.set_pgn_s_outcome(s_outcome)
+        except:
+            pass
+
+        #Apply ETL on the game_schema, implemented within that class
+        game_schema.all_parse_pgn_instructions()
+        
+        #Load the game_schema into the list
+        game_schemas.append(game_schema)
+
+        #Build a source key to identify duplicates
+        source_key = pgn_fn + "-" + str(i)
+        source_keys.append(source_key)
+
+
+    #Build up full array of data
+    data_list = []
+    
+    assert len(source_keys) == len(game_schemas)
+
+    for i, gameSchema in enumerate(game_schemas):
+            
+        data_elem = {}
+
+        data_elem['source-key'] = source_keys[i]
+        
+        game_schema_dict = json.loads(gameSchema.to_json())
+        data_elem['game-schema'] = game_schema_dict
+        
+        data_list.append(data_elem)
+
+    
+    #Top Level Hierachy for xpgn.json
+    xpgn_dict = {}
+
+    xpgn_dict['data'] = data_list
+
+    #meta data for parsing here, e.g. commit version
+    xpgn_meta = {}
+    xpgn_meta['parse-time'] = str(time.time())
+    xpgn_dict['meta-data'] = xpgn_meta
+
+
+    #Writeout
+    if not(b_silent):
+        with open(xpgn_path + xpgn_fn, 'w') as f:
+            json.dump(xpgn_dict, f)
+
+    
+    #Return for non filesystem testing
+    if b_silent:
+        return xpgn_dict
+
+    return None
+
+
+def test_pgn_to_xpgn_1():
+    
+    '''verify the output xpgn creation tool'''
+    
+    #path changed so pytest is called froom root
+    
+    s_json = pgn_to_xpgn(pgn_fn = 'GarryKasparov.pgn'
+                            ,xpgn_fn = 'output1.xpgn'
+                            ,pgn_path = 'data/'     
+                            ,xpgn_path = 'data/'
+                            ,max_lines = 100
+                            ,b_silent = True)
+
+    assert s_json.has_key('data')
+
+    assert s_json['data'][0].has_key('source-key')
+    
+    assert len(s_json['data']) == 6
+
+
+def dummy_test_pgn_to_xpgn_2():
+    
+    '''Verify file-system transaction here '''
+    
+    pass
+
+    # os.listdir()
+    # os.rm('test_dummy_1.txt')
+    
+    # ret = pgn_to_xpgn(pgn_fn = 'GarryKasparov.pgn'
+    #                         ,xpgn_fn = 'test_dummy_1.xpgn'
+    #                         ,pgn_path = 'data/'     
+    #                         ,xpgn_path = 'data/'                            
+    #                         ,max_lines = 100
+    #                         )
+
+    # dir_fns = os.listdir()
+    # assert 'test_dummy' in dir_fns
+    
 
 def test_printout_to_data_1():
     

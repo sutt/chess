@@ -1,5 +1,6 @@
-import time, copy
+import time, copy, json
 from utils import parse_pgn_instructions
+
 
 class GameSchema:
     
@@ -20,9 +21,53 @@ class GameSchema:
         
         self.doublet_instructions = None
 
+    def to_json(self,**kwargs):
+        
+        data = {}
+
+        data['pgn_instructions'] = self.pgn_instructions
+
+        data['pgn_check_schedule'] = self.pgn_check_schedule
+        data['pgn_capture_schedule'] = self.pgn_capture_schedule
+        data['pgn_mate_turn'] = self.pgn_mate_turn
+        data['pgn_player_last_move'] = self.pgn_player_last_move
+
+        data['pgn_s_outcome'] = self.pgn_s_outcome
+        
+        return json.dumps(data)
+        
+    def from_json(self,json_data):
+        
+        k = 'pgn_instructions'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+
+        k = 'pgn_check_schedule'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+
+        k = 'pgn_capture_schedule'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+
+        k = 'pgn_mate_turn'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+
+        k = 'pgn_player_last_move'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+
+        k = 'pgn_s_outcome'
+        if json_data.has_key(k):
+            self.pgn_instructions = json_data[k]
+        
     
     def set_pgn_instructions(self, s_instructions):
         self.pgn_instructions = s_instructions
+
+    def set_pgn_s_outcome(self, s_outcome):
+        self.pgn_s_outcome = s_outcome
 
     def get_pgn_parsed(self):
         return copy.copy(self.pgn_parsed)
