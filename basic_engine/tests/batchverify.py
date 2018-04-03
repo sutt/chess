@@ -3,6 +3,7 @@ sys.path.append('../')
 
 from src.main import Game
 from src.GameLog import GameSchema
+from src.Display import Display
 
 #Must run from inside directory: basic_engine/tests/
 
@@ -189,7 +190,9 @@ def test_batch_last_player_move_at_least_ties():
     verify_last_player_move_at_least_ties(data,b_print=False)
     
 
-def verify_check_schedule_match(data, b_naive_check=False, b_assert=True):
+def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
+                                ,b_details=False
+                                ):
     ''' Compare check each turn in pgn vs own implementation of play().
         Note: play() identify player is in check but pgn identify the 
         player that causes check. So they are off by one.
@@ -219,9 +222,61 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True):
         if b_assert:
             assert b_pass == True
         else:
+            
+            #this case does not pass, identify it
             if not(b_pass):
                 print str(i) + ' | ' + data_elem['source-key']
-    
+
+                #investigate the case
+                if b_details:
+                    
+                    for _i_turn, v_check  in enumerate(log_check_schedule[1:]):
+                    
+                        if v_check != schema_check_schedule[_i_turn]:
+                    
+                            break   # i_turn is frozen now, used below
+
+                    # which move to break from play?
+                    # test-case: on i_turn=2, "blacks first move", black puts white in check:
+                    #           -> schema_check_schedule[1] = True (index-0)
+                    #           -> log_check_schedule[2] = True (index-0)
+                    #           -> log_check_schedule[1:][1] = True
+                    #           -> _i_turn = 1
+                    #       -> i_turn = _i_turn + 1
+                    #       Test-exit-moves exits before applied move, so
+                    #       to see White in check i_turn=3:
+                    #           -> test_exit_moves = 3
+                    #   -> test_exit_moves = i_turn + 1
+                    #   -> test_exit_moves = _i_turn + 2
+                    #
+                    # test-case: if _i_turn is odd than white is in check
+                    #            if _i_turn is even balck is in check
+
+                    s_player = 'White' if (_i_turn % 2 == 1) else 'Black'
+
+                    print 'First Turn Check doesnt match (_i_turn format): ', str(_i_turn)
+                    print 'Player allegedly in check: ', s_player
+                    print 'play() check value: ', str(v_check)
+                    print 'schema check value: ', str(schema_check_schedule[_i_turn])
+
+                    #Perform a replay, show board state at the kickout move
+                    try:
+                        game_replay = Game(s_pgn_instructions = s_pgn
+                                            ,test_exit_moves = _i_turn + 2)
+                        
+                        ret = game.play( king_in_check_on = b_naive_check
+                                        ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                                        )
+
+                        replay_pieces = ret['pieces']
+
+                        print 'Board State pre-move at i_turn: ', str(_i_turn + 2), '\n'
+                        display = Display()
+                        ret = display.print_board_letters(replay_pieces)
+                    except:
+                        print 'could not replay the game to the move desired.\n'
+
+
 
 def test_batch_check_schedule_match():
     
@@ -258,7 +313,52 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
     print 'done.'
 
 
+def kickouts_details():
+    ''' Use this to build more detailed info about verify() discrepancies.
+
+        To output all print calls to log:
+        [Call kickouts_details from tests/hack.py]:
+        >python hack.py > ../data/tests/kickouts_check_schedule1.txt  
+
+    Current Discrepancies: 
+    76 | GarryKasparov.pgn-2827
+    63 | GarryKasparov.pgn-17019
+    61 | GarryKasparov.pgn-18587
+    7 | GarryKasparov.pgn-22523
+    55 | GarryKasparov.pgn-23291
+    56 | GarryKasparov.pgn-23307
+    57 | GarryKasparov.pgn-23323
+    34 | GarryKasparov.pgn-24555
+    2 | GarryKasparov.pgn-25643
+    7 | GarryKasparov.pgn-25723
+    # done.
+
+    '''
+
+    data = load_xpgn_data(max_tests=None)
     
+    specific_keys = [2827,17019]
+    specific_keys = [2827,17019,18587,22523,23291,23307,23323,24555,25643,25723]
+    
+    data_specific = filter_data_by_source_key(data, specific_keys)
+
+    print 'Analyzing ', str(len(data_specific)), 'kickouts: \n'
+
+    #Check if they kickout with naive_check
+    verify_check_schedule_match(data_specific
+                                ,b_assert=False
+                                ,b_naive_check=True
+                                )
+    print 'done verifying naive check. \n'
+
+    #Produce the errors with details
+    verify_check_schedule_match(data_specific
+                                ,b_assert=False
+                                ,b_details=True
+                                )
+
+    
+
 
 #Unit-testing for the batch verify functions themselves ------------------
 

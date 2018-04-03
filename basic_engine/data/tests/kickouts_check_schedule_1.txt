@@ -1,0 +1,161 @@
+Analyzing  10 kickouts: 
+
+0 | GarryKasparov.pgn-2827
+1 | GarryKasparov.pgn-17019
+2 | GarryKasparov.pgn-18587
+3 | GarryKasparov.pgn-22523
+4 | GarryKasparov.pgn-23291
+5 | GarryKasparov.pgn-23307
+6 | GarryKasparov.pgn-23323
+7 | GarryKasparov.pgn-24555
+8 | GarryKasparov.pgn-25643
+9 | GarryKasparov.pgn-25723
+done verifying naive check. 
+
+0 | GarryKasparov.pgn-2827
+First Turn Check doesnt match (_i_turn format):  72
+Player allegedly in check:  Black
+play() check value:  False
+schema check value:  True
+Board State pre-move at i_turn:  74 
+
+   A B C D E F G H
+
+1  b ~ ~ ~ ~ Q ~ ~
+2  p ~ ~ ~ ~ ~ p ~
+3  ~ p ~ ~ ~ ~ k ~
+4  ~ ~ ~ ~ ~ ~ ~ p
+5  ~ P ~ ~ P R ~ ~
+6  P ~ ~ ~ ~ ~ ~ K
+7  ~ ~ ~ ~ ~ ~ P P
+8  ~ ~ ~ ~ q ~ ~ ~
+
+1 | GarryKasparov.pgn-17019
+First Turn Check doesnt match (_i_turn format):  20
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  22 
+
+   A B C D E F G H
+
+1  ~ ~ ~ r ~ ~ k ~
+2  ~ p ~ P ~ ~ p ~
+3  ~ ~ ~ ~ R b B p
+4  ~ ~ ~ ~ ~ ~ ~ P
+5  ~ ~ p ~ ~ ~ P ~
+6  P ~ ~ ~ ~ ~ ~ ~
+7  P ~ K ~ ~ ~ ~ ~
+8  ~ ~ ~ ~ ~ ~ ~ ~
+
+2 | GarryKasparov.pgn-18587
+First Turn Check doesnt match (_i_turn format):  26
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  28 
+
+   A B C D E F G H
+
+1  r ~ ~ ~ ~ k ~ ~
+2  ~ ~ p n ~ ~ ~ r
+3  p p ~ ~ ~ ~ B P
+4  ~ ~ ~ ~ p P B ~
+5  ~ ~ n ~ ~ P ~ ~
+6  ~ ~ K ~ ~ ~ ~ ~
+7  P ~ P ~ ~ ~ ~ ~
+8  ~ ~ ~ R ~ ~ ~ R
+
+3 | GarryKasparov.pgn-22523
+First Turn Check doesnt match (_i_turn format):  20
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  22 
+
+   A B C D E F G H
+
+1  ~ ~ ~ ~ ~ ~ ~ ~
+2  ~ ~ ~ ~ ~ P R N
+3  ~ ~ ~ k ~ ~ ~ ~
+4  ~ r ~ ~ ~ ~ ~ ~
+5  p ~ ~ ~ ~ ~ ~ ~
+6  ~ ~ ~ ~ ~ ~ ~ ~
+7  K ~ n ~ ~ ~ ~ P
+8  ~ ~ ~ ~ ~ ~ ~ ~
+
+4 | GarryKasparov.pgn-23291
+First Turn Check doesnt match (_i_turn format):  12
+Player allegedly in check:  Black
+play() check value:  False
+schema check value:  False
+could not replay the game to the move desired.
+
+5 | GarryKasparov.pgn-23307
+First Turn Check doesnt match (_i_turn format):  12
+Player allegedly in check:  Black
+play() check value:  False
+schema check value:  False
+could not replay the game to the move desired.
+
+6 | GarryKasparov.pgn-23323
+First Turn Check doesnt match (_i_turn format):  16
+Player allegedly in check:  Black
+play() check value:  False
+schema check value:  False
+could not replay the game to the move desired.
+
+7 | GarryKasparov.pgn-24555
+First Turn Check doesnt match (_i_turn format):  18
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  20 
+
+   A B C D E F G H
+
+1  ~ ~ r ~ ~ ~ k r
+2  p ~ n ~ ~ R ~ p
+3  ~ ~ ~ ~ p p ~ ~
+4  ~ ~ p ~ ~ ~ ~ B
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  ~ ~ N ~ ~ ~ ~ ~
+7  P P P ~ ~ P ~ P
+8  ~ ~ K ~ ~ ~ R ~
+
+8 | GarryKasparov.pgn-25643
+First Turn Check doesnt match (_i_turn format):  26
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  28 
+
+   A B C D E F G H
+
+1  r ~ ~ ~ ~ k ~ ~
+2  ~ ~ p n ~ ~ ~ r
+3  p p ~ ~ ~ ~ B P
+4  ~ ~ ~ ~ p P B ~
+5  ~ ~ n ~ ~ P ~ ~
+6  ~ ~ K ~ ~ ~ ~ ~
+7  P ~ P ~ ~ ~ ~ ~
+8  ~ ~ ~ R ~ ~ ~ R
+
+9 | GarryKasparov.pgn-25723
+First Turn Check doesnt match (_i_turn format):  18
+Player allegedly in check:  Black
+play() check value:  True
+schema check value:  False
+Board State pre-move at i_turn:  20 
+
+   A B C D E F G H
+
+1  ~ r b R ~ ~ ~ r
+2  ~ ~ ~ ~ p k ~ p
+3  ~ ~ P ~ p ~ p ~
+4  ~ p ~ ~ ~ ~ ~ ~
+5  ~ ~ ~ ~ ~ ~ ~ ~
+6  ~ ~ N ~ ~ P ~ ~
+7  ~ ~ P ~ ~ ~ ~ P
+8  ~ ~ K R ~ ~ ~ ~
+
