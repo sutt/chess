@@ -1,4 +1,4 @@
-import os, sys, time, json, copy, exceptions
+import os, sys, time, json, copy, exceptions, types
 sys.path.append('../')
 
 from src.main import Game
@@ -14,6 +14,8 @@ BATCH_DATA_SOURCE = '../data/GarryKasparov.xpgn'
 BATCH_KICKOUTS_LOG = '../data/tests/batchverify_kickout_log.txt'
 
 #TODO - printout or logout when there are kickouts
+
+#Helper Fucntions -----------------------------------
 
 def load_xpgn_data(fn = BATCH_DATA_SOURCE
                     ,max_tests = BATCH_SAMPLING_N
@@ -38,6 +40,31 @@ def load_xpgn_data(fn = BATCH_DATA_SOURCE
 
     return data
 
+
+def build_modulo_print_data(data, modulo_print):
+    ''' Build data out of slices of the data. 
+        For batch runs which take a long time; print after each section.
+    '''
+
+    if modulo_print is None:
+        return [data]    
+
+    else:
+        assert type(modulo_print) == types.IntType
+        try:
+            data_modulo = []
+            for i in range(len(data) / modulo_print):        
+                data_modulo.append(data[i*modulo_print:(i+1)*modulo_print])
+            
+            data_modulo.append(data[(i+1)*modulo_print:])    #the fractional leftover
+
+        except:
+            return None
+
+    return data_modulo
+
+
+#Main Verify() functions --------------------------------------------
 
 def verify_has_outcome_str(data, b_assert=False):
     '''Verify there is a string in each game-schema element'''
@@ -143,7 +170,78 @@ def test_batch_last_player_move_at_least_ties():
     verify_last_player_move_at_least_ties(data,b_print=False)
     
 
-#Unit-testing for the batch verify functions themselves
+def verify_check_schedule_match(data, b_naive_check=False, b_assert=True):
+    ''' Compare check each turn in pgn vs own implementation of play().
+        Note: play() identify player is in check but pgn identify the 
+        player that causes check. So they are off by one.
+    '''
+
+    for i, data_elem in enumerate(data):
+        
+        s_gameSchema = data_elem['game-schema']
+        o_gameSchema = GameSchema()
+        o_gameSchema.from_json(s_gameSchema)
+
+        s_pgn = o_gameSchema.get_instructions()
+        schema_check_schedule = o_gameSchema.get_check_schedule()
+
+        game = Game(s_pgn_instructions=s_pgn
+                    ,b_log_check_schedule=True
+                    )
+
+        game.play( king_in_check_on = b_naive_check
+                    ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                    )
+
+        log_check_schedule = game.get_gamelog().get_log_check_schedule()
+        
+        b_pass = (log_check_schedule[1:] == schema_check_schedule[:-1])
+
+        if b_assert:
+            assert b_pass == True
+        else:
+            if not(b_pass):
+                print str(i) + ' | ' + data_elem['source-key']
+    
+
+def test_batch_check_schedule_match():
+    
+    data = load_xpgn_data(max_tests=20)     #heavy computation, run less
+    
+    verify_check_schedule_match(data
+                                ,b_naive_check=False
+                                ,b_assert=True 
+                                )
+
+def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None):
+    
+    data = load_xpgn_data(max_tests=n)
+
+    data_modulo = build_modulo_print_data(data, modulo_print=modulo_print)
+
+    for i, data_section in enumerate(data_modulo):
+        try:
+
+            print 'Starting Section i: ', str(i)
+
+            verify_check_schedule_match(data_section
+                                        ,b_naive_check=False
+                                        ,b_assert=False
+                                        )        
+        except Exception as e:
+
+            if type(e) == exceptions.KeyboardInterrupt:
+                print 'BREAKING'
+                break
+            else:
+                print 'exception in data_section_i: ', str(i)
+
+    print 'done.'
+
+
+    
+
+#Unit-testing for the batch verify functions themselves ------------------
 
 def test_load_xpgn_data():
     
@@ -161,6 +259,17 @@ def test_load_xpgn_data():
                             ,exclude_inds=[1,2,3])
 
     assert len(data) == 7
+
+
+def test_build_modulo_print_data():
+    ''' Test this helper function. '''
+    data = load_xpgn_data(max_tests = 202)
+    data2 = build_modulo_print_data(data, modulo_print=20)
+
+    assert len(data) == 202
+    assert len(data2) == 11
+    assert len(data2[0]) == 20
+    assert len(data2[11 - 1]) == 2
 
 
 def test_verify_has_outcome_str_true_negative():

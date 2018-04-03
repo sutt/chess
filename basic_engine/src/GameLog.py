@@ -69,6 +69,9 @@ class GameSchema:
     def set_pgn_s_outcome(self, s_outcome):
         self.pgn_s_outcome = s_outcome
 
+    def get_instructions(self):
+        return str(self.pgn_instructions)   #convert from unicode
+
     def get_pgn_parsed(self):
         return copy.copy(self.pgn_parsed)
 
