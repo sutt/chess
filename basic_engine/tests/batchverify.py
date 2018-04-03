@@ -1,4 +1,4 @@
-import os, sys, time, json
+import os, sys, time, json, copy, exceptions
 sys.path.append('../')
 
 from src.main import Game
@@ -16,7 +16,9 @@ BATCH_KICKOUTS_LOG = '../data/tests/batchverify_kickout_log.txt'
 #TODO - printout or logout when there are kickouts
 
 def load_xpgn_data(fn = BATCH_DATA_SOURCE
-                    ,max_tests = BATCH_SAMPLING_N):
+                    ,max_tests = BATCH_SAMPLING_N
+                    ,exclude_inds = None
+                    ):
 
     '''This loads data for verify() tests'''
     
@@ -29,6 +31,9 @@ def load_xpgn_data(fn = BATCH_DATA_SOURCE
     if max_tests is not None:
         data = data[:max_tests]
         #TODO - add sampling not first N
+
+    if exclude_inds is not None:
+        data = [v for i,v in enumerate(data) if not(i in exclude_inds)]
 
     return data
 
@@ -99,6 +104,44 @@ def manual_batch_standard_outcome():
     print 'done.'
 
 
+def verify_last_player_move_at_least_ties(data, b_print=False):
+
+    for i, data_elem in enumerate(data):
+        
+        try:
+            s_gameSchema = data_elem['game-schema']
+            o_gameSchema = GameSchema()
+            o_gameSchema.from_json(s_gameSchema)
+
+            s_outcome = o_gameSchema.get_s_outcome()
+
+            i_last_player = o_gameSchema.get_player_last_move()
+
+            if i_last_player == 0:  #white
+                assert s_outcome != "0-1"
+            elif i_last_player == 1:
+                assert s_outcome != "1-0"
+            else:
+                assert False
+        
+        except AssertionError:
+            
+            if b_print:
+                print i
+                print s_gameSchema
+            
+            return exceptions.AssertionError()
+
+def manual_last_player_move_at_least_ties():
+    data = load_xpgn_data(max_tests=None)
+    verify_last_player_move_at_least_ties(data, b_print=True)
+    print 'done.'
+
+def test_last_player_move_at_least_ties():
+    data = load_xpgn_data(exclude_inds = [49])
+    verify_last_player_move_at_least_ties(data,b_print=False)
+    
+
 #Unit-testing for the batch verify functions themselves
 
 def test_load_xpgn_data():
@@ -111,6 +154,12 @@ def test_load_xpgn_data():
     data = load_xpgn_data()
     
     assert len(data) == 100
+
+    data = load_xpgn_data(fn = "../data/GarryKasparov.xpgn"
+                            ,max_tests=10
+                            ,exclude_inds=[1,2,3])
+
+    assert len(data) == 7
 
 
 def test_verify_has_outcome_str_true_negative():
@@ -167,3 +216,22 @@ def test_verify_standard_outcome_true_negative():
 
     assert b_assertion == True
 
+
+def test_verify_last_player_move_at_least_ties_true_negative():
+
+    ''' True Negative: show last player to move losing the game.
+        This actually occurs on GarryKasparove game 49 (index-0-based).
+    '''
+
+    #Control Case: show it passes first
+    data = load_xpgn_data(exclude_inds = [49])
+    ret = verify_last_player_move_at_least_ties(data,b_print=False)
+
+    assert not(type(ret) == exceptions.AssertionError)
+
+
+    #Test Case: the function should return an assertion error
+    data = load_xpgn_data(exclude_inds = [15])
+    ret = verify_last_player_move_at_least_ties(data,b_print=False)
+
+    assert type(ret) == exceptions.AssertionError
