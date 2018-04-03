@@ -33,6 +33,7 @@ def load_xpgn_data(fn = BATCH_DATA_SOURCE
         #TODO - add sampling not first N
 
     if exclude_inds is not None:
+        #TODO- make this based off source-key so we can sample
         data = [v for i,v in enumerate(data) if not(i in exclude_inds)]
 
     return data
@@ -137,7 +138,7 @@ def manual_last_player_move_at_least_ties():
     verify_last_player_move_at_least_ties(data, b_print=True)
     print 'done.'
 
-def test_last_player_move_at_least_ties():
+def test_batch_last_player_move_at_least_ties():
     data = load_xpgn_data(exclude_inds = [49])
     verify_last_player_move_at_least_ties(data,b_print=False)
     
