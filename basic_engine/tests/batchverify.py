@@ -10,6 +10,7 @@ from src.GameLog import GameSchema
 #Batch Params for batch-testing here:
 #test_batch_xxx_xxx() functions run on pytest; only verify some records
 BATCH_SAMPLING_N = 100
+BATCH_HEAVY_N = 5
 BATCH_DATA_SOURCE = '../data/GarryKasparov.xpgn'
 BATCH_KICKOUTS_LOG = '../data/tests/batchverify_kickout_log.txt'
 
@@ -63,6 +64,24 @@ def build_modulo_print_data(data, modulo_print):
 
     return data_modulo
 
+def filter_data_by_source_key(data, list_source_keys):
+    ''' input: list_source_key: (list) of int/str to identify source-key
+        returns: data only for records where there is a list
+    '''
+    
+    s_list_source_keys = map(lambda uni_s: str(uni_s), list_source_keys)
+
+    
+    ret = filter(lambda d: any(
+                map(lambda s_key: 
+                        s_key == str(d['source-key'])[-len(s_key):] \
+                        and \
+                        str(d['source-key'])[-(len(s_key)+1)] == "-" \
+                    ,s_list_source_keys)
+                    )          
+                ,data)
+
+    return ret
 
 #Main Verify() functions --------------------------------------------
 
@@ -206,7 +225,7 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True):
 
 def test_batch_check_schedule_match():
     
-    data = load_xpgn_data(max_tests=20)     #heavy computation, run less
+    data = load_xpgn_data(max_tests=BATCH_HEAVY_N)     #heavy computation, run less
     
     verify_check_schedule_match(data
                                 ,b_naive_check=False
@@ -270,6 +289,21 @@ def test_build_modulo_print_data():
     assert len(data2) == 11
     assert len(data2[0]) == 20
     assert len(data2[11 - 1]) == 2
+
+def test_filter_data_by_source_key():
+    
+    data = load_xpgn_data(max_tests=None)
+    assert len(data) == 1854
+
+    sk = [11]
+    data2 = filter_data_by_source_key(data, sk)
+    assert len(data2) == 1
+
+    sk = ["43", 11]
+    data3 = filter_data_by_source_key(data, sk)
+    assert len(data3) == 2
+
+    assert str(data3[0]['source-key']) == "GarryKasparov.pgn-11"
 
 
 def test_verify_has_outcome_str_true_negative():
