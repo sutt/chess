@@ -2,3 +2,4 @@
 .vscode
 .cache
 hack.py
+tests/batchverify-scratch.py

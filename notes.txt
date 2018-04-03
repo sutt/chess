@@ -556,6 +556,124 @@ board should store edge cases:
 
             Are doublet_instructions faster to run than pgn_instructions?
 
+            to run through verified pgn's we dont need filter_check or is_check
+            so we should have a master switch to turn that all off
+            ultimately all the check functions will need to be centralized
+            when introducing check_cache
+
+            There is a probabilistic way to make naive check faster:
+                - since we return early on 1st check we find, we optimally start
+                with "the most likely to cause check" piece and proceed in order
+                that way, e.g. "bishop checked me last turn, bet he's the one to do
+                it this turn"
+                - still you have to do it for each of your moves, but you can exit on
+                ideally the first opponent piece.
+                - can you even do this with mutator() efficiency?
+
+            Can we put this python engine into Xamarin? How about if we strip
+            any extra packages, and compile it to iron-python? then "to dll" then
+            into android?
+        
+        3/31
+
+            build a batch test to verify correctness
+                first on check_schedule
+                then on: mate_turn
+                then on:
+                    last player = outcome
+                    or
+                    stalemate-outcome match
+                        well need to add more functionality here.
+
+            Use JSON for building data
+
+            Also add some sqlite in here, true?
+
+            Refactoring Ideas
+                in play(), building test_data in a function of Game.
+                    reset_test() at top of play.
+
+        4/2
+
+            build GameSchema into a full data-management class
+            read/write to json
+
+            we havent verified all check is correct yet: do that
+
+            still need interactive mode out_log as a pgn
+
+            build example TruePositive kickouts from verify() functions
+                e.g. add a move incompatibility to a pgn
+                and show how it kicksout. bonus for prettyprint display
+                with meta data: e.g turn 39, white's move, etc... and
+                then what move was requested.
+
+            TODO
+
+                strip \n from pgn_s_instructions in parse_pgn
+
+            Refactoring play()
+
+                top of the func should be put into a method and instead
+                pieces = self.pieces
+                board = self.board
+                player = self.player
+                check_test_exit:
+                    build_test_data(data, in , here)  [1-liner]
+                    continue
+                rename to check_test_exit_pre_move
+                          check_test_exit_post_move
+
+                build 
+
+                refactor filter_king_in_check names
+
+            Grand Projects
+
+                import stockfish and use calls into it
+
+                Create a MoveSchema
+
+                Create a ComputationalTimeSchema
+
+        4/3
+
+            TODO
+
+                merge game-schema-add branch
+                add notes to master
+                create move-instruction bugs
+                create kickouts_log
+                fix move-instruction bugs
+                    (can verify validity thru other chess apps)
+                find out if cruft like fn0.pgn is being used
+                git rm unnec cruft
+
+                grid is wrong on printout (1-8 -> 8-1)
+                    does this effect anything else?
+
+                try vs code with terminal on the side
+
+                add filter_data
+                add test_filter_data
+                add specific_turn in verify
+                build printout turn function
+                and build kickouts for check_schedule
+
+                build verify_move_availability
+                build true_negative unit test for verify_move_availibility
+                build kickouts_move_availability.txt
+                investigate kickouts
+                
+                wrap manual_check_schedule_match in decorator
+                and manual_move_availability
+
+                apply this command to data/tests/test_dummy_1.txt
+                (as it changes each time pytest is run b/c its destroyed recreated
+                with a new parse-time)
+                git update-index --assume-unchanged src/file/to/ignore
+
+
 
 
         HOWTOs
