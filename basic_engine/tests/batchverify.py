@@ -126,11 +126,27 @@ def test_verify_has_outcome_str_true_negative():
 
     b_assertion = False
     try:
-        verify_standard_outcome(data, b_assert=True)
+        verify_has_outcome_str(data, b_assert=True)
     except AssertionError:
         b_assertion = True
 
     assert b_assertion == True
+
+    #Test this test against a false negative
+    data = load_xpgn_data(fn = '../data/tests/test_dummy_1.xpgn'
+                        ,max_tests=None)
+    
+    
+    DUMMY_TEST_CASE_IND = 3
+    data = [data[DUMMY_TEST_CASE_IND]]    #expecting a list of data_elems
+
+    b_assertion = False
+    try:
+        verify_has_outcome_str(data, b_assert=True)
+    except AssertionError:
+        b_assertion = True
+
+    assert b_assertion == False
 
 
 def test_verify_standard_outcome_true_negative():
