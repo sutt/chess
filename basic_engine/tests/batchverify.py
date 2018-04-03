@@ -315,6 +315,86 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
     print 'done.'
 
 
+def verify_move_available(data
+                            ,b_naive_check=False
+                            ,b_assert=True
+                            ,b_details=False
+                            ):
+    ''' See if any games exit with a int return code meaning move was rejected.'''
+    
+
+    for i, data_elem in enumerate(data):
+        
+        s_gameSchema = data_elem['game-schema']
+        o_gameSchema = GameSchema()
+        o_gameSchema.from_json(s_gameSchema)
+
+        s_pgn = o_gameSchema.get_instructions()
+        schema_check_schedule = o_gameSchema.get_check_schedule()
+
+        
+        try:
+            b_pass = True
+            game = Game(s_pgn_instructions=s_pgn)
+
+            ret = game.play( king_in_check_on = b_naive_check
+                        ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                        )
+        
+            #if return code is plain int then its incompatible at that move
+            if isinstance(ret, int):
+                b_pass = False
+                
+        except:
+            b_pass = False
+
+        if b_assert:
+            assert b_pass == True
+        else:
+            if not(b_pass):
+                print str(i) + ' | ' + data_elem['source-key']
+                print ret
+
+                if b_details:
+                    pass
+
+def manual_move_available(n = None, b_naive_check=False, modulo_print=100):
+    
+    data = load_xpgn_data(max_tests=n)
+    
+    data_modulo = build_modulo_print_data(data, modulo_print=modulo_print)
+    
+
+    for i, data_section in enumerate(data_modulo):
+        try:
+
+            print 'Starting Section i: ', str(i)
+
+            verify_move_available(data_section
+                                    ,b_naive_check=False
+                                    ,b_assert=False
+                                    )        
+        except Exception as e:
+
+            if type(e) == exceptions.KeyboardInterrupt:
+                print 'BREAKING'
+                break
+            else:
+                print 'exception in data_section_i: ', str(i)
+
+    print 'done.'
+
+def test_batch_move_available():
+    
+    data = load_xpgn_data(max_tests=BATCH_HEAVY_N)     #heavy computation, run less
+    
+    verify_move_available(data
+                            ,b_naive_check=False
+                            ,b_assert=True 
+                            )                
+
+
+
 def kickouts_details():
     ''' Use this to build more detailed info about verify() discrepancies.
 
@@ -322,7 +402,7 @@ def kickouts_details():
         [Call kickouts_details from tests/hack.py]:
         >python hack.py > ../data/tests/kickouts_check_schedule1.txt  
 
-    Current Discrepancies: 
+    Check_Schedule Discrepancies: 
     76 | GarryKasparov.pgn-2827 - caused by promotion=N causing an immediate check
     63 | GarryKasparov.pgn-17019 - queen side castling causes check
     61 | GarryKasparov.pgn-18587 - queen side castling causes check
@@ -334,6 +414,14 @@ def kickouts_details():
     2 | GarryKasparov.pgn-25643  - queen side castling causes check
     7 | GarryKasparov.pgn-25723 - queen side castling causes check
     # done.
+
+    Move_Available Discrepencies:
+    55 | GarryKasparov.pgn-23291 - clearly something is fishy about these games
+    15
+    56 | GarryKasparov.pgn-23307- clearly something is fishy about these games
+    2
+    57 | GarryKasparov.pgn-23323 - clearly something is fishy about these games
+    19
 
     '''
 
