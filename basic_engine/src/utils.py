@@ -540,9 +540,9 @@ def pgn_to_xpgn(pgn_fn
             b_result_found = False
             result_ind = i - 2
             result_line = lines[result_ind]
-            s_find_result = '[Results'
-            if result_line[:len(s_result)] == s_find_result:
-                quote_inds = [i for i,s in enumerate(result_line) if s == '"']
+            s_find_result = '[Result'
+            if result_line[:len(s_find_result)] == s_find_result:
+                quote_inds = [_i for _i,s in enumerate(result_line) if s == '"']
                 if len(quote_inds) == 2:
                     b_result_found = True
             

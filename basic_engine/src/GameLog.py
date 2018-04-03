@@ -44,23 +44,23 @@ class GameSchema:
 
         k = 'pgn_check_schedule'
         if json_data.has_key(k):
-            self.pgn_instructions = json_data[k]
+            self.pgn_check_schedule = json_data[k]
 
         k = 'pgn_capture_schedule'
         if json_data.has_key(k):
-            self.pgn_instructions = json_data[k]
+            self.pgn_capture_schedule = json_data[k]
 
         k = 'pgn_mate_turn'
         if json_data.has_key(k):
-            self.pgn_instructions = json_data[k]
+            self.pgn_mate_turn = json_data[k]
 
         k = 'pgn_player_last_move'
         if json_data.has_key(k):
-            self.pgn_instructions = json_data[k]
+            self.pgn_player_last_move = json_data[k]
 
         k = 'pgn_s_outcome'
         if json_data.has_key(k):
-            self.pgn_instructions = json_data[k]
+            self.pgn_s_outcome = json_data[k]
         
     
     def set_pgn_instructions(self, s_instructions):
@@ -80,6 +80,9 @@ class GameSchema:
 
     def get_mate_turn(self):
         return self.pgn_mate_turn
+
+    def get_s_outcome(self):
+        return self.pgn_s_outcome
 
     def get_player_last_move(self):
         return self.pgn_player_last_move
