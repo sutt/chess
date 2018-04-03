@@ -1,4 +1,4 @@
-import sys, time, json
+import sys, time, json, os
 from basic import *
 from datatypes import moveHolder
 from Display import Display
@@ -624,24 +624,41 @@ def test_pgn_to_xpgn_1():
     assert len(s_json['data']) == 6
 
 
-def dummy_test_pgn_to_xpgn_2():
+def test_pgn_to_xpgn_2():
     
     '''Verify file-system transaction here '''
-    
-    pass
 
-    # os.listdir()
-    # os.rm('test_dummy_1.txt')
-    
-    # ret = pgn_to_xpgn(pgn_fn = 'GarryKasparov.pgn'
-    #                         ,xpgn_fn = 'test_dummy_1.xpgn'
-    #                         ,pgn_path = 'data/'     
-    #                         ,xpgn_path = 'data/'                            
-    #                         ,max_lines = 100
-    #                         )
+    # test_dir = '../data/tests/' #if run from src/
+    test_dir = 'data/tests/'
 
-    # dir_fns = os.listdir()
-    # assert 'test_dummy' in dir_fns
+    target_fn = 'test_dummy_1.xpgn'
+    
+    fns_before = os.listdir(test_dir)
+    
+    if target_fn in fns_before:
+        print 'first removing file...' + str(target_fn)
+        os.remove(test_dir + target_fn)
+        assert not(target_fn in os.listdir(test_dir))
+    
+    ret = pgn_to_xpgn( pgn_fn = 'test_pgn_1.pgn'
+                        ,xpgn_fn = target_fn
+                        ,pgn_path = test_dir     
+                        ,xpgn_path = test_dir                            
+                        ,max_lines = 100
+                        )
+
+    #Test it got created
+    assert target_fn in os.listdir(test_dir)
+
+    #Test the output makes some sense in it
+    with open(test_dir + target_fn, 'r') as f:
+        lines = f.readlines()
+
+    xpgn_json = json.loads(lines[0])
+
+    assert xpgn_json.has_key('data')
+
+    assert len(xpgn_json['data']) > 0
     
 
 def test_printout_to_data_1():

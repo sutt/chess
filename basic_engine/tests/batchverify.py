@@ -67,6 +67,7 @@ def test_batch_has_outcome_str():
 def verify_standard_outcome(data, b_assert=False):
     ''' verify only outcomes are: 1-0 , 0-1 , 1/2-1/2 '''
     
+    
     for i, data_elem in enumerate(data):
         
         s_gameSchema = data_elem['game-schema']
@@ -110,4 +111,43 @@ def test_load_xpgn_data():
     data = load_xpgn_data()
     
     assert len(data) == 100
+
+
+def test_verify_has_outcome_str_true_negative():
+    
+    '''True Negative: this xpgn has a null for outcome. Do we catch it?'''
+    
+    data = load_xpgn_data(fn = '../data/tests/test_dummy_1.xpgn'
+                        ,max_tests=None)
+    
+    
+    TEST_CASE_IND = 2
+    data = [data[TEST_CASE_IND]]    #expecting a list of data_elems
+
+    b_assertion = False
+    try:
+        verify_standard_outcome(data, b_assert=True)
+    except AssertionError:
+        b_assertion = True
+
+    assert b_assertion == True
+
+
+def test_verify_standard_outcome_true_negative():
+    
+    '''True Negative: this xpgn has a non-standard string in outcome. Do we catch it?'''
+    
+    data = load_xpgn_data(fn = '../data/tests/test_dummy_1.xpgn'
+                        ,max_tests=None)
+    
+    TEST_CASE_IND = 3
+    data = [data[TEST_CASE_IND]]    #expecting a list of data_elems
+
+    b_assertion = False
+    try:
+        verify_standard_outcome(data, b_assert=True)
+    except AssertionError:
+        b_assertion = True
+
+    assert b_assertion == True
 
