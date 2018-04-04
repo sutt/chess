@@ -673,7 +673,25 @@ board should store edge cases:
                 with a new parse-time)
                 git update-index --assume-unchanged src/file/to/ignore
 
+        4/4
 
+            naive_check can be made more efficient by only processing
+            pawn attacks, not pawn moves
+
+            add a board rotation to see from black-pov
+
+            TODO
+
+                get into branch refactor-game
+
+                put top of play into initialize()
+
+                run initialize by default()
+
+            Grand Projects
+
+                Build an api at basic_engine level which allows apps to interface
+                with Game.
 
 
         HOWTOs
