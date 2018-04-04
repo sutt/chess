@@ -183,20 +183,24 @@ class Game():
 
             if kwargs.get('filter_check_naive', False):
                 moves = filter_king_check(board, pieces, moves, player)
-            if kwargs.get('king_in_check_test_copy', False):
-                moves = filter_king_check_test_copy(board, pieces, moves, player)
-            if kwargs.get('king_in_check_test_copy_apply', False):
-                moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
-            if kwargs.get('king_in_check_test_copy_apply_2', False):
-                moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
-            if kwargs.get('king_in_check_test_copy_apply_3', False):
-                moves = filter_king_check_test_copy_apply_3(board, pieces, moves, player)
             if kwargs.get('filter_check_opt', True):
                 moves = filter_king_check_test_copy_apply_4(board, pieces, moves, player)
-            if kwargs.get('king_in_check_optimal', False):
+
+            if kwargs.get('filter_check_test_copy', False):
+                moves = filter_king_check_test_copy(board, pieces, moves, player)
+            if kwargs.get('filter_check_test_copy_apply', False):
+                moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
+            if kwargs.get('filter_check_test_copy_apply_2', False):
+                moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
+            if kwargs.get('filter_check_test_copy_apply_3', False):
+                moves = filter_king_check_test_copy_apply_3(board, pieces, moves, player)
+            if kwargs.get('filter_check_test_copy_opt', False):
                 moves = filter_king_check_optimal(board, pieces, moves, player)
-            if kwargs.get('king_in_check_optimal_2', False):
-                moves = filter_king_check_optimal_2(board, pieces, moves, player)
+            
+
+
+    
+    
             
             self.display.print_turn(pieces, player)
 

@@ -32,22 +32,22 @@ def select_function(s_function):
     if s_function == "test_copy":
         
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_test_copy=True)
+        game.play(filter_check_naive=False, filter_check_test_copy=True)
 
     if s_function == "test_copy_apply":
         
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_test_copy_apply=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply=True)
 
     if s_function == "test_c_apply_2":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_test_copy_apply_2=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply_2=True)
 
     if s_function == "test_c_apply_3":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_test_copy_apply_3=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply_3=True)
 
     if s_function == "test_c_apply_4":
             
@@ -105,7 +105,7 @@ def select_function(s_function):
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(filter_check_naive=False, king_in_check_optimal_2 = True)    
+        game.play(filter_check_naive=False, filter_check_test_copy_opt = True)    
         return game.get_gamelog()
 
     if s_function == "check_optimal":
@@ -116,7 +116,7 @@ def select_function(s_function):
     if s_function == "check_optimal_2":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_optimal_2=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_opt=True)
 
     return None     #to show that the function is no returning a test exit data
 

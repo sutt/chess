@@ -181,7 +181,7 @@ elif run_type == "randomplay2":
                      ,test_exit_moves = 1 )
 
         ret_moves = game2.play(filter_check_naive = True
-                                ,king_in_check_test_copy_4 = False
+                                ,filter_check_opt = False
                                 )
 
         print 'Moves available: ', str(ret_moves['moves'])
