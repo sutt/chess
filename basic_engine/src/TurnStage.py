@@ -396,96 +396,8 @@ def get_possible_check_optimal(pieces, board, move, player):
 
 
 
-# def filter_king_check_optimal_2(board, pieces, moves, player):
-    
-#     out = []
-    
-#     for _move in moves:
-
-#         #cant these just move outside the loop?
-#         #The problem is apply_move mutates state piece, right?
-#         _board = copy.deepcopy(board)   
-#         _pieces = copy.deepcopy(pieces)
-
-#         board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-#         b_check = get_possible_check_optimal(pieces2, board2, _move, player)
-        
-#         if not(b_check):
-#             out.append(_move)
-
-#     return out
 
 
-def filter_check_test_copy_opt(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        #cant these just move outside the loop?
-        #The problem is apply_move mutates state piece, right?
-        _board = copy.deepcopy(board)   
-        _pieces = copy.deepcopy(pieces)
-
-        board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-        b_check = get_possible_check_optimal(pieces2, board2, _move, player)
-        
-        if not(b_check):
-            out.append(_move)
-
-    return out
-
-def filter_check_naive(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        _board = copy.deepcopy(board)   # .copy?
-        _pieces = copy.deepcopy(pieces)
-
-        board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-        player2 = not(player)
-
-        b_check = get_possible_check(pieces2, board2, player2)
-        
-        if not(b_check):
-            out.append(_move)
-
-    return out
-
-def filter_check_test_copy(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        _board = copy.deepcopy(board)   # .copy?
-        _pieces = copy.deepcopy(pieces)
-
-        #board2, pieces2 = apply_move(_move, _board, _pieces, player)    
-
-        out.append(_move)
-
-    return out
-
-def filter_check_test_copy_apply(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        _board = copy.deepcopy(board)   # .copy?
-        _pieces = copy.deepcopy(pieces)
-
-        board2, pieces2 = apply_move(_move, _board, _pieces, player)    
-
-        out.append(_move)
-
-    return out
 
 class Mutator():
     
@@ -590,6 +502,91 @@ class Mutator():
             return pieces
 
 
+def filter_check_naive(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+        player2 = not(player)
+
+        b_check = get_possible_check(pieces2, board2, player2)
+        
+        if not(b_check):
+            out.append(_move)
+
+    return out
+
+
+def filter_check_opt(board, pieces, moves, player):
+    
+    '''Rough draft of fully optimized filter_check()'''
+
+    out = []
+
+    mutator = Mutator()
+    
+    for _move in moves:
+
+        b_regular =  (_move.code == MOVE_CODE['regular'])
+
+        if b_regular:
+            _board = mutator.mutate_board(board, _move)
+            _pieces = mutator.mutate_pieces(pieces, player)
+        else:
+            #Non-Standard Board/Piece Mutation
+            _board = copy.deepcopy(board)
+            _pieces = copy.deepcopy(pieces)
+            _board, _pieces = apply_move(_move, _board, _pieces, player)
+
+        b_check = get_possible_check_optimal(_pieces, _board, _move, player)
+        
+        if not(b_check):
+            out.append(_move)
+
+        if b_regular:
+            board = mutator.demutate_board(_board)
+            pieces = mutator.demutate_pieces(_pieces, player)
+
+    return out
+
+
+def filter_check_test_copy(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        #board2, pieces2 = apply_move(_move, _board, _pieces, player)    
+
+        out.append(_move)
+
+    return out
+
+def filter_check_test_copy_apply(board, pieces, moves, player):
+    
+    out = []
+    
+    for _move in moves:
+
+        _board = copy.deepcopy(board)   # .copy?
+        _pieces = copy.deepcopy(pieces)
+
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)    
+
+        out.append(_move)
+
+    return out
+
+
 def filter_check_test_copy_apply_2(board, pieces, moves, player):
     
     '''Analyze the computational cost of mutating board instead of
@@ -626,6 +623,7 @@ def filter_check_test_copy_apply_2(board, pieces, moves, player):
         out.append(_move)
 
     return out
+
 
 def filter_check_test_copy_apply_3(board, pieces, moves, player):
     
@@ -668,37 +666,27 @@ def filter_check_test_copy_apply_3(board, pieces, moves, player):
 
     return out
 
-def filter_check_opt(board, pieces, moves, player):
+
+def filter_check_test_copy_opt(board, pieces, moves, player):
     
-    '''Rough draft of fully optimized filter_check()'''
-
     out = []
-
-    mutator = Mutator()
     
     for _move in moves:
 
-        b_regular =  (_move.code == MOVE_CODE['regular'])
+        #cant these just move outside the loop?
+        #The problem is apply_move mutates state piece, right?
+        _board = copy.deepcopy(board)   
+        _pieces = copy.deepcopy(pieces)
 
-        if b_regular:
-            _board = mutator.mutate_board(board, _move)
-            _pieces = mutator.mutate_pieces(pieces, player)
-        else:
-            #Non-Standard Board/Piece Mutation
-            _board = copy.deepcopy(board)
-            _pieces = copy.deepcopy(pieces)
-            _board, _pieces = apply_move(_move, _board, _pieces, player)
+        board2, pieces2 = apply_move(_move, _board, _pieces, player)
 
-        b_check = get_possible_check_optimal(_pieces, _board, _move, player)
+        b_check = get_possible_check_optimal(pieces2, board2, _move, player)
         
         if not(b_check):
             out.append(_move)
 
-        if b_regular:
-            board = mutator.demutate_board(_board)
-            pieces = mutator.demutate_pieces(_pieces, player)
-
     return out
+
 
 def is_king_in_check(board, pieces, player):
 
