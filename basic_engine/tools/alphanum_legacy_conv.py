@@ -2,28 +2,39 @@ import copy, sys
 
 #From src/utils -----------------------------
 
-def alphanum_to_pos(inp, b_legacy=True):
+def alphanum_to_pos(inp, b_legacy=True, b_legacy2=True):
     if b_legacy:
         letter_data = 'ABCDEFGH'
         pos0 = letter_data.index(str.upper(inp[0]))
         pos1 = int(inp[1]) - 1
         return (pos0,pos1)
-    else:
+    elif b_legacy2:
         col_letters = 'ABCDEFGH'
         row = int(inp[1]) - 1
         col = col_letters.index(str.upper(inp[0]))
         return (row, col)
+    else:
+        col_letters = 'ABCDEFGH'
+        row = 8 - int(inp[1])                       #update
+        col = col_letters.index(str.upper(inp[0]))
+        return (row, col)
 
-def pos_to_alphanum(inp, b_legacy=True):
+def pos_to_alphanum(inp, b_legacy=True, b_legacy2=True):
     if b_legacy:
         letter_data = 'abcdefgh'
         number_data = [i+1 for i in range(8)]
         s1 = letter_data[inp[0]]
         s2 = str(number_data[inp[1]])
         return s1 + s2
-    else:
+    elif b_legacy2:
         letter_data = 'abcdefgh'
         number_data = [i+1 for i in range(8)]
+        s1 = letter_data[inp[1]]
+        s2 = str(number_data[inp[0]])
+        return s1 + s2
+    else:
+        letter_data = 'abcdefgh'
+        number_data = [i for i in range(8,0,-1)]    #update
         s1 = letter_data[inp[1]]
         s2 = str(number_data[inp[0]])
         return s1 + s2
@@ -52,8 +63,8 @@ def convert_string(s_input):
         if is_alphanum_tuple(two_chars):
             
             #convert
-            _pos = alphanum_to_pos(two_chars, b_legacy=True)
-            _new = pos_to_alphanum(_pos, b_legacy=False)
+            _pos = alphanum_to_pos(two_chars, b_legacy=False, b_legacy2=True)
+            _new = pos_to_alphanum(_pos, b_legacy=False, b_legacy2=False)
 
             #write
             final_string += _new[0]
@@ -101,8 +112,9 @@ def test_is_1():
 def test_conv_1():
     
     pass
-    s_in = '1. g1 e1 2. b1 d1'
-    s_out = '1. a7 a5 2. a2 a4'
+    # s_in = '1. g1 e1 2. b1 d1'
+    s_in = '1. a7 a5 2. a2 a4'
+    s_out = '1. a2 a4 2. a7 a5'
     assert convert_string(s_in) == s_out
 
 #MAIN
