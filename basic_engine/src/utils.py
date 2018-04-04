@@ -737,16 +737,21 @@ def test_pgn_parse_2():
 def test_alphanum_legacy_conversion_1():
     
     # assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
-    assert (0,6) == alphanum_to_pos('g1')
+    # assert (0,6) == alphanum_to_pos('g1')
+    assert (0,6) == alphanum_to_pos('g8')
 
     # assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
-    assert (4,0) == alphanum_to_pos('a5')
+    # assert (4,0) == alphanum_to_pos('a5')
+    assert (4,0) == alphanum_to_pos('a4')
 
     # assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
-    assert 'f4' == pos_to_alphanum((3,5))
+    assert 'f4' == pos_to_alphanum((4,5))
 
     # assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
-    assert 'h8' == pos_to_alphanum((7,7))
+    assert 'h8' == pos_to_alphanum((0,7))
+
+    assert 'h1' == pos_to_alphanum((7,7))
+
 
 def test_alphanum_legacy_conversion_2():
     
