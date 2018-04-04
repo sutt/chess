@@ -181,7 +181,7 @@ class Game():
 
             moves = get_available_moves(pieces, board, player)
 
-            if kwargs.get('king_in_check_on', False):
+            if kwargs.get('filter_check_naive', False):
                 moves = filter_king_check(board, pieces, moves, player)
             if kwargs.get('king_in_check_test_copy', False):
                 moves = filter_king_check_test_copy(board, pieces, moves, player)
@@ -191,7 +191,7 @@ class Game():
                 moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
             if kwargs.get('king_in_check_test_copy_apply_3', False):
                 moves = filter_king_check_test_copy_apply_3(board, pieces, moves, player)
-            if kwargs.get('king_in_check_test_copy_apply_4', True):
+            if kwargs.get('filter_check_opt', True):
                 moves = filter_king_check_test_copy_apply_4(board, pieces, moves, player)
             if kwargs.get('king_in_check_optimal', False):
                 moves = filter_king_check_optimal(board, pieces, moves, player)
@@ -574,8 +574,8 @@ def test_filter_check_pawn_1():
                 ,init_player = False     
                 ,test_exit_moves = 1    
                 )
-    ret_data2a = game2a.play(king_in_check_test_copy_apply_4 = False
-                            ,king_in_check_on = True
+    ret_data2a = game2a.play(filter_check_opt = False
+                            ,filter_check_naive = True
                             )
     generic_check_moves = ret_data2a['moves']
 
@@ -585,8 +585,8 @@ def test_filter_check_pawn_1():
                 ,init_player = False     
                 ,test_exit_moves = 1    
                 )
-    ret_data2b = game2b.play(king_in_check_test_copy_apply_4 = True
-                            ,king_in_check_on = False
+    ret_data2b = game2b.play(filter_check_opt = True
+                            ,filter_check_naive = False
                             )
     opt_check_moves = ret_data2b['moves']
 
@@ -629,8 +629,8 @@ H  ~ ~ ~ ~ ~ ~ ~ ~
                 ,init_player = False     
                 ,test_exit_moves = 1    
                 )
-    ret_data2a = game2a.play(king_in_check_test_copy_apply_4 = False
-                            ,king_in_check_on = True
+    ret_data2a = game2a.play(filter_check_opt = False
+                            ,filter_check_naive = True
                             )
     generic_check_moves = ret_data2a['moves']
 
@@ -639,8 +639,8 @@ H  ~ ~ ~ ~ ~ ~ ~ ~
                 ,init_player = False     
                 ,test_exit_moves = 1    
                 )
-    ret_data2b = game2b.play(king_in_check_test_copy_apply_4 = True
-                            ,king_in_check_on = False
+    ret_data2b = game2b.play(filter_check_opt = True
+                            ,filter_check_naive = False
                             )
     opt_check_moves = ret_data2b['moves']
     
@@ -679,15 +679,15 @@ def test_filter_forward_diagonal_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -717,15 +717,15 @@ def test_filter_forward_diagonal_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -764,15 +764,15 @@ def test_filter_forward_diagonal_2():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -802,15 +802,15 @@ def test_filter_forward_diagonal_2():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -845,15 +845,15 @@ def test_pawn_check_true_positive_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -888,15 +888,15 @@ def test_pawn_check_true_positive_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -935,15 +935,15 @@ def test_pawn_check_negative_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -977,15 +977,15 @@ def test_pawn_check_negative_1():
                 ,test_exit_moves = 1    
                 )
 
-    ret_data_generic = game.play(king_in_check_test_copy_apply_4 = False
-                                ,king_in_check_on = True
+    ret_data_generic = game.play(filter_check_opt = False
+                                ,filter_check_naive = True
                                 )
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
     game.reset_init_switch()
-    ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
-                                ,king_in_check_on = False
+    ret_data_opt = game.play(filter_check_opt = True
+                                ,filter_check_naive = False
                                 )
     opt_check_moves = ret_data_opt['moves']
 
@@ -1333,8 +1333,8 @@ def batchtest_multi_pgn_games_1(**kwargs):
         try:
             game = Game(s_pgn_instructions = s_game)
             if b_naive_check:
-                ret = game.play(king_in_check_on = True
-                                ,king_in_check_test_copy_apply_4 = False)
+                ret = game.play(filter_check_naive = True
+                                ,filter_check_opt = False)
             else:
                 ret = game.play()
         except Exception as e:
@@ -1393,8 +1393,8 @@ def test_filter_check_pinned_piece_1():
                 ,test_exit_moves = 1    
                 )
 
-    # ret = game.play(king_in_check_on=True)
-    ret = game.play(king_in_check_on=False)
+    # ret = game.play(filter_check_naive=True)
+    ret = game.play(filter_check_naive=False)
     moves = ret['moves']
 
     assert not(Move(pos0=(5, 2), pos1=(6, 4), code=0) in moves)

@@ -180,7 +180,7 @@ elif run_type == "randomplay2":
                      ,init_player = losing_player
                      ,test_exit_moves = 1 )
 
-        ret_moves = game2.play(king_in_check_on = True
+        ret_moves = game2.play(filter_check_naive = True
                                 ,king_in_check_test_copy_4 = False
                                 )
 

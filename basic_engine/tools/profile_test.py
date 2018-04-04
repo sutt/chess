@@ -12,21 +12,21 @@ ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 
 def run_profiles():
     
     cmd =  """game = Game(s_instructions = ss); """
-    cmd += """game.play(king_in_check_on=False)"""
+    cmd += """game.play(filter_check_naive=False)"""
     cProfile.run( cmd, 'output_profile_1')
 
     cmd =  """game = Game(s_instructions = ss); """
-    cmd += """game.play(king_in_check_on=False """
+    cmd += """game.play(filter_check_naive=False """
     cmd += """          ,king_in_check_test_copy_apply=True """
     cmd += """          )"""
     cProfile.run( cmd, 'output_profile_2')
     
     cmd =  """game = Game(s_instructions = ss); """
-    cmd += """game.play(king_in_check_on=True)"""
+    cmd += """game.play(filter_check_naive=True)"""
     cProfile.run(cmd, 'output_profile_3')
 
     cmd =  """game = Game(s_instructions = ss); """
-    cmd += """game.play(king_in_check_on=False """
+    cmd += """game.play(filter_check_naive=False """
     cmd += """          ,king_in_check_optimal=True """
     cmd += """          )"""
     cProfile.run( cmd, 'output_profile_4')
