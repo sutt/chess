@@ -177,13 +177,13 @@ def parse_pgn_instructions( s
 
 def alphanum_to_pos(inp):
     col_letters = 'ABCDEFGH'
-    row = int(inp[1]) - 1
+    row = 8 - int(inp[1])
     col = col_letters.index(str.upper(inp[0]))
     return (row, col)
 
 def pos_to_alphanum(inp):
     letter_data = 'abcdefgh'
-    number_data = [i+1 for i in range(8)]
+    number_data = [i for i in range(8,0,-1)]
     s1 = letter_data[inp[1]]
     s2 = str(number_data[inp[0]])
     return s1 + s2
@@ -735,16 +735,21 @@ def test_pgn_parse_2():
 def test_alphanum_legacy_conversion_1():
     
     # assert (6,0) == alphanum_to_pos('g1', b_legacy = True)
-    assert (0,6) == alphanum_to_pos('g1')
+    # assert (0,6) == alphanum_to_pos('g1')
+    assert (0,6) == alphanum_to_pos('g8')
 
     # assert (0,4) == alphanum_to_pos('a5', b_legacy = True)
-    assert (4,0) == alphanum_to_pos('a5')
+    # assert (4,0) == alphanum_to_pos('a5')
+    assert (4,0) == alphanum_to_pos('a4')
 
     # assert 'd6' == pos_to_alphanum((3,5), b_legacy=True)
-    assert 'f4' == pos_to_alphanum((3,5))
+    assert 'f4' == pos_to_alphanum((4,5))
 
     # assert 'h8' == pos_to_alphanum((7,7), b_legacy=True)
-    assert 'h8' == pos_to_alphanum((7,7))
+    assert 'h8' == pos_to_alphanum((0,7))
+
+    assert 'h1' == pos_to_alphanum((7,7))
+
 
 def test_alphanum_legacy_conversion_2():
     
