@@ -396,7 +396,28 @@ def get_possible_check_optimal(pieces, board, move, player):
 
 
 
-def filter_king_check_optimal_2(board, pieces, moves, player):
+# def filter_king_check_optimal_2(board, pieces, moves, player):
+    
+#     out = []
+    
+#     for _move in moves:
+
+#         #cant these just move outside the loop?
+#         #The problem is apply_move mutates state piece, right?
+#         _board = copy.deepcopy(board)   
+#         _pieces = copy.deepcopy(pieces)
+
+#         board2, pieces2 = apply_move(_move, _board, _pieces, player)
+
+#         b_check = get_possible_check_optimal(pieces2, board2, _move, player)
+        
+#         if not(b_check):
+#             out.append(_move)
+
+#     return out
+
+
+def filter_check_test_copy_opt(board, pieces, moves, player):
     
     out = []
     
@@ -416,28 +437,7 @@ def filter_king_check_optimal_2(board, pieces, moves, player):
 
     return out
 
-
-def filter_king_check_optimal(board, pieces, moves, player):
-    
-    out = []
-    
-    for _move in moves:
-
-        #cant these just move outside the loop?
-        #The problem is apply_move mutates state piece, right?
-        _board = copy.deepcopy(board)   
-        _pieces = copy.deepcopy(pieces)
-
-        board2, pieces2 = apply_move(_move, _board, _pieces, player)
-
-        b_check = get_possible_check_optimal(pieces2, board2, _move, player)
-        
-        if not(b_check):
-            out.append(_move)
-
-    return out
-
-def filter_king_check(board, pieces, moves, player):
+def filter_check_naive(board, pieces, moves, player):
     
     out = []
     
@@ -457,7 +457,7 @@ def filter_king_check(board, pieces, moves, player):
 
     return out
 
-def filter_king_check_test_copy(board, pieces, moves, player):
+def filter_check_test_copy(board, pieces, moves, player):
     
     out = []
     
@@ -472,7 +472,7 @@ def filter_king_check_test_copy(board, pieces, moves, player):
 
     return out
 
-def filter_king_check_test_copy_apply(board, pieces, moves, player):
+def filter_check_test_copy_apply(board, pieces, moves, player):
     
     out = []
     
@@ -590,7 +590,7 @@ class Mutator():
             return pieces
 
 
-def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
+def filter_check_test_copy_apply_2(board, pieces, moves, player):
     
     '''Analyze the computational cost of mutating board instead of
         copying it.'''
@@ -627,7 +627,7 @@ def filter_king_check_test_copy_apply_2(board, pieces, moves, player):
 
     return out
 
-def filter_king_check_test_copy_apply_3(board, pieces, moves, player):
+def filter_check_test_copy_apply_3(board, pieces, moves, player):
     
     '''Analyze the computational cost of mutating board instead of
         copying it.'''
@@ -668,7 +668,7 @@ def filter_king_check_test_copy_apply_3(board, pieces, moves, player):
 
     return out
 
-def filter_king_check_test_copy_apply_4(board, pieces, moves, player):
+def filter_check_opt(board, pieces, moves, player):
     
     '''Rough draft of fully optimized filter_check()'''
 

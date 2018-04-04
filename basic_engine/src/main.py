@@ -9,15 +9,17 @@ from GameLog import GameSchema
 from Display import Display
 from TurnStage import increment_turn, get_available_moves, apply_move
 from TurnStage import check_endgame
-from TurnStage import filter_king_check
 from TurnStage import is_king_in_check
-from TurnStage import filter_king_check_test_copy   #temp
-from TurnStage import filter_king_check_test_copy_apply   #temp
-from TurnStage import filter_king_check_optimal   #emp
-from TurnStage import filter_king_check_optimal_2   #temp
-from TurnStage import filter_king_check_test_copy_apply_2   #temp
-from TurnStage import filter_king_check_test_copy_apply_3   #temp
-from TurnStage import filter_king_check_test_copy_apply_4   #temp
+from TurnStage import filter_check_naive
+from TurnStage import filter_check_opt   
+
+from TurnStage import filter_check_test_copy   
+from TurnStage import filter_check_test_copy_apply   
+from TurnStage import filter_check_test_copy_apply_2
+from TurnStage import filter_check_test_copy_apply_3
+from TurnStage import filter_check_test_copy_opt
+
+
 
 Move = moveHolder()
 
@@ -182,25 +184,21 @@ class Game():
             moves = get_available_moves(pieces, board, player)
 
             if kwargs.get('filter_check_naive', False):
-                moves = filter_king_check(board, pieces, moves, player)
+                moves = filter_check_naive(board, pieces, moves, player)
             if kwargs.get('filter_check_opt', True):
-                moves = filter_king_check_test_copy_apply_4(board, pieces, moves, player)
+                moves = filter_check_opt(board, pieces, moves, player)
 
             if kwargs.get('filter_check_test_copy', False):
-                moves = filter_king_check_test_copy(board, pieces, moves, player)
+                moves = filter_check_test_copy(board, pieces, moves, player)
             if kwargs.get('filter_check_test_copy_apply', False):
-                moves = filter_king_check_test_copy_apply(board, pieces, moves, player)
+                moves = filter_check_test_copy_apply(board, pieces, moves, player)
             if kwargs.get('filter_check_test_copy_apply_2', False):
-                moves = filter_king_check_test_copy_apply_2(board, pieces, moves, player)
+                moves = filter_check_test_copy_apply_2(board, pieces, moves, player)
             if kwargs.get('filter_check_test_copy_apply_3', False):
-                moves = filter_king_check_test_copy_apply_3(board, pieces, moves, player)
+                moves = filter_check_test_copy_apply_3(board, pieces, moves, player)
             if kwargs.get('filter_check_test_copy_opt', False):
-                moves = filter_king_check_optimal(board, pieces, moves, player)
+                moves = filter_check_test_copy_opt(board, pieces, moves, player)
             
-
-
-    
-    
             
             self.display.print_turn(pieces, player)
 
