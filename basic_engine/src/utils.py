@@ -177,13 +177,15 @@ def parse_pgn_instructions( s
 
 def alphanum_to_pos(inp):
     col_letters = 'ABCDEFGH'
-    row = int(inp[1]) - 1
+    #row = int(inp[1]) - 1
+    row = 8 - int(inp[1])
     col = col_letters.index(str.upper(inp[0]))
     return (row, col)
 
 def pos_to_alphanum(inp):
     letter_data = 'abcdefgh'
-    number_data = [i+1 for i in range(8)]
+    # number_data = [i+1 for i in range(8)]
+    number_data = [i for i in range(8,0,-1)]
     s1 = letter_data[inp[1]]
     s2 = str(number_data[inp[0]])
     return s1 + s2
