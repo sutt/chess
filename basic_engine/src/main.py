@@ -30,6 +30,7 @@ class Game():
         ,pgn_control = ()
         ,s_instructions = ""
         ,s_pgn_instructions = ""
+        ,b_initialize = True
         ,init_board = None
         ,init_player = None
         ,init_pieces = None
@@ -63,6 +64,7 @@ class Game():
 
         self.outcome = None
 
+        self.init_switch = b_initialize
         self.init_player = init_player
         self.init_board = copy.deepcopy(init_board)
         self.init_pieces = copy.deepcopy(init_pieces)
@@ -85,6 +87,9 @@ class Game():
 
     def reset_test(self):
         self.b_test_exit = False
+
+    def reset_init_switch(self):
+        self.init_switch = True
 
     def check_test_exit_moves(self, **kwargs):
         '''bool: exit after 'moves' is calcd / before check_enggame() in play().'''
@@ -119,22 +124,48 @@ class Game():
         return move
 
 
+    def initialize(self):
+        ''' '''
+        _board = Board()
+        
+        #Set board and pieces
+        if self.init_board is not None:
+            # init_board represent data_by_player
+            _board.set_data(self.init_board)     
+            _pieces = self.init_pieces
+        else:
+            _board, _pieces = place_pieces(_board)
+        
+        # Set player and i_turn
+        # These incremetent at top-of-turn-loop; 
+        # so they're off by one right now.
+        
+        #TODO - make i_turn local and overideable
+        self.i_turn = 0
+
+        _player = False 
+        if self.init_player is not None:
+            _player = not(self.init_player)        
+        
+        self.init_switch = False
+
+        return _board, _pieces, _player
+
+
+    def load(self):
+        ''' load relevant state from Game into play '''
+        pass
+
+
+    def save(self):
+        ''' save relevant state from play into Game '''
+        pass
+        
 
     def play(self, **kwargs):
 
-        board = Board()
-        
-        if self.init_board is not None:
-            board.set_data(self.init_board)     #init_board represent data_by_player
-            pieces = self.init_pieces
-        else:
-            board, pieces = place_pieces(board)
-        
-        #These incremetent at top-of-turn-loop
-        self.i_turn = 0
-        player = False 
-        if self.init_player is not None:
-            player = not(self.init_player)
+        if self.init_switch:
+            board, pieces, player = self.initialize()
 
         game_going = True
         
@@ -654,6 +685,7 @@ def test_filter_forward_diagonal_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -691,6 +723,7 @@ def test_filter_forward_diagonal_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -737,6 +770,7 @@ def test_filter_forward_diagonal_2():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -774,6 +808,7 @@ def test_filter_forward_diagonal_2():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -816,6 +851,7 @@ def test_pawn_check_true_positive_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -858,6 +894,7 @@ def test_pawn_check_true_positive_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -904,6 +941,7 @@ def test_pawn_check_negative_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
@@ -945,6 +983,7 @@ def test_pawn_check_negative_1():
     generic_check_moves = ret_data_generic['moves']
 
     game.reset_test()
+    game.reset_init_switch()
     ret_data_opt = game.play(king_in_check_test_copy_apply_4 = True
                                 ,king_in_check_on = False
                                 )
