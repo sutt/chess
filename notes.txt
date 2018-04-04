@@ -682,16 +682,55 @@ board should store edge cases:
 
             TODO
 
-                get into branch refactor-game
+                x get into branch refactor-game
 
-                put top of play into initialize()
+                x put top of play into initialize()
 
-                run initialize by default()
+                x run initialize by default()
+
+                x refactor main kwargs
+
+                refactor other kwargs
+
+                add check_for_check kwrarg to control 
+                calling is_king_in_check()
+
+                refactor function names and import names
+
+                refactor check_test_exit / check_test_exit_moves
+
+                refactor build_test_data
+                    rebench any tests
+
+                handle load() / save() to persist game
+
+                [break]
+
+                hello world on perf_test
+
+                send perf_tests data to data/perf_tests
+
+                build indexed samples of games to run in perf_tests
+
+                log perf_tests to sqlite
+
+                build some perf_test unit tests
+                    e.g test_strict_opt_time: opt < 3.5x baseline
+                        test_lax_opt_time: opt < 4.3x baseline
+                        we can keep running tests untill strict is reached
+
+                build GarryKasparov_clean.xpgn
+
+                add meta-data to pgn_to_xpgn
+                    current commit hash
+                    parse options requested
+
+                
 
             Grand Projects
 
                 Build an api at basic_engine level which allows apps to interface
-                with Game.
+                with Game. The M in MVC.
 
 
         HOWTOs

@@ -396,9 +396,6 @@ def get_possible_check_optimal(pieces, board, move, player):
 
 
 
-
-
-
 class Mutator():
     
     '''Helper Class for preserving board state without deepcopying.'''
@@ -503,6 +500,10 @@ class Mutator():
 
 
 def filter_check_naive(board, pieces, moves, player):
+
+    ''' Naive method to see remove any individual _move
+        that would put current player in check. Runs in
+        N^2 time, where N = num_available_moves.'''
     
     out = []
     
@@ -525,7 +526,9 @@ def filter_check_naive(board, pieces, moves, player):
 
 def filter_check_opt(board, pieces, moves, player):
     
-    '''Rough draft of fully optimized filter_check()'''
+    ''' Fully optimized filter_check(). Uses Mutator and 
+        get_possible_check_optimal to run in ~3.5N time instead of N^2,
+        where N = num_available_moves, and is typically between 18-30.'''
 
     out = []
 
@@ -558,6 +561,11 @@ def filter_check_opt(board, pieces, moves, player):
 
 def filter_check_test_copy(board, pieces, moves, player):
     
+    ''' A perf-test function: to analyze the computational cost of 
+        deepcopying board, pieces. It does not call apply_move or
+        get_possible_check. Use this to figure out how much just copying
+        costs in computation out of the whole required function. '''
+
     out = []
     
     for _move in moves:
@@ -572,6 +580,11 @@ def filter_check_test_copy(board, pieces, moves, player):
     return out
 
 def filter_check_test_copy_apply(board, pieces, moves, player):
+
+    ''' A perf-test function: to analyze the computational cost of 
+        deepcopying board, pieces and running apply_move(). The only thing
+        it doesn't do is call get_possible_check allowing us to interpret 
+        the difference between this and filter_check_naive. '''
     
     out = []
     
@@ -589,8 +602,9 @@ def filter_check_test_copy_apply(board, pieces, moves, player):
 
 def filter_check_test_copy_apply_2(board, pieces, moves, player):
     
-    '''Analyze the computational cost of mutating board instead of
-        copying it.'''
+    ''' A perf-test function: to analyze the computational cost of 
+        mutating board instead of deepcopying it. Does not call any
+        get_possible_check function.'''
     
     #We'll need to set this as the default and run pytest to see if
     # it's working
@@ -627,8 +641,9 @@ def filter_check_test_copy_apply_2(board, pieces, moves, player):
 
 def filter_check_test_copy_apply_3(board, pieces, moves, player):
     
-    '''Analyze the computational cost of mutating board instead of
-        copying it.'''
+    ''' A perf-test function: to analyze the computational cost of 
+        mutating board and pieces instead of deepcopying them. Does not
+        call any get_possible_check function.'''
     
     #We'll need to set this as the default and run pytest to see if
     # it's working
@@ -668,6 +683,9 @@ def filter_check_test_copy_apply_3(board, pieces, moves, player):
 
 
 def filter_check_test_copy_opt(board, pieces, moves, player):
+    
+    ''' A perf-test function: uses deepcopy instead of mutator, but does
+        use possible_check_optimal, so it's faster than naive.'''
     
     out = []
     
