@@ -22,7 +22,7 @@ def select_function(s_function):
     if s_function == "baseline":
         
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False)    
+        game.play(filter_check_naive=False)    
         
     if s_function == "naive_check":
 
@@ -32,27 +32,27 @@ def select_function(s_function):
     if s_function == "test_copy":
         
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_test_copy=True)
+        game.play(filter_check_naive=False, filter_check_test_copy=True)
 
     if s_function == "test_copy_apply":
         
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_test_copy_apply=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply=True)
 
     if s_function == "test_c_apply_2":
             
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_test_copy_apply_2=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply_2=True)
 
     if s_function == "test_c_apply_3":
             
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_test_copy_apply_3=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_apply_3=True)
 
     if s_function == "test_c_apply_4":
             
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_test_copy_apply_4=True)
+        game.play(filter_check_naive=False, filter_check_opt=True)
     
     if s_function == "baseline_tt":
         
@@ -60,7 +60,7 @@ def select_function(s_function):
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
-        game.play(king_in_check_on=False)    
+        game.play(filter_check_naive=False)    
         return game.get_gamelog()
     
     if s_function == "naive_check_tt":
@@ -69,7 +69,7 @@ def select_function(s_function):
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(king_in_check_on=True)    
+        game.play(filter_check_naive=True)    
         return game.get_gamelog()
 
     if s_function == "baseline_long":
@@ -78,7 +78,7 @@ def select_function(s_function):
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
-        game.play(king_in_check_on=False)    
+        game.play(filter_check_naive=False)    
         return game.get_gamelog()
     
     if s_function == "naive_long":
@@ -87,7 +87,7 @@ def select_function(s_function):
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(king_in_check_on=True)    
+        game.play(filter_check_naive=True)    
         return game.get_gamelog()
 
     if s_function == "optimal1_long":
@@ -96,7 +96,7 @@ def select_function(s_function):
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
-        game.play(king_in_check_on=False, king_in_check_optimal = True)    
+        game.play(filter_check_naive=False, king_in_check_optimal = True)    
         return game.get_gamelog()
     
     if s_function == "optimal2_long":
@@ -105,18 +105,18 @@ def select_function(s_function):
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(king_in_check_on=False, king_in_check_optimal_2 = True)    
+        game.play(filter_check_naive=False, filter_check_test_copy_opt = True)    
         return game.get_gamelog()
 
     if s_function == "check_optimal":
             
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_optimal=True)
+        game.play(filter_check_naive=False, king_in_check_optimal=True)
 
     if s_function == "check_optimal_2":
             
         game = Game(s_instructions = ss)
-        game.play(king_in_check_on=False, king_in_check_optimal_2=True)
+        game.play(filter_check_naive=False, filter_check_test_copy_opt=True)
 
     return None     #to show that the function is no returning a test exit data
 
