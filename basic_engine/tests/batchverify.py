@@ -212,7 +212,7 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
                     )
 
         game.play( filter_check_naive = b_naive_check
-                    ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                    ,filter_check_opt = not(b_naive_check)
                     )
 
         log_check_schedule = game.get_gamelog().get_log_check_schedule()
@@ -265,7 +265,7 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
                                             ,test_exit_moves = _i_turn + 2)
                         
                         ret = game_replay.play( filter_check_naive = b_naive_check
-                                        ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                                        ,filter_check_opt = not(b_naive_check)
                                         )
 
                         replay_pieces = ret['pieces']
@@ -338,7 +338,7 @@ def verify_move_available(data
             game = Game(s_pgn_instructions=s_pgn)
 
             ret = game.play( filter_check_naive = b_naive_check
-                        ,king_in_check_test_copy_apply_4 = not(b_naive_check)
+                        ,filter_check_opt = not(b_naive_check)
                         )
         
             #if return code is plain int then its incompatible at that move

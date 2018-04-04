@@ -52,7 +52,7 @@ def select_function(s_function):
     if s_function == "test_c_apply_4":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_test_copy_apply_4=True)
+        game.play(filter_check_naive=False, filter_check_opt=True)
     
     if s_function == "baseline_tt":
         
