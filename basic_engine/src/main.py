@@ -1376,14 +1376,14 @@ def test_printout_grid():
     s_benchmark = \
 """   A B C D E F G H
 
-1  r n b q k b n r
-2  p p p p p p p p
-3  ~ ~ ~ ~ ~ ~ ~ ~
-4  ~ ~ ~ ~ ~ ~ ~ ~
-5  ~ ~ ~ ~ ~ ~ ~ ~
+8  r n b q k b n r
+7  p p p p p p p p
 6  ~ ~ ~ ~ ~ ~ ~ ~
-7  P P P P P P P P
-8  R N B Q K B N R
+5  ~ ~ ~ ~ ~ ~ ~ ~
+4  ~ ~ ~ ~ ~ ~ ~ ~
+3  ~ ~ ~ ~ ~ ~ ~ ~
+2  P P P P P P P P
+1  R N B Q K B N R
 """
     assert ret == s_benchmark
 

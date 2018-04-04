@@ -63,7 +63,7 @@ class Display:
             out += "\n"
             out += "\n"
             
-            row_grid = "12345678"
+            row_grid = "87654321"
             if b_grid_pos:
                 row_grid = "01234567"
 
