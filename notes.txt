@@ -680,6 +680,15 @@ board should store edge cases:
 
             add a board rotation to see from black-pov
 
+            still need to work on end_game routine
+                only_king_50_moves logging
+
+            add gamelog for regular vs exotic moves
+
+            still need to work on
+
+            need more pgn datasets, or to extend them further
+
             TODO
 
                 x get into branch refactor-game
@@ -690,12 +699,12 @@ board should store edge cases:
 
                 x refactor main kwargs
 
-                refactor other kwargs
+                x refactor other kwargs
 
                 add check_for_check kwrarg to control 
                 calling is_king_in_check()
 
-                refactor function names and import names
+                x refactor function names and import names
 
                 refactor check_test_exit / check_test_exit_moves
 
@@ -725,13 +734,59 @@ board should store edge cases:
                     current commit hash
                     parse options requested
 
-                
-
             Grand Projects
 
                 Build an api at basic_engine level which allows apps to interface
                 with Game. The M in MVC.
 
+    4/5
+
+        WANTED
+
+            Decorators examples
+                perf_test
+                batchverify manual_batch cntl+c
+
+            yield examples
+            
+            sqlite
+                stick .xpgns into it
+                log each turn's game move
+
+            git merge conflicts
+                create them, solve them
+
+            python3
+                two_to_three
+                perf_test diff
+
+        Grand Projects
+
+            Build the basic_engine into multi-platforms
+
+                home-rolled [flask] http / html web-service game
+
+                pyQt - basic Qt gui app
+
+                kivy
+                    android
+                    ios
+                    other?
+
+                iron python library? with .net gui MVC?`
+
+            Build the AI component
+
+            Build a centralized workspace for computational analysis
+
+
+        TODO
+
+            hello profile_test
+            output to data dir
+            ipython?
+
+            we want a regression on MOVES['regular'], output to 
 
         HOWTOs
 
