@@ -797,6 +797,15 @@ board should store edge cases:
                     eliminate check code
                     add an argument for player_in_check
 
+                now get a v1 profile_test.py and data without
+                check_for_check, and make sure data is in the right place.
+                eliminate the data in the wrong place.
+
+
+                how to printout profile-test with no misc text?
+
+                build v2 and unit tests
+
         HOWTOs
 
             to view the board while debugging:
