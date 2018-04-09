@@ -788,6 +788,15 @@ board should store edge cases:
 
             we want a regression on MOVES['regular'], output to 
 
+        4/9
+
+            TODO
+
+                switch to master
+                make changes to main:
+                    eliminate check code
+                    add an argument for player_in_check
+
         HOWTOs
 
             to view the board while debugging:
