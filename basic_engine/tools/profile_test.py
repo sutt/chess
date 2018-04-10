@@ -19,13 +19,13 @@ fn = [
 fn = [DATA_DIR + _fn for _fn in fn]
 
 
-def run_profiles(s_instruct, file_names = fn):
+def run_profiles(s_instruct, file_names):
     ''' output cProfile files for different filter_check algos '''
     
     cmd = """from src.main import Game; """
     cmd +=  """game = Game(s_instructions = s_instruct); """
     cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), fn[0])
+    cProfile.runctx( cmd, globals(), locals(), file_names[0])
 
     cmd = """from src.main import Game; """
     cmd +=  """game = Game(s_instructions = s_instruct); """
@@ -34,7 +34,7 @@ def run_profiles(s_instruct, file_names = fn):
     cmd += """          ,check_for_check=False """
     cmd += """          )"""
     # cProfile.run( cmd, fn[1])
-    cProfile.runctx( cmd, globals(), locals(), fn[1])
+    cProfile.runctx( cmd, globals(), locals(), file_names[1])
     
     cmd = """from src.main import Game; """
     cmd +=  """game = Game(s_instructions = s_instruct); """
@@ -43,13 +43,13 @@ def run_profiles(s_instruct, file_names = fn):
     cmd += """          ,check_for_check=False """
     cmd += """          )"""
     # cProfile.run(cmd, fn[2])
-    cProfile.runctx( cmd, globals(), locals(), fn[2])
+    cProfile.runctx( cmd, globals(), locals(), file_names[2])
 
     cmd = """from src.main import Game; """
     cmd +=  """game = Game(s_instructions = s_instruct); """
     cmd += """game.play(filter_check_opt=True, check_for_check=False) """
     # cProfile.run( cmd, fn[3])
-    cProfile.runctx( cmd, globals(), locals(), fn[3])
+    cProfile.runctx( cmd, globals(), locals(), file_names[3])
 
 
 def run_profiles_2(_s, fn):
@@ -66,7 +66,7 @@ def run_profiles_2(_s, fn):
     cProfile.runctx( cmd, globals(), locals(), fn[1])
 
 
-def display_profiles(fn, amt=10, b_full=True):
+def display_profiles(fn, amt=10, b_full=False):
     p = pstats.Stats(fn)
     p.strip_dirs()
     if b_full:
@@ -92,18 +92,33 @@ def return_ncalls( fn
 if __name__ == "__main__":
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--full", action="store_true")
+    ap.add_argument("--current", action="store_true")
     args = vars(ap.parse_args())
-    
-    s_instruct = "1. g1 h3"  
 
-    run_profiles(s_instruct = s_instruct, file_names = fn)
+    if args["current"]:
+        
+        print '\nShowing current profile on long game, with params:'
+        print 'TODO - parameters here \n'
+        
+        s_instruct = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. h3 Bb7 9. d3 d6 10. a3 Na5 11. Ba2 c5 12. Nc3 Nc6 13. Bg5 Qd7 14. Nh2 Ne8 15. Bd2 Nc7 16. Nf1 Kh8 17. Ng3 Nd4 18. Nce2 Nde6 19. b4 d5 20. bxc5 Bxc5 21. Bb4 Rfe8 22. Bxc5 Nxc5 23. Nc3 Rad8 24. Qh5 f6 25. d4 exd4 26. Nxd5 Re5 27. Qh4 Nxd5 28. exd5 Bxd5 29. Rxe5 fxe5 30. Bxd5 Qxd5 31. Re1 Ne6 32. Nf5 Nf4 33. Qg5 Rd7 34. Nh4 h6 35. Qg4 g5 36. Nf3 e4 37. Rxe4 Qxe4 38. Qxd7 d3 39. cxd3 Qxd3 40. Qc8+ Kg7 41. Qb7+ Kg8 42. Qxa6 Ne2+ 43. Kh2 Qe4 44. Qf6 Qf4+ 45. Qxf4 gxf4 46. g4 fxg3+ 47. fxg3 Nc3 48. Nd4 h5 49. h4 Kf7 50. Kh3 Kf6 51. g4 hxg4+ 52. Kxg4 Kg6 53. h5+ Kh7 54. Kh4 Kg8 55. h6 Kh7 56. Kh5 Ne4 57. Nxb5 Nf6+ 58. Kg5 Ne4+ 59. Kf5 Nc5 60. Ke5 Kxh6 61. Kd4 Na6 62. Kd5 Kg6 63. Nd4 Kf6 64. Kd6 Kf7 65. Ne6 '
+        run_profiles(s_instruct = s_instruct, file_names = fn)
+        
+        display_profiles(fn[3], b_full=True, amt=30)
 
-    b_full = args["full"]
-    display_profiles(fn[0], b_full=b_full)
-    display_profiles(fn[1], b_full=b_full)
-    display_profiles(fn[2], b_full=b_full)
-    display_profiles(fn[3], b_full=b_full, amt = 15)
+
+    else:
+        
+        print '\nShowing the difference between filter_check algos'
+        print 'using only the opening move.'
+
+        s_instruct = "1. g1 h3"  
+        run_profiles(s_instruct = s_instruct, file_names = fn)
+
+        print 
+        display_profiles(fn[0])
+        display_profiles(fn[1])
+        display_profiles(fn[2])
+        display_profiles(fn[3], amt = 15)
 
 
 def test_opening_move_ncalls_get_available():

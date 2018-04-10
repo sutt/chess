@@ -810,11 +810,11 @@ board should store edge cases:
 
             TODO
  
-                do unit tests for get_ncalls
-                add a bypass of non-regular moves for time comparison
+                x do unit tests for get_ncalls
+                x add a bypass of non-regular moves for time comparison
                     do in both filter_check_opt and filter_check_naive
-                now do runprofiles2 with bypass on
-                do a unit test of bypass
+                x now do runprofiles2 with bypass on
+                x do a unit test of bypass
 
                 now, combine run_profiles into modularized function
                     and with this change fn list structure
