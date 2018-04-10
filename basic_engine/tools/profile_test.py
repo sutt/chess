@@ -8,46 +8,48 @@ from src.main import Game
 
 DATA_DIR = '../data/profiles/'
 
-ap = argparse.ArgumentParser()
-ap.add_argument("--full", action="store_true")
-args = vars(ap.parse_args())
-
-
-# s_instruct = "1. g1 h3 2. a7 a6 3. e2 e4 4. b7 b6 5. f1 d3 6. c7 c6 7. e1 f1 8. d7 d6 9. f1 e1 10. e7 e6"
-
 
 fn = [
          'profile_baseline_no_filter_check'
         ,'profile_naive_filter_check'
         ,'profile_test_copy_opt'
-        ,'profile_test_copy_opt'
+        ,'profile_opt'
     ]
 
 fn = [DATA_DIR + _fn for _fn in fn]
 
 
-def run_profiles(s_inp_instruct, file_names = fn):
+def run_profiles(s_instruct, file_names = fn):
     ''' output cProfile files for different filter_check algos '''
     
-    s2 = s_inp_instruct
-    cmd =  """game = Game(s_instructions = s_instruct); """
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
     cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
-    cProfile.run( cmd, fn[0])
+    cProfile.runctx( cmd, globals(), locals(), fn[0])
 
-    cmd =  """game = Game(s_instructions = s_instruct); """
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
     cmd += """game.play(filter_check_naive=True """
-    cmd += """          ,filter_check_opt=True """
-    cmd += """          , check_for_check=False """
+    cmd += """          ,filter_check_opt=False """
+    cmd += """          ,check_for_check=False """
     cmd += """          )"""
-    cProfile.run( cmd, fn[1])
+    # cProfile.run( cmd, fn[1])
+    cProfile.runctx( cmd, globals(), locals(), fn[1])
     
-    cmd =  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_test_copy_opt=True, check_for_check=False)"""
-    cProfile.run(cmd, fn[2])
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
+    cmd += """game.play(filter_check_test_copy_opt=True """
+    cmd += """          ,filter_check_opt=False """
+    cmd += """          ,check_for_check=False """
+    cmd += """          )"""
+    # cProfile.run(cmd, fn[2])
+    cProfile.runctx( cmd, globals(), locals(), fn[2])
 
-    cmd =  """game = Game(s_instructions = s_instruct); """
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
     cmd += """game.play(filter_check_opt=True, check_for_check=False) """
-    cProfile.run( cmd, fn[3])
+    # cProfile.run( cmd, fn[3])
+    cProfile.runctx( cmd, globals(), locals(), fn[3])
 
 
 def display_profiles(fn, amt=10, b_full=True):
@@ -59,21 +61,102 @@ def display_profiles(fn, amt=10, b_full=True):
     p.print_stats('basic', 'get_available_moves')
 
 
+def return_ncalls( fn
+                   ,sel_list = ('basic', 'get_available_moves')
+                 ):
+    ''' get a machine readable value of n calls '''
+    p = pstats.Stats(fn)
+    k_plus = p.get_print_list(sel_list)
+    k = k_plus[1][0]
+    d = p.stats
+    stats = d[k]
+    ncalls = stats[0]
+    return ncalls
+    
+    
+
 if __name__ == "__main__":
 
-    # s_instruct = "1. g1 h3 2. a7 a6 3. e2 e4 4. b7 b6 5. f1 d3 6. c7 c6 7. e1 f1 8. d7 d6 9. f1 e1 10. e7 e6"  
-    # run_profiles(s_inp_instruct = s_instruct, file_names = fn)
-    s_instruct = "1. g1 h3"  
-    run_profiles(s_inp_instruct = s_instruct, file_names = fn)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--full", action="store_true")
+    args = vars(ap.parse_args())
     
-    #TODO - need to turn off is_king_in_check() for accurate 
-    #       assessment of get_available_moves on one turn
+    s_instruct = "1. g1 h3"  
+
+    run_profiles(s_instruct = s_instruct, file_names = fn)
 
     b_full = args["full"]
     display_profiles(fn[0], b_full=b_full)
     display_profiles(fn[1], b_full=b_full)
     display_profiles(fn[2], b_full=b_full)
     display_profiles(fn[3], b_full=b_full, amt = 15)
+
+
+def test_opening_move_ncalls_get_available():
+    ''' Test that each form of filter_check makes correct number calls to
+        basic.get_available_moves(). Using opening move as baseline'''
+
+    fn = [
+         'profile_baseline_no_filter_check'
+        ,'profile_naive_filter_check'
+        ,'profile_test_copy_opt'
+        ,'profile_opt'
+    ]
+
+    DATA_DIR = '../data/profiles/'
+    fn = [DATA_DIR + _fn for _fn in fn]
+
+    s_instruct = "1. g1 h3"  
+    run_profiles(s_instruct = s_instruct, file_names = fn)
+
+    assert 16 == return_ncalls(fn[0])   #baseline - no check_filter
+
+    #There are 16 pieces white can use:
+    #   16 =  calls once for each
+
+    assert 336 == return_ncalls(fn[1])   #naive_check
+
+    #There are 20 moves (for 16 pieces) white can make.
+    #For each move, there are 16 pieces for black we need to examine.
+    #   320 = 20 * 16
+    #   336 = 320 + 16 (to populate white's moves in play)
+
+    assert 36 == return_ncalls(fn[2])   #test_copy_opt
+
+    #This is a test filter_check, but uses get_check_optimal,
+    #So there should be no difference in calls to get_available_moves.
+
+    assert 36 == return_ncalls(fn[3])   #filter_check_opt
+
+    #First add the 16 calls to populate moves.
+    #There are 20 moves for white, so for each of these, need to make
+    #a get_available_moves on white's super_king piece. But never
+    #need to make a call to black's pieces.
+    #   36 = 16 + 20
+
+
+
+
+#4/10
+
+# Tue Apr 10 14:24:18 2018    ../data/profiles/profile_baseline_no_filter_check
+#    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+#        16    0.000    0.000    0.000    0.000 basic.py:406(get_available_moves)
+
+
+# Tue Apr 10 14:24:18 2018    ../data/profiles/profile_naive_filter_check
+#    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+#       336    0.002    0.000    0.011    0.000 basic.py:406(get_available_moves)
+
+
+# Tue Apr 10 14:24:18 2018    ../data/profiles/profile_test_copy_opt
+#    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+#        36    0.000    0.000    0.002    0.000 basic.py:406(get_available_moves)
+
+
+# Tue Apr 10 14:24:18 2018    ../data/profiles/profile_opt
+#    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+#        36    0.000    0.000    0.002    0.000 basic.py:406(get_available_moves)
 
 # 4/9
 

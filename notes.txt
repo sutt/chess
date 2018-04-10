@@ -806,6 +806,16 @@ board should store edge cases:
 
                 build v2 and unit tests
 
+        4/10
+
+            TODO
+
+                x pstats.print_stats without any decoration
+                do unit tests for n_calls
+
+
+
+
         HOWTOs
 
             to view the board while debugging:

@@ -1,1 +1,9 @@
 List commands for this workspace here:
+
+Display profiling stats:
+    ~/tools/ > python profile_test.py
+
+Run profiling unit tests:
+    ~/tools/ > pytest -vv profile_test.py
+
+    
