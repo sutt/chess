@@ -809,9 +809,31 @@ board should store edge cases:
         4/10
 
             TODO
+ 
+                do unit tests for get_ncalls
+                add a bypass of non-regular moves for time comparison
+                    do in both filter_check_opt and filter_check_naive
+                now do runprofiles2 with bypass on
+                do a unit test of bypass
 
-                x pstats.print_stats without any decoration
-                do unit tests for n_calls
+                now, combine run_profiles into modularized function
+                    and with this change fn list structure
+
+                    __main__ doesnt need to import Game
+                    test does need to import Game
+
+                    handle not having b_bypass in test functions
+
+                Look at cproifle cum to see if anything fishy is holding us back
+
+                Build batch verifies which look at num_moves with bypass on and off
+
+                BUG? fn is a global not a local 'file_names' is run_profile()
+
+
+            Grand Projects
+
+                write an api for openai gym
 
 
 

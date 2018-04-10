@@ -52,6 +52,20 @@ def run_profiles(s_instruct, file_names = fn):
     cProfile.runctx( cmd, globals(), locals(), fn[3])
 
 
+def run_profiles_2(_s, fn):
+    ''' output cProfile files with bypass on/off '''
+    
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_pgn_instructions = _s); """
+    cmd += """game.play(bypass_irregular=True, check_for_check=False)"""
+    cProfile.runctx( cmd, globals(), locals(), fn[0])
+
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_pgn_instructions = _s); """
+    cmd += """game.play(bypass_irregular=False, check_for_check=False)"""
+    cProfile.runctx( cmd, globals(), locals(), fn[1])
+
+
 def display_profiles(fn, amt=10, b_full=True):
     p = pstats.Stats(fn)
     p.strip_dirs()
@@ -135,6 +149,26 @@ def test_opening_move_ncalls_get_available():
     #   36 = 16 + 20
 
 
+def test_bypass_irregular_less_moves():
+    ''' Test that bypass_irregular kwarg is having an effect by checking
+        that there are less calls to get_check_optimal 
+        or get_available_moves. '''
+
+    #A game with castling, therefore we know it was an available move at some point
+    s = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7'
+
+    fn_test = ['profile_bypass_on', 'profile_bypass_off']
+    fn_test = [DATA_DIR + _fn for _fn in fn_test]
+    run_profiles_2(_s = s, fn = fn_test)
+
+    bypass_on_ncalls = return_ncalls(fn_test[0]
+                            ,sel_list=('TurnStage', 'get_possible_check_optimal')
+                            )
+    bypass_off_ncalls = return_ncalls(fn_test[1]
+                            ,sel_list=('TurnStage', 'get_possible_check_optimal')
+                            )
+
+    assert bypass_on_ncalls < bypass_off_ncalls
 
 
 #4/10
