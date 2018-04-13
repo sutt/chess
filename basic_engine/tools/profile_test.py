@@ -2,21 +2,251 @@ import sys
 import cProfile
 import pstats
 import argparse
+import copy
 sys.path.append('../')
 
 from src.main import Game
 
 DATA_DIR = '../data/profiles/'
 
-
+#TODO - get rid of this stuff
+#TODO - add DATA_DIR into classes
 fn = [
-         'profile_baseline_no_filter_check'
+         'profile_filter_check_none'
         ,'profile_naive_filter_check'
         ,'profile_test_copy_opt'
         ,'profile_opt'
     ]
 
 fn = [DATA_DIR + _fn for _fn in fn]
+
+class TestArgs:
+    
+    ''' Holds the kwargs for Game.play() each cProfile run:
+            set_base_arg makes each test element have those values.
+            add_test adds a test element, with one different arg / arg-value.
+    '''
+    
+    def __init__(self):
+        self.base_args = {}
+        self.test_data = {}
+
+    def set_base_arg(self, tuple_param):
+        k, v = tuple_param[0], tuple_param[1]
+        self.base_args[k] = v
+
+    def get_test_data(self):
+        return copy.copy(self.test_data)
+
+    def add_test(self, inp):
+        ''' input: (test_name [str], (arg_key [str], arg_val [bool]))'''
+        
+        test_name = inp[0]
+        args = copy.copy(self.base_args)
+        
+        if inp[1] is not None:
+            arg_key, arg_val = inp[1][0], inp[1][1]    
+            args[arg_key] = arg_val
+
+        self.test_data[test_name] = args
+
+
+def test_testargs_class_1():
+    ''' Testing methods of TestArgs class'''
+
+    testArgs = TestArgs()
+    testArgs.set_base_arg(('base1', True))
+    testArgs.set_base_arg(('base2', False))
+    testArgs.add_test(('test_1',('test_arg1', True)))
+    testArgs.add_test(('test_2',('base1', False)))
+
+    data = testArgs.get_test_data()
+
+    # verify test records exist
+    test_1 = data.get('test_1', None)
+    assert test_1 is not None
+    test_2 = data.get('test_2', None)
+    assert test_2 is not None
+
+    #verify base and test args exist
+    assert test_2.get('base1', None) is not None
+    assert test_2.get('base2', None) is not None
+    
+    assert test_2.get('test_arg1', None) is None
+    assert test_1.get('test_arg1', None) is not None
+    
+    # verify base1 is overwritten correctly
+    assert test_1.get('base1', None) == True
+    assert test_2.get('base1', None) == False
+
+    #verify no pass by ref between test_data records
+    test_1['base2'] = 99
+    assert test_2['base2'] == False
+    data2 = testArgs.get_test_data()
+    test_3 = data2.get('test_2', None)
+    assert test_3.get('base2', None) is not None
+    assert test_3.get('base2', None) == False
+    # print 'done.'
+
+
+
+def test_build_cmd_str_1():
+    pass
+
+def pretty_print(d):
+    out = ""
+    for k in d.keys():
+        out += str(k)
+        out += " : "
+        out += str(d[k])
+        out += "\n"
+    print out
+
+def test_pyconcept_pass_by_ref_dict():
+    
+    ''' Testing neccesity of copy() for dicts. '''
+
+    d0 = {}
+    d0['one'] = 1
+    ref0 = d0
+    ref0['two'] = 2
+    ref0['one'] = 17
+
+    d1 = {}
+    d1['one'] = 1
+    ref1 = copy.copy(d0)
+    ref1['two'] = 2
+    ref1['one'] = 17
+
+    print 'd0: ',   str(d0)
+    print 'ref0: ', str(ref0)
+    print 'd1: ',   str(d1)
+    print 'ref1: ', str(ref1)
+
+    assert  ref0 == d0      #without copy, you overide
+    assert not(ref1 == d1)  #with copy.copy you're OK.
+
+if __name__ == "__main__":
+
+    # test_pyconcept_pass_by_ref_dict()
+    # sys.exit()
+    
+    test_testargs_class_1()
+    # sys.exit()
+
+    #different filter_check algos
+    d_params = TestArgs()
+    d_params.set_base_arg(('check_for_check', False))
+    d_params.set_base_arg(('filter_check_opt', False))
+
+    d_params.add_test(('filter_check_none',         None)) 
+    d_params.add_test(('filter_check_naive',        ('filter_check_naive', True)))
+    d_params.add_test(('filter_check_test_copy',    ('filter_check_test_copy_opt', True)))
+    d_params.add_test(('filter_check_opt',          ('filter_check_opt', True)))
+
+    pretty_print(d_params.get_test_data())
+    
+    #bypass on/off with filter_check_opt
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', True))
+
+    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
+    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
+
+    pretty_print(d_params.get_test_data())
+
+    #bypass on with filter_check_opt / filter_check_naive
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', False))
+    d_params.set_base_arg( ('bypass_irregular', True))
+
+    d_params.add_test(('bypass_naive',        ('filter_check_naive', True)))
+    d_params.add_test(('bypass_opt',          ('filter_check_opt', True)))
+
+    pretty_print(d_params.get_test_data())
+
+def build_code_str(s_instruct, d_params, b_import=True):
+    
+    ''' Build the str of commands fed into runctx. 
+        input:   d_params (dict) 
+        returns: cmd (str) 
+        '''
+
+    # TODO - add b_pgn for non A1-instructions
+    
+    cmd = ""
+    
+    if b_import:
+        cmd += "from src.main import Game; "
+
+    temp_cmd = 'game = Game(s_instructions="' + s_instruct + '"); '
+    cmd += temp_cmd
+
+    cmd += "game.play("
+
+    args_cmd = ""
+    comma_sw = False
+    for k in d_params:
+        arg_cmd = ""
+        if comma_sw: 
+            arg_cmd = ","
+        arg_cmd += k
+        arg_cmd += "="
+        arg_cmd += str(d_params[k])
+        args_cmd += arg_cmd
+        comma_sw = True
+
+    cmd += args_cmd
+    cmd += ");"
+
+    return cmd
+
+
+def run_profile(s_cmd):
+    ''' Modularized function for running '''
+    #TODO - output to file optional
+    cProfile.runctx( s_cmd, globals(), locals(), file_names[0])
+
+
+def test_build_code_str():
+    '''Test build_str'''
+    
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', True))
+    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
+    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
+
+    test_data = d_params.get_test_data()
+
+    list_s_cmd = []
+    
+    for test_key in test_data.keys():
+        
+        test_name = str(test_key)
+        test_params = test_data[test_key]
+        test_s_instruct = "1. g1 h3"  
+        
+        s_cmd = build_code_str(
+                                s_instruct = test_s_instruct
+                                ,d_params = test_params
+                                ,b_import = True
+                                )
+        
+        list_s_cmd.append(s_cmd)
+
+    #Now test the strings:
+    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
+
+
+
+if __name__ == "__main__":
+    test_build_code_str()
+    print 'done testing.'
+    sys.exit()    
 
 
 def run_profiles(s_instruct, file_names):
@@ -121,69 +351,69 @@ if __name__ == "__main__":
         display_profiles(fn[3], amt = 15)
 
 
-def test_opening_move_ncalls_get_available():
-    ''' Test that each form of filter_check makes correct number calls to
-        basic.get_available_moves(). Using opening move as baseline'''
+# def test_opening_move_ncalls_get_available():
+#     ''' Test that each form of filter_check makes correct number calls to
+#         basic.get_available_moves(). Using opening move as baseline'''
 
-    fn = [
-         'profile_baseline_no_filter_check'
-        ,'profile_naive_filter_check'
-        ,'profile_test_copy_opt'
-        ,'profile_opt'
-    ]
+#     fn = [
+#          'profile_baseline_no_filter_check'
+#         ,'profile_naive_filter_check'
+#         ,'profile_test_copy_opt'
+#         ,'profile_opt'
+#     ]
 
-    DATA_DIR = '../data/profiles/'
-    fn = [DATA_DIR + _fn for _fn in fn]
+#     DATA_DIR = '../data/profiles/'
+#     fn = [DATA_DIR + _fn for _fn in fn]
 
-    s_instruct = "1. g1 h3"  
-    run_profiles(s_instruct = s_instruct, file_names = fn)
+#     s_instruct = "1. g1 h3"  
+#     run_profiles(s_instruct = s_instruct, file_names = fn)
 
-    assert 16 == return_ncalls(fn[0])   #baseline - no check_filter
+#     assert 16 == return_ncalls(fn[0])   #baseline - no check_filter
 
-    #There are 16 pieces white can use:
-    #   16 =  calls once for each
+#     #There are 16 pieces white can use:
+#     #   16 =  calls once for each
 
-    assert 336 == return_ncalls(fn[1])   #naive_check
+#     assert 336 == return_ncalls(fn[1])   #naive_check
 
-    #There are 20 moves (for 16 pieces) white can make.
-    #For each move, there are 16 pieces for black we need to examine.
-    #   320 = 20 * 16
-    #   336 = 320 + 16 (to populate white's moves in play)
+#     #There are 20 moves (for 16 pieces) white can make.
+#     #For each move, there are 16 pieces for black we need to examine.
+#     #   320 = 20 * 16
+#     #   336 = 320 + 16 (to populate white's moves in play)
 
-    assert 36 == return_ncalls(fn[2])   #test_copy_opt
+#     assert 36 == return_ncalls(fn[2])   #test_copy_opt
 
-    #This is a test filter_check, but uses get_check_optimal,
-    #So there should be no difference in calls to get_available_moves.
+#     #This is a test filter_check, but uses get_check_optimal,
+#     #So there should be no difference in calls to get_available_moves.
 
-    assert 36 == return_ncalls(fn[3])   #filter_check_opt
+#     assert 36 == return_ncalls(fn[3])   #filter_check_opt
 
-    #First add the 16 calls to populate moves.
-    #There are 20 moves for white, so for each of these, need to make
-    #a get_available_moves on white's super_king piece. But never
-    #need to make a call to black's pieces.
-    #   36 = 16 + 20
+#     #First add the 16 calls to populate moves.
+#     #There are 20 moves for white, so for each of these, need to make
+#     #a get_available_moves on white's super_king piece. But never
+#     #need to make a call to black's pieces.
+#     #   36 = 16 + 20
 
 
-def test_bypass_irregular_less_moves():
-    ''' Test that bypass_irregular kwarg is having an effect by checking
-        that there are less calls to get_check_optimal 
-        or get_available_moves. '''
+# def test_bypass_irregular_less_moves():
+#     ''' Test that bypass_irregular kwarg is having an effect by checking
+#         that there are less calls to get_check_optimal 
+#         or get_available_moves. '''
 
-    #A game with castling, therefore we know it was an available move at some point
-    s = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7'
+#     #A game with castling, therefore we know it was an available move at some point
+#     s = '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7'
 
-    fn_test = ['profile_bypass_on', 'profile_bypass_off']
-    fn_test = [DATA_DIR + _fn for _fn in fn_test]
-    run_profiles_2(_s = s, fn = fn_test)
+#     fn_test = ['profile_bypass_on', 'profile_bypass_off']
+#     fn_test = [DATA_DIR + _fn for _fn in fn_test]
+#     run_profiles_2(_s = s, fn = fn_test)
 
-    bypass_on_ncalls = return_ncalls(fn_test[0]
-                            ,sel_list=('TurnStage', 'get_possible_check_optimal')
-                            )
-    bypass_off_ncalls = return_ncalls(fn_test[1]
-                            ,sel_list=('TurnStage', 'get_possible_check_optimal')
-                            )
+#     bypass_on_ncalls = return_ncalls(fn_test[0]
+#                             ,sel_list=('TurnStage', 'get_possible_check_optimal')
+#                             )
+#     bypass_off_ncalls = return_ncalls(fn_test[1]
+#                             ,sel_list=('TurnStage', 'get_possible_check_optimal')
+#                             )
 
-    assert bypass_on_ncalls < bypass_off_ncalls
+#     assert bypass_on_ncalls < bypass_off_ncalls
 
 
 #4/10
