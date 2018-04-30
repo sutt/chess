@@ -4,10 +4,13 @@ import pstats
 import argparse
 import copy
 sys.path.append('../')
+# sys.path.append('../src/')
 
 from src.main import Game
+# from main import Game
 
 DATA_DIR = '../data/profiles/'
+
 
 #TODO - get rid of this stuff
 #TODO - add DATA_DIR into classes
@@ -20,78 +23,10 @@ fn = [
 
 fn = [DATA_DIR + _fn for _fn in fn]
 
-class TestArgs:
-    
-    ''' Holds the kwargs for Game.play() each cProfile run:
-            set_base_arg makes each test element have those values.
-            add_test adds a test element, with one different arg / arg-value.
-    '''
-    
-    def __init__(self):
-        self.base_args = {}
-        self.test_data = {}
+# -----------------------------------------------------------------------------
+#   Helper Functions to run Batch cProfiles
+#------------------------------------------------------------------------------
 
-    def set_base_arg(self, tuple_param):
-        k, v = tuple_param[0], tuple_param[1]
-        self.base_args[k] = v
-
-    def get_test_data(self):
-        return copy.copy(self.test_data)
-
-    def add_test(self, inp):
-        ''' input: (test_name [str], (arg_key [str], arg_val [bool]))'''
-        
-        test_name = inp[0]
-        args = copy.copy(self.base_args)
-        
-        if inp[1] is not None:
-            arg_key, arg_val = inp[1][0], inp[1][1]    
-            args[arg_key] = arg_val
-
-        self.test_data[test_name] = args
-
-
-def test_testargs_class_1():
-    ''' Testing methods of TestArgs class'''
-
-    testArgs = TestArgs()
-    testArgs.set_base_arg(('base1', True))
-    testArgs.set_base_arg(('base2', False))
-    testArgs.add_test(('test_1',('test_arg1', True)))
-    testArgs.add_test(('test_2',('base1', False)))
-
-    data = testArgs.get_test_data()
-
-    # verify test records exist
-    test_1 = data.get('test_1', None)
-    assert test_1 is not None
-    test_2 = data.get('test_2', None)
-    assert test_2 is not None
-
-    #verify base and test args exist
-    assert test_2.get('base1', None) is not None
-    assert test_2.get('base2', None) is not None
-    
-    assert test_2.get('test_arg1', None) is None
-    assert test_1.get('test_arg1', None) is not None
-    
-    # verify base1 is overwritten correctly
-    assert test_1.get('base1', None) == True
-    assert test_2.get('base1', None) == False
-
-    #verify no pass by ref between test_data records
-    test_1['base2'] = 99
-    assert test_2['base2'] == False
-    data2 = testArgs.get_test_data()
-    test_3 = data2.get('test_2', None)
-    assert test_3.get('base2', None) is not None
-    assert test_3.get('base2', None) == False
-    # print 'done.'
-
-
-
-def test_build_cmd_str_1():
-    pass
 
 def pretty_print(d):
     out = ""
@@ -102,70 +37,6 @@ def pretty_print(d):
         out += "\n"
     print out
 
-def test_pyconcept_pass_by_ref_dict():
-    
-    ''' Testing neccesity of copy() for dicts. '''
-
-    d0 = {}
-    d0['one'] = 1
-    ref0 = d0
-    ref0['two'] = 2
-    ref0['one'] = 17
-
-    d1 = {}
-    d1['one'] = 1
-    ref1 = copy.copy(d0)
-    ref1['two'] = 2
-    ref1['one'] = 17
-
-    print 'd0: ',   str(d0)
-    print 'ref0: ', str(ref0)
-    print 'd1: ',   str(d1)
-    print 'ref1: ', str(ref1)
-
-    assert  ref0 == d0      #without copy, you overide
-    assert not(ref1 == d1)  #with copy.copy you're OK.
-
-if __name__ == "__main__":
-
-    # test_pyconcept_pass_by_ref_dict()
-    # sys.exit()
-    
-    test_testargs_class_1()
-    # sys.exit()
-
-    #different filter_check algos
-    d_params = TestArgs()
-    d_params.set_base_arg(('check_for_check', False))
-    d_params.set_base_arg(('filter_check_opt', False))
-
-    d_params.add_test(('filter_check_none',         None)) 
-    d_params.add_test(('filter_check_naive',        ('filter_check_naive', True)))
-    d_params.add_test(('filter_check_test_copy',    ('filter_check_test_copy_opt', True)))
-    d_params.add_test(('filter_check_opt',          ('filter_check_opt', True)))
-
-    pretty_print(d_params.get_test_data())
-    
-    #bypass on/off with filter_check_opt
-    d_params = TestArgs()
-    d_params.set_base_arg( ('check_for_check', False))
-    d_params.set_base_arg( ('filter_check_opt', True))
-
-    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
-    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
-
-    pretty_print(d_params.get_test_data())
-
-    #bypass on with filter_check_opt / filter_check_naive
-    d_params = TestArgs()
-    d_params.set_base_arg( ('check_for_check', False))
-    d_params.set_base_arg( ('filter_check_opt', False))
-    d_params.set_base_arg( ('bypass_irregular', True))
-
-    d_params.add_test(('bypass_naive',        ('filter_check_naive', True)))
-    d_params.add_test(('bypass_opt',          ('filter_check_opt', True)))
-
-    pretty_print(d_params.get_test_data())
 
 def build_code_str(s_instruct, d_params, b_import=True):
     
@@ -204,99 +75,14 @@ def build_code_str(s_instruct, d_params, b_import=True):
     return cmd
 
 
-def run_profile(s_cmd):
+def run_profiles(s_instruct):
     ''' Modularized function for running '''
     #TODO - output to file optional
     cProfile.runctx( s_cmd, globals(), locals(), file_names[0])
 
 
-def test_build_code_str():
-    '''Test build_str'''
-    
-    d_params = TestArgs()
-    d_params.set_base_arg( ('check_for_check', False))
-    d_params.set_base_arg( ('filter_check_opt', True))
-    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
-    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
-
-    test_data = d_params.get_test_data()
-
-    list_s_cmd = []
-    
-    for test_key in test_data.keys():
-        
-        test_name = str(test_key)
-        test_params = test_data[test_key]
-        test_s_instruct = "1. g1 h3"  
-        
-        s_cmd = build_code_str(
-                                s_instruct = test_s_instruct
-                                ,d_params = test_params
-                                ,b_import = True
-                                )
-        
-        list_s_cmd.append(s_cmd)
-
-    #Now test the strings:
-    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
-    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
-
-
-
-if __name__ == "__main__":
-    test_build_code_str()
-    print 'done testing.'
-    sys.exit()    
-
-
-def run_profiles(s_instruct, file_names):
-    ''' output cProfile files for different filter_check algos '''
-    
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), file_names[0])
-
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_naive=True """
-    cmd += """          ,filter_check_opt=False """
-    cmd += """          ,check_for_check=False """
-    cmd += """          )"""
-    # cProfile.run( cmd, fn[1])
-    cProfile.runctx( cmd, globals(), locals(), file_names[1])
-    
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_test_copy_opt=True """
-    cmd += """          ,filter_check_opt=False """
-    cmd += """          ,check_for_check=False """
-    cmd += """          )"""
-    # cProfile.run(cmd, fn[2])
-    cProfile.runctx( cmd, globals(), locals(), file_names[2])
-
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_opt=True, check_for_check=False) """
-    # cProfile.run( cmd, fn[3])
-    cProfile.runctx( cmd, globals(), locals(), file_names[3])
-
-
-def run_profiles_2(_s, fn):
-    ''' output cProfile files with bypass on/off '''
-    
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_pgn_instructions = _s); """
-    cmd += """game.play(bypass_irregular=True, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), fn[0])
-
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_pgn_instructions = _s); """
-    cmd += """game.play(bypass_irregular=False, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), fn[1])
-
-
 def display_profiles(fn, amt=10, b_full=False):
+    #TODO - add sel_list optional arg for non-get_available functions
     p = pstats.Stats(fn)
     p.strip_dirs()
     if b_full:
@@ -316,10 +102,89 @@ def return_ncalls( fn
     stats = d[k]
     ncalls = stats[0]
     return ncalls
+
+
+# ------------------------------------------------------------------------
+#   Build Batch Experiments Instances
+# -----------------------------------------------------------------------
+
+
+class TestArgs:
     
+    ''' Holds the kwargs for Game.play() each cProfile run:
+            set_base_arg makes each test element have those values.
+            add_test adds a test element, with one different arg / arg-value.
+    '''
     
+    def __init__(self):
+        self.base_args = {}
+        self.test_data = {}
+
+    def set_base_arg(self, tuple_param):
+        k, v = tuple_param[0], tuple_param[1]
+        self.base_args[k] = v
+
+    def get_test_data(self):
+        return copy.copy(self.test_data)
+
+    def add_test(self, inp):
+        ''' input: (test_name [str], (arg_key [str], arg_val [bool]))'''
+        
+        test_name = inp[0]
+        args = copy.copy(self.base_args)
+        
+        if inp[1] is not None:
+            arg_key, arg_val = inp[1][0], inp[1][1]    
+            args[arg_key] = arg_val
+
+        self.test_data[test_name] = args
+
 
 if __name__ == "__main__":
+
+
+    #different filter_check algos
+    d_params = TestArgs()
+    d_params.set_base_arg(('check_for_check', False))
+    d_params.set_base_arg(('filter_check_opt', False))
+
+    d_params.add_test(('filter_check_none',         None)) 
+    d_params.add_test(('filter_check_naive',        ('filter_check_naive', True)))
+    d_params.add_test(('filter_check_test_copy',    ('filter_check_test_copy_opt', True)))
+    d_params.add_test(('filter_check_opt',          ('filter_check_opt', True)))
+
+    # pretty_print(d_params.get_test_data())
+    
+    #bypass on/off with filter_check_opt
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', True))
+
+    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
+    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
+
+    # pretty_print(d_params.get_test_data())
+
+    #bypass on with filter_check_opt / filter_check_naive
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', False))
+    d_params.set_base_arg( ('bypass_irregular', True))
+
+    d_params.add_test(('bypass_naive',        ('filter_check_naive', True)))
+    d_params.add_test(('bypass_opt',          ('filter_check_opt', True)))
+
+    # pretty_print(d_params.get_test_data())
+
+
+# ---------------------------------------------------------------------
+#       Main Section - for calling this utility directly
+#----------------------------------------------------------------------
+
+
+if __name__ == "__main__":
+    
+    print 'into main section'
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--current", action="store_true")
@@ -350,6 +215,10 @@ if __name__ == "__main__":
         display_profiles(fn[2])
         display_profiles(fn[3], amt = 15)
 
+
+# --------------------------------------------------------------------
+#       Profile Tests - assessing ncalls based on different algos
+# --------------------------------------------------------------------
 
 # def test_opening_move_ncalls_get_available():
 #     ''' Test that each form of filter_check makes correct number calls to
@@ -414,6 +283,166 @@ if __name__ == "__main__":
 #                             )
 
 #     assert bypass_on_ncalls < bypass_off_ncalls
+
+
+# ----------------------------------------------------------------------
+#       Legacy Deprecated Functions
+# ----------------------------------------------------------------------
+
+
+def run_profiles(s_instruct, file_names):
+    ''' output cProfile files for different filter_check algos '''
+    
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
+    cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
+    cProfile.runctx( cmd, globals(), locals(), file_names[0])
+
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
+    cmd += """game.play(filter_check_naive=True """
+    cmd += """          ,filter_check_opt=False """
+    cmd += """          ,check_for_check=False """
+    cmd += """          )"""
+    # cProfile.run( cmd, fn[1])
+    cProfile.runctx( cmd, globals(), locals(), file_names[1])
+    
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
+    cmd += """game.play(filter_check_test_copy_opt=True """
+    cmd += """          ,filter_check_opt=False """
+    cmd += """          ,check_for_check=False """
+    cmd += """          )"""
+    # cProfile.run(cmd, fn[2])
+    cProfile.runctx( cmd, globals(), locals(), file_names[2])
+
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_instructions = s_instruct); """
+    cmd += """game.play(filter_check_opt=True, check_for_check=False) """
+    # cProfile.run( cmd, fn[3])
+    cProfile.runctx( cmd, globals(), locals(), file_names[3])
+
+
+def run_profiles_2(_s, fn):
+    ''' output cProfile files with bypass on/off '''
+    
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_pgn_instructions = _s); """
+    cmd += """game.play(bypass_irregular=True, check_for_check=False)"""
+    cProfile.runctx( cmd, globals(), locals(), fn[0])
+
+    cmd = """from src.main import Game; """
+    cmd +=  """game = Game(s_pgn_instructions = _s); """
+    cmd += """game.play(bypass_irregular=False, check_for_check=False)"""
+    cProfile.runctx( cmd, globals(), locals(), fn[1])
+
+
+
+# --------------------------------------------------------
+#      Unit Tests for the helper functions
+#---------------------------------------------------------
+
+def test_pyconcept_pass_by_ref_dict():
+    
+    ''' Testing neccesity of copy() for dicts. '''
+
+    d0 = {}
+    d0['one'] = 1
+    ref0 = d0
+    ref0['two'] = 2
+    ref0['one'] = 17
+
+    d1 = {}
+    d1['one'] = 1
+    ref1 = copy.copy(d0)
+    ref1['two'] = 2
+    ref1['one'] = 17
+
+    print 'd0: ',   str(d0)
+    print 'ref0: ', str(ref0)
+    print 'd1: ',   str(d1)
+    print 'ref1: ', str(ref1)
+
+    assert  ref0 == d0      #without copy, you overide
+    assert not(ref1 == d1)  #with copy.copy you're OK.
+
+
+def test_testargs_class_1():
+    
+    ''' Testing methods of TestArgs class'''
+
+    testArgs = TestArgs()
+    testArgs.set_base_arg(('base1', True))
+    testArgs.set_base_arg(('base2', False))
+    testArgs.add_test(('test_1',('test_arg1', True)))   # only this one
+    testArgs.add_test(('test_2',('base1', False)))      # overwrite
+
+    data = testArgs.get_test_data()
+
+    # verify test records exist
+    test_1 = data.get('test_1', None)
+    assert test_1 is not None
+    test_2 = data.get('test_2', None)
+    assert test_2 is not None
+
+    #verify base and test args exist
+    assert test_2.get('base1', None) is not None
+    assert test_2.get('base2', None) is not None
+    
+    assert test_2.get('test_arg1', None) is None
+    assert test_1.get('test_arg1', None) is not None    # only this one
+    
+    # verify base1 is overwritten correctly
+    assert test_1.get('base1', None) == True
+    assert test_2.get('base1', None) == False           # overwrite
+
+    #verify no pass by ref between test_data records
+    test_1['base2'] = 99
+    assert test_2['base2'] == False
+    data2 = testArgs.get_test_data()
+    test_3 = data2.get('test_2', None)
+    assert test_3.get('base2', None) is not None
+    assert test_3.get('base2', None) == False           # overwrite
+    # print 'done.'
+
+
+def test_build_code_str():
+    
+    '''Test build_code_str'''
+    
+    d_params = TestArgs()
+    d_params.set_base_arg( ('check_for_check', False))
+    d_params.set_base_arg( ('filter_check_opt', True))
+    d_params.add_test(('bypass_on',     ('bypass_irregular', True)))
+    d_params.add_test(('bypass_off',    ('bypass_irregular', False)))
+
+    test_data = d_params.get_test_data()
+
+    list_s_cmd = []
+    
+    for test_key in test_data.keys():
+        
+        test_name = str(test_key)
+        test_params = test_data[test_key]
+        test_s_instruct = "1. g1 h3"  
+        
+        s_cmd = build_code_str(
+                                s_instruct = test_s_instruct
+                                ,d_params = test_params
+                                ,b_import = True
+                                )
+        
+        list_s_cmd.append(s_cmd)
+
+    #Now test the strings:
+    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
+
+
+# --------------------------------------------------------------------
+#       Data Scratchpad
+# --------------------------------------------------------------------
+
 
 
 #4/10
