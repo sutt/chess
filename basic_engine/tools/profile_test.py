@@ -42,21 +42,22 @@ def pretty_print(d, b_json_style=False):
     print out
 
 
-def build_code_str(s_instruct, d_params, b_import=True):
+def build_code_str(s_instruct, d_params, b_import=True, b_pgn=False):
     
     ''' Build the str of commands fed into runctx. 
         input:   d_params (dict) 
         returns: cmd (str) 
         '''
-
-    # TODO - add b_pgn for non A1-instructions
     
     cmd = ""
     
     if b_import:
         cmd += "from src.main import Game; "
 
-    temp_cmd = 'game = Game(s_instructions="' + s_instruct + '"); '
+    if b_pgn:
+        temp_cmd = 'game = Game(s_pgn_instructions="' + s_instruct + '"); '    
+    else:
+        temp_cmd = 'game = Game(s_instructions="' + s_instruct + '"); '
     cmd += temp_cmd
 
     cmd += "game.play("
@@ -79,12 +80,12 @@ def build_code_str(s_instruct, d_params, b_import=True):
     return cmd
 
 
-def batch_build_code_strs(test_data_params, s_instruct):
+def batch_build_code_strs(test_data_params, s_instruct, b_pgn=False):
     ''' input: d_params (dict of dicts), s_instruct (str)
         return: dict of dicts with cmd-string as val '''
     d_out = {}
     for _k in test_data_params.keys():
-        d_out[_k] = build_code_str(s_instruct, test_data_params[_k])
+        d_out[_k] = build_code_str(s_instruct, test_data_params[_k], True, b_pgn)
     return d_out
 
 
@@ -94,9 +95,9 @@ def run_profile(s_cmd, fn):
     cProfile.runctx(s_cmd, globals(), locals(), fn)
 
 
-def execute_profile_tests(test_data_params, s_instruct):
+def execute_profile_tests(test_data_params, s_instruct, b_pgn=False):
     ''' Main function to execute all code built into test_data_paramaters'''
-    d_cmd_str = batch_build_code_strs(test_data_params, s_instruct)
+    d_cmd_str = batch_build_code_strs(test_data_params, s_instruct, b_pgn)
     for i, _k in enumerate(d_cmd_str.keys()):
         run_profile(s_cmd=d_cmd_str[_k], fn=FN[i])
     #TODO - return for non fn
@@ -241,6 +242,7 @@ if __name__ == "__main__":
         sys.exit()
 
     b_display_all_functions = args["displayallfunctions"]
+    b_pgn_instruct = False
     
     if args["current"]:
         print """
@@ -248,6 +250,7 @@ if __name__ == "__main__":
         """
         test_data_params = param_data_different_filter_algos()
         s_instruct = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. h3 Bb7 9. d3 d6 10. a3 Na5 11. Ba2 c5 12. Nc3 Nc6 13. Bg5 Qd7 14. Nh2 Ne8 15. Bd2 Nc7 16. Nf1 Kh8 17. Ng3 Nd4 18. Nce2 Nde6 19. b4 d5 20. bxc5 Bxc5 21. Bb4 Rfe8 22. Bxc5 Nxc5 23. Nc3 Rad8 24. Qh5 f6 25. d4 exd4 26. Nxd5 Re5 27. Qh4 Nxd5 28. exd5 Bxd5 29. Rxe5 fxe5 30. Bxd5 Qxd5 31. Re1 Ne6 32. Nf5 Nf4 33. Qg5 Rd7 34. Nh4 h6 35. Qg4 g5 36. Nf3 e4 37. Rxe4 Qxe4 38. Qxd7 d3 39. cxd3 Qxd3 40. Qc8+ Kg7 41. Qb7+ Kg8 42. Qxa6 Ne2+ 43. Kh2 Qe4 44. Qf6 Qf4+ 45. Qxf4 gxf4 46. g4 fxg3+ 47. fxg3 Nc3 48. Nd4 h5 49. h4 Kf7 50. Kh3 Kf6 51. g4 hxg4+ 52. Kxg4 Kg6 53. h5+ Kh7 54. Kh4 Kg8 55. h6 Kh7 56. Kh5 Ne4 57. Nxb5 Nf6+ 58. Kg5 Ne4+ 59. Kf5 Nc5 60. Ke5 Kxh6 61. Kd4 Na6 62. Kd5 Kg6 63. Nd4 Kf6 64. Kd6 Kf7 65. Ne6 '
+        b_pgn_instruct = True
         b_display_all_functions = True
 
     if args["classiccomparison"]:
@@ -260,19 +263,21 @@ if __name__ == "__main__":
         
     if args["longgame"]:
         s_instruct = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. h3 Bb7 9. d3 d6 10. a3 Na5 11. Ba2 c5 12. Nc3 Nc6 13. Bg5 Qd7 14. Nh2 Ne8 15. Bd2 Nc7 16. Nf1 Kh8 17. Ng3 Nd4 18. Nce2 Nde6 19. b4 d5 20. bxc5 Bxc5 21. Bb4 Rfe8 22. Bxc5 Nxc5 23. Nc3 Rad8 24. Qh5 f6 25. d4 exd4 26. Nxd5 Re5 27. Qh4 Nxd5 28. exd5 Bxd5 29. Rxe5 fxe5 30. Bxd5 Qxd5 31. Re1 Ne6 32. Nf5 Nf4 33. Qg5 Rd7 34. Nh4 h6 35. Qg4 g5 36. Nf3 e4 37. Rxe4 Qxe4 38. Qxd7 d3 39. cxd3 Qxd3 40. Qc8+ Kg7 41. Qb7+ Kg8 42. Qxa6 Ne2+ 43. Kh2 Qe4 44. Qf6 Qf4+ 45. Qxf4 gxf4 46. g4 fxg3+ 47. fxg3 Nc3 48. Nd4 h5 49. h4 Kf7 50. Kh3 Kf6 51. g4 hxg4+ 52. Kxg4 Kg6 53. h5+ Kh7 54. Kh4 Kg8 55. h6 Kh7 56. Kh5 Ne4 57. Nxb5 Nf6+ 58. Kg5 Ne4+ 59. Kf5 Nc5 60. Ke5 Kxh6 61. Kd4 Na6 62. Kd5 Kg6 63. Nd4 Kf6 64. Kd6 Kf7 65. Ne6 '
+        b_pgn_instruct = True
 
     if args["shortgame"]:
         s_instruct = '1. e4 e5'
+        b_pgn_instruct = False
         
     if args["verboseparams"]:
         print 'Test Data Params: \n', pretty_print(test_data_params, b_json_style=True)
-        d_cmdstr = batch_build_code_strs(test_data_params, s_instruct)
+        d_cmdstr = batch_build_code_strs(test_data_params, s_instruct, b_pgn_instruct)
         print 'Literal Command Strings:'
         print "\n".join([v for v in d_cmdstr.values()])
 
 
     #MAIN
-    execute_profile_tests(test_data_params, s_instruct)
+    execute_profile_tests(test_data_params, s_instruct, b_pgn_instruct)
 
     
     #TODO - consolidate
@@ -302,30 +307,29 @@ def test_opening_move_ncalls_get_available():
 
     #Setup here
     s_instruct = "1. g1 h3"  
-    # test_data_params = param_data_different_filter_algos()
-    # execute_profile_tests()
-    # run_profiles(s_instruct = s_instruct, file_names = fn)
+    b_pgn_instruct = False
+    test_data_params = param_data_different_filter_algos()
+    execute_profile_tests(test_data_params, s_instruct, b_pgn_instruct)
 
-    #How to handle FN's?
 
-    assert 16 == return_ncalls(fn[0])   #baseline - no check_filter
+    assert 16 == return_ncalls(FN[0])   #baseline - no check_filter
 
     #There are 16 pieces white can use:
     #   16 =  calls once for each
 
-    assert 336 == return_ncalls(fn[1])   #naive_check
+    assert 336 == return_ncalls(FN[1])   #naive_check
 
     #There are 20 moves (for 16 pieces) white can make.
     #For each move, there are 16 pieces for black we need to examine.
     #   320 = 20 * 16
     #   336 = 320 + 16 (to populate white's moves in play)
 
-    assert 36 == return_ncalls(fn[2])   #test_copy_opt
+    assert 36 == return_ncalls(FN[2])   #test_copy_opt
 
     #This is a test filter_check, but uses get_check_optimal,
     #So there should be no difference in calls to get_available_moves.
 
-    assert 36 == return_ncalls(fn[3])   #filter_check_opt
+    assert 36 == return_ncalls(FN[3])   #filter_check_opt
 
     #First add the 16 calls to populate moves.
     #There are 20 moves for white, so for each of these, need to make
@@ -549,6 +553,7 @@ def test_build_code_str():
                                 s_instruct = test_s_instruct
                                 ,d_params = test_params
                                 ,b_import = True
+                                ,b_pgn = False
                                 )
         
         list_s_cmd.append(s_cmd)
@@ -557,6 +562,49 @@ def test_build_code_str():
     assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
     assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
 
+
+def test_build_code_str_b_pgn():
+    
+    '''Test b_pgn arg for using s_pgn_insturctions in Game() constructor'''
+    
+    d_params = TestArgs()
+    d_params.set_base_arg( ('dummy', False))
+    d_params.add_test(('legacy_instruct',     None))
+    d_params.add_test(('pgn_instruct',        None))
+
+    test_data = d_params.get_test_data()
+
+    list_s_cmd = []
+    
+    print test_data.keys()
+    for test_key in test_data.keys():
+        
+        test_name = str(test_key)
+        test_params = test_data[test_key]
+
+        print test_name
+        if test_name == "legacy_instruct":
+            test_s_instruct = "1. g1 h3"  
+            b_pgn_instruct = False
+        elif test_name == "pgn_instruct":
+            test_s_instruct = "1. e4 e5 2. Nf3 Nc6"
+            b_pgn_instruct = True
+        else:
+            #shouldnt be here; test fails
+            assert False
+        
+        s_cmd = build_code_str(
+                                s_instruct = test_s_instruct
+                                ,d_params = test_params
+                                ,b_import = True
+                                ,b_pgn = b_pgn_instruct
+                                )
+        
+        list_s_cmd.append(s_cmd)
+
+    #Now test the strings:
+    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_pgn_instructions="1. e4 e5 2. Nf3 Nc6"); game.play(dummy=False);"""
+    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(dummy=False);"""
 
 # --------------------------------------------------------------------
 #       Data Scratchpad
