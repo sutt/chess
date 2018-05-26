@@ -8,30 +8,14 @@ from src.main import Game
 
 DATA_DIR = '../data/profiles/'
 
-
-#TODO - get rid of this stuff
-#TODO - add DATA_DIR into classes
-# FN = [
-#          'profile_filter_check_none'
-#         ,'profile_naive_filter_check'
-#         ,'profile_test_copy_opt'
-#         ,'profile_opt'
-#     ]
-
-# FN = [DATA_DIR + _fn for _fn in FN]
-
 # -----------------------------------------------------------------------------
 #   Helper Functions to run Batch cProfiles
 #------------------------------------------------------------------------------
 
 def file_path(fn):
+    ''' pstat file is test_name + path to where this datya is stored.'''
     return DATA_DIR + fn
 
-def file_paths(list_fn):
-    out = []
-    for _fn in list_fn:
-        out.append(file_path(_fn))
-    return out
     
 def pretty_print(d, b_json_style=False):
     ''' For printing out TestArgs data structure '''
@@ -313,7 +297,8 @@ if __name__ == "__main__":
         print "\n".join([v for v in d_cmdstr.values()])
 
 
-    #MAIN
+    #MAIN FUNCTIONS ----------------------
+
     execute_profile_tests(test_data_params, s_instruct, b_pgn_instruct)
 
     printout_display(test_data_params)
@@ -327,6 +312,7 @@ if __name__ == "__main__":
     # > python profile_test --current
     # > python profile_test --current --verboseparams
     # > python profile_test --current --verboseparams --shortgame
+    # > python profile_test --classiccomparison --verboseparams
 
 
 # --------------------------------------------------------------------
@@ -379,49 +365,6 @@ def test_opening_move_ncalls_get_available():
 #       Legacy Profile Tests 
 # --------------------------------------------------------------------
 
-# def test_opening_move_ncalls_get_available():
-#     ''' Test that each form of filter_check makes correct number calls to
-#         basic.get_available_moves(). Using opening move as baseline'''
-
-#     fn = [
-#          'profile_baseline_no_filter_check'
-#         ,'profile_naive_filter_check'
-#         ,'profile_test_copy_opt'
-#         ,'profile_opt'
-#     ]
-
-#     DATA_DIR = '../data/profiles/'
-#     fn = [DATA_DIR + _fn for _fn in fn]
-
-#     s_instruct = "1. g1 h3"  
-#     run_profiles(s_instruct = s_instruct, file_names = fn)
-
-#     assert 16 == return_ncalls(fn[0])   #baseline - no check_filter
-
-#     #There are 16 pieces white can use:
-#     #   16 =  calls once for each
-
-#     assert 336 == return_ncalls(fn[1])   #naive_check
-
-#     #There are 20 moves (for 16 pieces) white can make.
-#     #For each move, there are 16 pieces for black we need to examine.
-#     #   320 = 20 * 16
-#     #   336 = 320 + 16 (to populate white's moves in play)
-
-#     assert 36 == return_ncalls(fn[2])   #test_copy_opt
-
-#     #This is a test filter_check, but uses get_check_optimal,
-#     #So there should be no difference in calls to get_available_moves.
-
-#     assert 36 == return_ncalls(fn[3])   #filter_check_opt
-
-#     #First add the 16 calls to populate moves.
-#     #There are 20 moves for white, so for each of these, need to make
-#     #a get_available_moves on white's super_king piece. But never
-#     #need to make a call to black's pieces.
-#     #   36 = 16 + 20
-
-
 # def test_bypass_irregular_less_moves():
 #     ''' Test that bypass_irregular kwarg is having an effect by checking
 #         that there are less calls to get_check_optimal 
@@ -449,51 +392,51 @@ def test_opening_move_ncalls_get_available():
 # ----------------------------------------------------------------------
 
 
-def run_profiles(s_instruct, file_names):
-    ''' output cProfile files for different filter_check algos '''
+# def run_profiles(s_instruct, file_names):
+#     ''' output cProfile files for different filter_check algos '''
     
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), file_names[0])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_instructions = s_instruct); """
+#     cmd += """game.play(filter_check_opt=False, check_for_check=False)"""
+#     cProfile.runctx( cmd, globals(), locals(), file_names[0])
 
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_naive=True """
-    cmd += """          ,filter_check_opt=False """
-    cmd += """          ,check_for_check=False """
-    cmd += """          )"""
-    # cProfile.run( cmd, fn[1])
-    cProfile.runctx( cmd, globals(), locals(), file_names[1])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_instructions = s_instruct); """
+#     cmd += """game.play(filter_check_naive=True """
+#     cmd += """          ,filter_check_opt=False """
+#     cmd += """          ,check_for_check=False """
+#     cmd += """          )"""
+#     # cProfile.run( cmd, fn[1])
+#     cProfile.runctx( cmd, globals(), locals(), file_names[1])
     
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_test_copy_opt=True """
-    cmd += """          ,filter_check_opt=False """
-    cmd += """          ,check_for_check=False """
-    cmd += """          )"""
-    # cProfile.run(cmd, fn[2])
-    cProfile.runctx( cmd, globals(), locals(), file_names[2])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_instructions = s_instruct); """
+#     cmd += """game.play(filter_check_test_copy_opt=True """
+#     cmd += """          ,filter_check_opt=False """
+#     cmd += """          ,check_for_check=False """
+#     cmd += """          )"""
+#     # cProfile.run(cmd, fn[2])
+#     cProfile.runctx( cmd, globals(), locals(), file_names[2])
 
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_instructions = s_instruct); """
-    cmd += """game.play(filter_check_opt=True, check_for_check=False) """
-    # cProfile.run( cmd, fn[3])
-    cProfile.runctx( cmd, globals(), locals(), file_names[3])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_instructions = s_instruct); """
+#     cmd += """game.play(filter_check_opt=True, check_for_check=False) """
+#     # cProfile.run( cmd, fn[3])
+#     cProfile.runctx( cmd, globals(), locals(), file_names[3])
 
 
-def run_profiles_2(_s, fn):
-    ''' output cProfile files with bypass on/off '''
+# def run_profiles_2(_s, fn):
+#     ''' output cProfile files with bypass on/off '''
     
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_pgn_instructions = _s); """
-    cmd += """game.play(bypass_irregular=True, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), fn[0])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_pgn_instructions = _s); """
+#     cmd += """game.play(bypass_irregular=True, check_for_check=False)"""
+#     cProfile.runctx( cmd, globals(), locals(), fn[0])
 
-    cmd = """from src.main import Game; """
-    cmd +=  """game = Game(s_pgn_instructions = _s); """
-    cmd += """game.play(bypass_irregular=False, check_for_check=False)"""
-    cProfile.runctx( cmd, globals(), locals(), fn[1])
+#     cmd = """from src.main import Game; """
+#     cmd +=  """game = Game(s_pgn_instructions = _s); """
+#     cmd += """game.play(bypass_irregular=False, check_for_check=False)"""
+#     cProfile.runctx( cmd, globals(), locals(), fn[1])
 
 
 
@@ -639,6 +582,7 @@ def test_build_code_str_b_pgn():
     #Now test the strings:
     assert d_s_cmd['pgn_instruct'] == """from src.main import Game; game = Game(s_pgn_instructions="1. e4 e5 2. Nf3 Nc6"); game.play(dummy=False);"""
     assert d_s_cmd['legacy_instruct'] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(dummy=False);"""
+
 
 # --------------------------------------------------------------------
 #       Data Scratchpad

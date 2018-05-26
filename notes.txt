@@ -948,12 +948,16 @@ board should store edge cases:
             [x] --current still shows one-move-game below
             [x] FN[i] is not the way to do it
 
-            [ ] finish documenting rest of functionality.
-            [ ] add cmds to docs/cmds-list.txt
+            [x] finish documenting rest of functionality.
+            [x] add cmds to docs/cmds-list.txt
             [ ] cleanup and merge branch
 
-
-
+            Stuff not completed in profile_test module (Maybe Later?):
+                [ ] a unit test on  test_bypass_irregular_less_moves
+                [ ] adding irregular_moves into main argparse functions
+                [ ] adding a return_ncalls type printout
+                [ ] a way to look at other functions than just get_available_moves
+                [ ] 
 
 
         HOWTOs
