@@ -950,14 +950,17 @@ board should store edge cases:
 
             [x] finish documenting rest of functionality.
             [x] add cmds to docs/cmds-list.txt
-            [ ] cleanup and merge branch
+            [x] cleanup and merge branch
 
             Stuff not completed in profile_test module (Maybe Later?):
                 [ ] a unit test on  test_bypass_irregular_less_moves
                 [ ] adding irregular_moves into main argparse functions
                 [ ] adding a return_ncalls type printout
                 [ ] a way to look at other functions than just get_available_moves
-                [ ] 
+              
+            [ ] cleanup directory of unused files
+            [ ] write some notes of whats needed next
+            
 
 
         HOWTOs

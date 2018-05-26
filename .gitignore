@@ -3,3 +3,6 @@
 .cache
 hack.py
 scrarch-batchverify.py
+*.code-workspace
+.ipynb_checkpoints
+
