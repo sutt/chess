@@ -186,10 +186,12 @@ class Game():
 
             moves = get_available_moves(pieces, board, player)
 
+            b_bypass = kwargs.get('bypass_irregular', False)
+
             if kwargs.get('filter_check_naive', False):
-                moves = filter_check_naive(board, pieces, moves, player)
+                moves = filter_check_naive(board, pieces, moves, player, b_bypass)
             if kwargs.get('filter_check_opt', True):
-                moves = filter_check_opt(board, pieces, moves, player)
+                moves = filter_check_opt(board, pieces, moves, player, b_bypass)
 
             if kwargs.get('filter_check_test_copy', False):
                 moves = filter_check_test_copy(board, pieces, moves, player)

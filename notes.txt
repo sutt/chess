@@ -788,6 +788,178 @@ board should store edge cases:
 
             we want a regression on MOVES['regular'], output to 
 
+        4/9
+
+            TODO
+
+                switch to master
+                make changes to main:
+                    eliminate check code
+                    add an argument for player_in_check
+
+                now get a v1 profile_test.py and data without
+                check_for_check, and make sure data is in the right place.
+                eliminate the data in the wrong place.
+
+
+                how to printout profile-test with no misc text?
+
+                build v2 and unit tests
+
+        4/10
+
+            TODO
+ 
+                x do unit tests for get_ncalls
+                x add a bypass of non-regular moves for time comparison
+                    do in both filter_check_opt and filter_check_naive
+                x now do runprofiles2 with bypass on
+                x do a unit test of bypass
+
+                now, combine run_profiles into modularized function
+                    and with this change fn list structure
+
+                    __main__ doesnt need to import Game
+                    test does need to import Game
+
+                    handle not having b_bypass in test functions
+
+                Look at cproifle cum to see if anything fishy is holding us back
+
+                Build batch verifies which look at num_moves with bypass on and off
+
+                BUG? fn is a global not a local 'file_names' is run_profile()
+
+
+            Grand Projects
+
+                write an api for openai gym
+
+        4/11
+
+            x cancel out tests
+            write unit tests for TestArgs
+            unittests for build_cmd_str
+            build __main__ to do some function, controlled by argparse
+
+            Larger Projects
+
+                can you substitute deepcopy on board or pieces with copy?
+
+                there is the application of late game situations with low pieces
+                where filter_check_naive may outperform, find those.
+
+                "Troitsky Line"
+                https://en.wikipedia.org/wiki/Two_knights_endgame#Two_knights_versus_pawn
+
+                PyChess
+                https://en.wikipedia.org/wiki/PyChess
+
+                Webapp two people can play
+
+                three-fold-repetition rule 
+                    (a draw)
+                    (even if not sequential e.g. perpetual check)
+
+                VSCode - "macros" for multiple view changes?
+                    toggle line number
+                    toggle panel
+                    toggle sidebar and sidebar size
+                    hide an editor panel to go half screen
+                https://code.visualstudio.com/docs/getstarted/userinterface
+
+        4/13
+
+            TODO
+
+                create run_profiles2
+                run_profiles -> run_profiles_legacy`
+                uncomment the tests below
+                refactor for new run_profile
+
+        4/15
+
+            Meetup
+
+                Neal
+                Lilian 
+                Yong
+
+        5/1
+
+            Lets ship profile_test:
+
+                First, get it running:
+                    need to build function which ties together:
+                        build_cmd_str
+                        runctx
+                        handles filenames, etc
+                    does TestArgs class even use base_args?
+                        are they accounted for in get_data()?
+
+
+                Then make sure commented-out batch tests run
+                    do these offer clues to getting a first run?
+
+                Finally use some command line args
+
+                More TODOs on profiling:
+                    [ ] Test names to CamelCase (as kwargs are snake_case)
+                    [ ] json dumps on parameters for cmd line calling
+
+            TODO
+
+                [x] run some pytests - still working?
+                [x] reproduce printout bug
+                [x] get windows spring update
+                [x] verify the bug is fixed
+                still need to turn off autocomplete for .txt files
+
+            
+            Grand Projects
+
+                Look at scenarios where naive is faster than opt
+
+                    build a test where you init with data_from_printout,
+                    here, just assess ncalls, e.g.
+                        K+Q+R vs. k+p
+
+
+                Validate the Troitsky line
+                
+        5/6
+
+            longgame isnt triggering a change in ncalls, so what's up?
+                lets delete the files and see
+
+        5/23
+
+            [x] delete all data/profile files; does it work?
+            [x] run all commands avail from cmd line, note them in commented code
+
+            [x] a long game is only profiling first move; why? b/c thye are pgn insturcts
+            [x] fix test 1 in profile_test
+            [x] limit --current to just one profile
+            [?] need to refactor for different experiment types
+            [ ] use ncalls to display a less verbose display
+
+        5/25
+
+            [x] --current still shows one-move-game below
+            [x] FN[i] is not the way to do it
+
+            [x] finish documenting rest of functionality.
+            [x] add cmds to docs/cmds-list.txt
+            [ ] cleanup and merge branch
+
+            Stuff not completed in profile_test module (Maybe Later?):
+                [ ] a unit test on  test_bypass_irregular_less_moves
+                [ ] adding irregular_moves into main argparse functions
+                [ ] adding a return_ncalls type printout
+                [ ] a way to look at other functions than just get_available_moves
+                [ ] 
+
+
         HOWTOs
 
             to view the board while debugging:

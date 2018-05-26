@@ -1,0 +1,41 @@
+List commands for this workspace here:
+
+Display profiling stats:
+    
+    Run all in: ~/tools/
+
+    [useful for diagnosis in continuing engine dev]
+        
+        > python profile_test.py --current
+
+    [view the classic comparison of naive vs opt on one move]
+
+        > python profile_test.py --classiccomparison --verboseparams
+
+    [also...]
+
+        > python profile_test.py --current --shortgame --verboseparams
+        > python profile_test.py --classiccomparison --longgame
+
+
+Run profiling unit tests:
+    ~/tools/ > pytest -vv profile_test.py
+
+
+Run main unit tests:
+
+    Run in /basic_enigne/
+
+    [the main engine unittests.]
+    (main imports all other modules so it imports their tests too)
+
+        >pytest -vv src/main.py
+
+Run batchverify tests:
+
+    Run in /basic_engine/tests/
+
+        >pytest -vv batchverify.py
+
+    (?) Also, aren't there way to alter the params for these tests?
+

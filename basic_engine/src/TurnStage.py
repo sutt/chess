@@ -499,17 +499,21 @@ class Mutator():
             return pieces
 
 
-def filter_check_naive(board, pieces, moves, player):
+def filter_check_naive(board, pieces, moves, player, b_bypass):
 
     ''' Naive method to see remove any individual _move
         that would put current player in check. Runs in
-        N^2 time, where N = num_available_moves.'''
+        N^2 time, where N = num_available_moves.
+        b_bypass filters all non-regular move-coded moves.'''
     
     out = []
     
     for _move in moves:
 
-        _board = copy.deepcopy(board)   # .copy?
+        if b_bypass and (_move.code == MOVE_CODE['regular']):
+            continue
+        
+        _board = copy.deepcopy(board)
         _pieces = copy.deepcopy(pieces)
 
         board2, pieces2 = apply_move(_move, _board, _pieces, player)
@@ -524,11 +528,12 @@ def filter_check_naive(board, pieces, moves, player):
     return out
 
 
-def filter_check_opt(board, pieces, moves, player):
+def filter_check_opt(board, pieces, moves, player, b_bypass):
     
     ''' Fully optimized filter_check(). Uses Mutator and 
         get_possible_check_optimal to run in ~3.5N time instead of N^2,
-        where N = num_available_moves, and is typically between 18-30.'''
+        where N = num_available_moves, and is typically between 18-30.
+        b_bypass filters all non-regular move-coded moves.'''
 
     out = []
 
@@ -542,6 +547,9 @@ def filter_check_opt(board, pieces, moves, player):
             _board = mutator.mutate_board(board, _move)
             _pieces = mutator.mutate_pieces(pieces, player)
         else:
+            if b_bypass:
+                continue
+
             #Non-Standard Board/Piece Mutation
             _board = copy.deepcopy(board)
             _pieces = copy.deepcopy(pieces)
