@@ -932,6 +932,27 @@ board should store edge cases:
             longgame isnt triggering a change in ncalls, so what's up?
                 lets delete the files and see
 
+        5/23
+
+            [x] delete all data/profile files; does it work?
+            [x] run all commands avail from cmd line, note them in commented code
+
+            [x] a long game is only profiling first move; why? b/c thye are pgn insturcts
+            [x] fix test 1 in profile_test
+            [x] limit --current to just one profile
+            [?] need to refactor for different experiment types
+            [ ] use ncalls to display a less verbose display
+
+        5/25
+
+            [x] --current still shows one-move-game below
+            [x] FN[i] is not the way to do it
+
+            [ ] finish documenting rest of functionality.
+            [ ] add cmds to docs/cmds-list.txt
+            [ ] cleanup and merge branch
+
+
 
 
 

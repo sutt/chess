@@ -11,20 +11,28 @@ DATA_DIR = '../data/profiles/'
 
 #TODO - get rid of this stuff
 #TODO - add DATA_DIR into classes
-FN = [
-         'profile_filter_check_none'
-        ,'profile_naive_filter_check'
-        ,'profile_test_copy_opt'
-        ,'profile_opt'
-    ]
+# FN = [
+#          'profile_filter_check_none'
+#         ,'profile_naive_filter_check'
+#         ,'profile_test_copy_opt'
+#         ,'profile_opt'
+#     ]
 
-FN = [DATA_DIR + _fn for _fn in FN]
+# FN = [DATA_DIR + _fn for _fn in FN]
 
 # -----------------------------------------------------------------------------
 #   Helper Functions to run Batch cProfiles
 #------------------------------------------------------------------------------
 
+def file_path(fn):
+    return DATA_DIR + fn
 
+def file_paths(list_fn):
+    out = []
+    for _fn in list_fn:
+        out.append(file_path(_fn))
+    return out
+    
 def pretty_print(d, b_json_style=False):
     ''' For printing out TestArgs data structure '''
     if b_json_style:
@@ -99,18 +107,19 @@ def execute_profile_tests(test_data_params, s_instruct, b_pgn=False):
     ''' Main function to execute all code built into test_data_paramaters'''
     d_cmd_str = batch_build_code_strs(test_data_params, s_instruct, b_pgn)
     for i, _k in enumerate(d_cmd_str.keys()):
-        run_profile(s_cmd=d_cmd_str[_k], fn=FN[i])
-    #TODO - return for non fn
+        run_profile(s_cmd=d_cmd_str[_k], fn=file_path(_k))
+        #TODO - return for non fn
     
 
-def display_profiles(i_fn, amt=10, b_full=False):
-    #TODO - add sel_list optional arg for non-get_available functions
-    p = pstats.Stats(FN[i_fn])
+def display_profiles(fn, amt=10, b_full=False):
+    ''' using an filename to use pstat stats printout'''
+    p = pstats.Stats(fn)
     p.strip_dirs()
     if b_full:
         p.sort_stats('cumulative')
         p.print_stats(amt)
         return None
+    #TODO - add sel_list optional arg for non-get_available functions
     p.print_stats('basic', 'get_available_moves')
 
 
@@ -134,7 +143,7 @@ def printout_display(test_data_params, **kwargs):
 
     for _i, _k in enumerate(test_data_params.keys()):
         
-        display_profiles(i_fn = _i ,b_full = b_opt_all_funcs )
+        display_profiles(fn = file_path(_k) ,b_full = b_opt_all_funcs )
 
 
 # ------------------------------------------------------------------------
@@ -178,6 +187,22 @@ class TestArgs:
 #   Build Batch Experiments Instances
 # -----------------------------------------------------------------------
 
+def param_data_test_different_filter_algos():
+    ''' This experiment looks at how different filter_check algos work. 
+        'test_' prepended to filename to isolate it. '''
+
+    d_params = TestArgs()
+    d_params.set_base_arg(('check_for_check', False))
+    d_params.set_base_arg(('filter_check_opt', False))
+
+    d_params.add_test(('test_filter_check_none',         None)) 
+    d_params.add_test(('test_filter_check_naive',        ('filter_check_naive', True)))
+    d_params.add_test(('test_filter_check_test_copy',    ('filter_check_test_copy_opt', True)))
+    d_params.add_test(('test_filter_check_opt',          ('filter_check_opt', True)))
+
+    return d_params.get_test_data()
+
+
 def param_data_different_filter_algos():
     ''' This experiment looks at how different filter_check algos work '''
 
@@ -188,6 +213,18 @@ def param_data_different_filter_algos():
     d_params.add_test(('filter_check_none',         None)) 
     d_params.add_test(('filter_check_naive',        ('filter_check_naive', True)))
     d_params.add_test(('filter_check_test_copy',    ('filter_check_test_copy_opt', True)))
+    d_params.add_test(('filter_check_opt',          ('filter_check_opt', True)))
+
+    return d_params.get_test_data()
+
+
+def param_data_just_opt():
+    ''' This experiment just looks at current optimized method '''
+
+    d_params = TestArgs()
+    d_params.set_base_arg(('check_for_check', False))
+    d_params.set_base_arg(('filter_check_opt', False))
+
     d_params.add_test(('filter_check_opt',          ('filter_check_opt', True)))
 
     return d_params.get_test_data()
@@ -246,9 +283,9 @@ if __name__ == "__main__":
     
     if args["current"]:
         print """
-            Showing current best algo 30 func profile on long (65 move) game
+            Showing current best algo w/ many function profile on 65 move game. \n
         """
-        test_data_params = param_data_different_filter_algos()
+        test_data_params = param_data_just_opt()
         s_instruct = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. h3 Bb7 9. d3 d6 10. a3 Na5 11. Ba2 c5 12. Nc3 Nc6 13. Bg5 Qd7 14. Nh2 Ne8 15. Bd2 Nc7 16. Nf1 Kh8 17. Ng3 Nd4 18. Nce2 Nde6 19. b4 d5 20. bxc5 Bxc5 21. Bb4 Rfe8 22. Bxc5 Nxc5 23. Nc3 Rad8 24. Qh5 f6 25. d4 exd4 26. Nxd5 Re5 27. Qh4 Nxd5 28. exd5 Bxd5 29. Rxe5 fxe5 30. Bxd5 Qxd5 31. Re1 Ne6 32. Nf5 Nf4 33. Qg5 Rd7 34. Nh4 h6 35. Qg4 g5 36. Nf3 e4 37. Rxe4 Qxe4 38. Qxd7 d3 39. cxd3 Qxd3 40. Qc8+ Kg7 41. Qb7+ Kg8 42. Qxa6 Ne2+ 43. Kh2 Qe4 44. Qf6 Qf4+ 45. Qxf4 gxf4 46. g4 fxg3+ 47. fxg3 Nc3 48. Nd4 h5 49. h4 Kf7 50. Kh3 Kf6 51. g4 hxg4+ 52. Kxg4 Kg6 53. h5+ Kh7 54. Kh4 Kg8 55. h6 Kh7 56. Kh5 Ne4 57. Nxb5 Nf6+ 58. Kg5 Ne4+ 59. Kf5 Nc5 60. Ke5 Kxh6 61. Kd4 Na6 62. Kd5 Kg6 63. Nd4 Kf6 64. Kd6 Kf7 65. Ne6 '
         b_pgn_instruct = True
         b_display_all_functions = True
@@ -256,7 +293,7 @@ if __name__ == "__main__":
     if args["classiccomparison"]:
         print """
                 Showing the difference between filter_check algos
-                using only the opening move.
+                using only the opening move. \n
         """
         test_data_params = param_data_different_filter_algos()
         s_instruct = "1. g1 h3"  
@@ -279,22 +316,17 @@ if __name__ == "__main__":
     #MAIN
     execute_profile_tests(test_data_params, s_instruct, b_pgn_instruct)
 
-    
-    #TODO - consolidate
     printout_display(test_data_params)
 
-    # display_profiles(FN[0])
-    # display_profiles(FN[1])
-    # display_profiles(FN[2])
-    # display_profiles(FN[3], amt = 15)
-
     if b_display_all_functions:
-        display_profiles(i_fn=3, b_full=True, amt=30)
+        display_profiles(fn=file_path('filter_check_opt'), b_full=True, amt=30)
 
 
     # Command List ----------------------
     #   (run in tools/)
     # > python profile_test --current
+    # > python profile_test --current --verboseparams
+    # > python profile_test --current --verboseparams --shortgame
 
 
 # --------------------------------------------------------------------
@@ -308,29 +340,33 @@ def test_opening_move_ncalls_get_available():
     #Setup here
     s_instruct = "1. g1 h3"  
     b_pgn_instruct = False
-    test_data_params = param_data_different_filter_algos()
+    test_data_params = param_data_test_different_filter_algos()
     execute_profile_tests(test_data_params, s_instruct, b_pgn_instruct)
 
 
-    assert 16 == return_ncalls(FN[0])   #baseline - no check_filter
+    assert 16 == return_ncalls(file_path('test_filter_check_none'))   
 
+    #baseline - no check_filter
     #There are 16 pieces white can use:
     #   16 =  calls once for each
+    
+    assert 336 == return_ncalls(file_path('test_filter_check_naive'))   
 
-    assert 336 == return_ncalls(FN[1])   #naive_check
-
+    #naive_check
     #There are 20 moves (for 16 pieces) white can make.
     #For each move, there are 16 pieces for black we need to examine.
     #   320 = 20 * 16
     #   336 = 320 + 16 (to populate white's moves in play)
 
-    assert 36 == return_ncalls(FN[2])   #test_copy_opt
+    assert 36 == return_ncalls(file_path('test_filter_check_test_copy'))   
 
+    #test_copy_opt
     #This is a test filter_check, but uses get_check_optimal,
     #So there should be no difference in calls to get_available_moves.
 
-    assert 36 == return_ncalls(FN[3])   #filter_check_opt
-
+    assert 36 == return_ncalls(file_path('test_filter_check_opt'))   
+    
+    #filter_check_opt
     #First add the 16 calls to populate moves.
     #There are 20 moves for white, so for each of these, need to make
     #a get_available_moves on white's super_king piece. But never
@@ -526,7 +562,6 @@ def test_testargs_class_1():
     test_3 = data2.get('test_2', None)
     assert test_3.get('base2', None) is not None
     assert test_3.get('base2', None) == False           # overwrite
-    # print 'done.'
 
 
 def test_build_code_str():
@@ -574,9 +609,8 @@ def test_build_code_str_b_pgn():
 
     test_data = d_params.get_test_data()
 
-    list_s_cmd = []
+    d_s_cmd = {}
     
-    print test_data.keys()
     for test_key in test_data.keys():
         
         test_name = str(test_key)
@@ -597,14 +631,14 @@ def test_build_code_str_b_pgn():
                                 s_instruct = test_s_instruct
                                 ,d_params = test_params
                                 ,b_import = True
-                                ,b_pgn = b_pgn_instruct
+                                ,b_pgn = b_pgn_instruct     #crux of the test
                                 )
         
-        list_s_cmd.append(s_cmd)
+        d_s_cmd[test_name] = s_cmd
 
     #Now test the strings:
-    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_pgn_instructions="1. e4 e5 2. Nf3 Nc6"); game.play(dummy=False);"""
-    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(dummy=False);"""
+    assert d_s_cmd['pgn_instruct'] == """from src.main import Game; game = Game(s_pgn_instructions="1. e4 e5 2. Nf3 Nc6"); game.play(dummy=False);"""
+    assert d_s_cmd['legacy_instruct'] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(dummy=False);"""
 
 # --------------------------------------------------------------------
 #       Data Scratchpad
