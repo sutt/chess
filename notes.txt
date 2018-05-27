@@ -1016,10 +1016,70 @@ board should store edge cases:
                 [ ] add a unit test after fix
                 [ ] add appropriate s_instructions
 
+            Cleaup:
+            [x] add clarifying comments
+            [x] summary - all the styles run via commenting out
+            [x] are play() kwargs correct in select_function()? no, fix!
+            [x] ss (set line 20) needs a short move
+            [ ] remove header print in interpret_turn_time_data()
+            [ ] opt_game_log (381) is mis-named
+            [ ] why does var3 take less  time than opt
+
+            Add Features:
+            [ ] select_function takes s_insturction as arg
+            [ ] need a way to do pgn_instructions
+            [ ] interpert_xxx_data() saves number data as string?
+            [ ] print out meta-data header for reports
+                [ ] s_instructions
+                [ ] num of plies
+                [ ] comments from each s_test e.g. "this is naive, it run naive_filter"
+            [ ] s_tests returned by named function
+            [ ] Currently timing Game's init() not just play()
+                [ ] change this with decorators?
+                [ ] use indv turn time summing, and take the difference
+            
+            Add Analysis:
+            [ ] add a check_for_check analysis
+            [ ] add num_irregluar to turntime logging and reporting
+            [ ] add b_bypass analysis ?
+            
+
+            Module Architecture:
+            [ ] add argparse to run these different styles
+                [ ] how to bring in a string of s_instructions
+            [ ] add an importable callable function that logs to data
+                    and has variables for s_instruction, s_test, etc..
+            [ ] function to write reports to files instead of console
+                [ ] build a data directory
+            
+            Advanced Concepts:
+            [ ] how to handle "zero" turn times?
+                [ ] - demonstrate how to get them
+                        n=1, b_turn_time should do it
+
+            [ ] Ultimately, this data can be used to build a regression:
+                
+                TurnTime ~ A + B*num_moves
+                TurnTime ~ A + B1*Regular_num_moves + B2*Irregular_num_moves
+                TurnTime ~ B1*num_my_pieces*num_your_moves
+                ...etc...
+
+                [ ] Log a lot of the data
+                [ ] Find a way to aggregate the logged data into regression form
+                [ ] Run a regression in R
+                [ ] Compare SSE to a priori results discovered via profile_test
+
+
             Other TODOs
 
                 [ ] a test runner to run all the tests
                 [ ] profile_test is using wrong A1 format on line 290
+                [ ] conversion functions:
+                    [ ] A1-movelog <-> PGN-movelog
+                    [ ] Get board state at certain move nums
+                        [ ] output as a python / json format
+                        [ ] output as a console
+                        [ ] how to handle board_state
 
 
 

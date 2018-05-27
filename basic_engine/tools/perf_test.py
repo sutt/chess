@@ -7,10 +7,8 @@ from src.main import Game
 
 
 
-#TODO's here:
-#add in sqlite3 for logging
-#add in git hashes, etc
-#add in a plot to compare N to King_in_Check(N)
+
+# s_insturction params -----------------------------------------------
 
 #These are in old (incorrect A1 format)
 # ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
@@ -18,9 +16,13 @@ from src.main import Game
 # ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '
 
 #Correct format
-ss = '1. a2 a4'
+# ss = '1. a2 a4'
+ss = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 ss_long = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
-ss = ss_long
+
+
+# Different Experiments --------------------------------------------------
+#  an s_test string causes a different style of Game and play to happen
 
 def select_function(s_function):
     ''' input: s_function (string)
@@ -28,40 +30,68 @@ def select_function(s_function):
         This string choses a way to:
              init Game(), param's for play(), possible return value.'''
     
-    if s_function == "baseline":
+    if s_function == "baseline_nk":
+        
+        # no check_for_check, no filter_check at all
+        game = Game(s_instructions = ss)
+        game.play(check_for_check=False, filter_check_opt=False)    
+
+    if s_function == "baseline_yk":
+        
+        # yes check_for_check, no filter_check at all
+        game = Game(s_instructions = ss)
+        game.play(check_for_check=True, filter_check_opt=False)    
+        
+    if s_function == "naive_nk":
+
+        #no check_for_check, filter_check
+        game = Game(s_instructions = ss)
+        game.play(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
+
+    if s_function == "naive_yk":
+    
+        game = Game(s_instructions = ss)
+        game.play(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
+
+    if s_function == "opt_nk":
+    
+        game = Game(s_instructions = ss)
+        game.play(check_for_check=False, filter_check_opt=True)
+
+    if s_function == "opt_yk":
         
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False)    
-        
-    if s_function == "naive_check":
+        game.play(check_for_check=True, filter_check_opt=True)
 
-        game = Game(s_instructions = ss)
-        game.play()
+    
+    #all vars below are yk - they do check_for_check
 
-    if s_function == "test_copy":
+    if s_function == "var0":
         
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_test_copy=True)
+        game.play(filter_check_opt=False, filter_check_test_copy=True)
 
-    if s_function == "test_copy_apply":
+    if s_function == "var1":
         
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_test_copy_apply=True)
+        game.play(filter_check_opt=False, filter_check_test_copy_apply=True)
 
-    if s_function == "test_c_apply_2":
+    if s_function == "var2":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_test_copy_apply_2=True)
+        game.play(filter_check_opt=False, filter_check_test_copy_apply_2=True)
 
-    if s_function == "test_c_apply_3":
+    if s_function == "var3":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_test_copy_apply_3=True)
+        game.play(filter_check_opt=False, filter_check_test_copy_apply_3=True)
 
-    if s_function == "test_c_apply_4":
+    if s_function == "var4":
             
         game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_opt=True)
+        game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
+
+    # still unexamined below ...
     
     if s_function == "baseline_tt":
         
@@ -250,6 +280,7 @@ def interpret_turn_time_data(results):
 
         n_test = data_test['n']
 
+        # TODO - remove this section, plus its buggy
         order_test = data_test['order']
         if order_test == 0:
             print 'Test A: ', test_name
@@ -356,8 +387,8 @@ def perf_test(s_tests
     '''main function to take a list of s_test, and log the time perf
 
         Output Terminology Heirarchy:
-            result         - a set of tests
-                test         - a set of full games
+            result         - a set of tests, "diff algo styles"
+                test         - a set of full games for one test
                     trial    - one full game
                         turn - one move in the game
     '''
@@ -408,7 +439,10 @@ def perf_test(s_tests
         result[s_test] = test
     
     return result
-    
+
+# TestParameters ------------------------------------------------    
+
+#TODO - add ss_insturctions here
 
 s_tests = [
     "baseline"
@@ -422,40 +456,178 @@ s_tests = [
     ,"check_optimal_2"
     ]
 
-s_tests = [
-    "baseline_long"
-    ,"naive_long"
-    ]
+# s_tests = [
+#     "baseline_long"
+#     ,"naive_long"
+#     ]
 
-results = perf_test(s_tests, n=10, b_trial_time=True)
 
-print('')
-print_results(results, b_basic=True)
-print('')
-print_results(results, b_basic_variation=True)
-print('')
-
-s_tests = [
+#Type 2...
+s_tests_2 = [
     "baseline_tt"
     ,"naive_check_tt"
     ]
 
-# "long" refers to a game with longer instructions
-
-s_tests = [
+s_tests_2 = [
     "baseline_long"
     ,"naive_long"
     ]
 
-s_tests = [
-    "optimal1_long"
-    ,"optimal2_long"
-    ]
+# s_tests_2 = [
+#     "optimal1_long"
+#     ,"optimal2_long"
+#     ]
+# "long" refers to a game with longer instructions
 
-results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
-print_results(results, b_turn_time=True)
+# Doc --------------------------------------------------------------
+
+# Output Terminology Heirarchy:
+#     result         - a set of tests
+#         test         - a set of full games
+#             trial    - one full game
+#                 turn - one move in the game
+
+# How a Main method works:
+# First...
+# perf_test() is called with s_test, a list of strings: 
+#   which looks up in select_function and runs that implementation of Game(), play()
+#   timing data for each full game is recorded here and written to test-dict
+#   by calling with: b_trial_time, b_turn_time, b_num_available
+#       you can add extra records to the test-dict data holder
+#       for turntime styles, the indv turn timing data is observed in 
+#       GameLog.add_turn_log() called from play().
+#       This timing data is then copied from the log at the end of the play().
+#   each s_test's, test-dict is record into results-dict, and returned.
+# Second...
+# print_results() are called with results-dict 
+#   and a style operator:
+#        b_basic, b_basic_variation, b_turn_time
+#   depending on style operator, a different function is called:
+#        interpret_basic_data, interpret_variation_data, interpret_turn_time_data
+#       which slices the results-dict along different dimensions and returns
+#       a tabular, list of list, called data
+#   also depending on style operator, a dims_out list of tuple info on formatting:
+#       ('Col Heading', chars_in_col, chars_spacer_right, char_round)
+#   data and dims_out are fed into print_formatted_results() which prints aligned cols
+# That's it.
+
+# How arparse or callable function work
+
+# Main Functions  ---------------------------------------------------
+
+def main1(s_tests):
+    ''' Type 1 - AlgoStlye by row, SummaryStats by col (Avg Min Max)'''
+    results = perf_test(s_tests, n=10, b_trial_time=True)
+    print('')
+    print_results(results, b_basic=True)
+    print('')
+    print_results(results, b_basic_variation=True)
+    print('')
+
+def main2(s_tests):
+    ''' Type 2 - TurnAttribute by row (NumAvailable Time), AlgoStyle by col '''
+    results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
+    print_results(results, b_turn_time=True)
+
+# Cmds -------------------------------------------------------------
+
+# > python perf_test.py --demo
+
+# > python perf_test.py --multialgosummary
+# > python perf_test.py --turntimenaivevsopt
+
+if __name__ == "__main__":
+    
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--demo", action="store_true")
+    ap.add_argument("--verboseparams", action="store_true")
+    args = vars(ap.parse_args())
+
+    
+    if args["verboseparams"] or args["demo"]:
+        pass
+            
+
+    if args["demo"]:
+        
+        s_tests = [
+                "baseline_nk"
+                ,"baseline_yk"
+                ,"naive_nk"
+                ,"naive_yk"
+                ,"opt_nk"
+                ,"opt_yk"
+                ,"var0"
+                ,"var1"
+                ,"var2"
+                ,"var3"
+                ,"var4"
+                ]
+
+        main1(s_tests)
+
+        s_tests = [
+                "baseline_long"
+                ,"naive_long"
+                ]
+
+        main2(s_tests)
+
+    print 'done.'
+        
+
+
+
+
+# Scratchpad ---------------------------------------------------------
 
 #5/27
+
+# >python perf_test.py --demo
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#     baseline_nk             0.00469                      n/a        10               0.046
+#     baseline_yk             0.00469                      1.0        10               0.046
+#        naive_nk             0.30780                     65.4        10               3.078
+#        naive_yk             0.29679                     63.1        10               2.967
+#          opt_nk             0.02030                     4.31        10               0.203
+#          opt_yk             0.02030                     4.31        10               0.203
+#            var0             0.19839                     42.2        10               1.983
+#            var1             0.20620                     43.8        10               2.062
+#            var2             0.16559                     35.2        10               1.655
+#            var3             0.00929                     1.97        10               0.092
+#            var4             0.22030                     46.8        10               2.203
+
+#      Test Name:           Avg Time:     Min Trial Time:     Max Trial Time:
+#     baseline_nk             0.00469                 0.0             0.01600
+#     baseline_yk             0.00469                 0.0             0.01600
+#        naive_nk             0.30780             0.28200               0.375
+#        naive_yk             0.29679             0.29600             0.29700
+#          opt_nk             0.02030             0.01500             0.03199
+#          opt_yk             0.02030             0.01500             0.03199
+#            var0             0.19839             0.18700             0.20399
+#            var1             0.20620             0.20299             0.21800
+#            var2             0.16559             0.15599             0.17200
+#            var3             0.00929                 0.0             0.01600
+#            var4             0.22030             0.21799             0.23400
+
+# Test B:  naive_long
+# N tests:  30
+
+# Test A:  baseline_long
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            2.066            22.86
+#          2             20              0.0            23.96
+#          3             22            2.100            26.00
+#          4             21            1.533            24.53
+#          5             28            2.066            33.30
+#          6             22              0.0            26.09
+#          7             25            4.199            30.70
+#          8             21            1.533            23.86
+#          9             35            1.566            41.23
+#         10             22            4.166            26.99
+# done.
 
 # BASECAMP results on refactor
 
@@ -721,3 +893,7 @@ print_results(results, b_turn_time=True)
 # with apply_rule in test_copy
 # total time:  1.734
 # per game:  0.17340
+
+
+# Unit Tests --------------------------------------------------------
+
