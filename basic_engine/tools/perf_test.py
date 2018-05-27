@@ -84,72 +84,34 @@ def select_function(s_function, s_instructions=SS_LONG):
         game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
 
-    # still unexamined below ...
-    
-    if s_function == "baseline_tt":
-        
-        game = Game(s_instructions = s_instructions
-                    ,b_log_turn_time = True
-                    ,b_log_num_available = True 
-                    )  
-        game.play(filter_check_naive=False)    
-        return game.get_gamelog()
-    
-    if s_function == "naive_check_tt":
 
-        game = Game(s_instructions = s_instructions
-            ,b_log_turn_time = True
-            ,b_log_num_available = True 
-            )  
-        game.play(filter_check_naive=True)    
-        return game.get_gamelog()
-
-    if s_function == "baseline_long":
+    if s_function == "tt_baseline":
             
         game = Game(s_instructions = s_instructions
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
-        game.play(filter_check_naive=False)    
+        game.play(filter_check_opt=False)    
         return game.get_gamelog()
     
-    if s_function == "naive_long":
+    if s_function == "tt_naive":
 
         game = Game(s_instructions = s_instructions
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
-        game.play(filter_check_naive=True)    
+        game.play(filter_check_naive=True, filter_check_opt=False)    
         return game.get_gamelog()
 
-    if s_function == "optimal1_long":
+    if s_function == "tt_opt":
             
         game = Game(s_instructions = s_instructions
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
-        game.play(filter_check_naive=False, king_in_check_optimal = True)    
+        game.play()    
         return game.get_gamelog()
     
-    if s_function == "optimal2_long":
-
-        game = Game(s_instructions = s_instructions
-            ,b_log_turn_time = True
-            ,b_log_num_available = True 
-            )  
-        game.play(filter_check_naive=False, filter_check_test_copy_opt = True)    
-        return game.get_gamelog()
-
-    if s_function == "check_optimal":
-            
-        game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, king_in_check_optimal=True)
-
-    if s_function == "check_optimal_2":
-            
-        game = Game(s_instructions = ss)
-        game.play(filter_check_naive=False, filter_check_test_copy_opt=True)
-
     return None     #to show that the function is no returning a test exit data
 
 
@@ -436,8 +398,6 @@ def perf_test(s_tests
 
 # TestParameters ------------------------------------------------    
 
-#TODO - add ss_insturctions here
-
 def data_all_algos():
     
     ''' These are all the algo styles available in play.
@@ -460,29 +420,16 @@ def data_all_algos():
 def data_turntime_baseline_vs_naive():
     ''' examines turntimes for baseline vs naive '''
     return [
-        "baseline_long"
-        ,"naive_long"
-        ]
+            "tt_baseline"
+            ,"tt_naive"
+            ]
 
-# s_tests = [
-#     "baseline_long"
-#     ,"naive_long"
-#     ]
-
-# s_tests_2 = [
-#     "baseline_tt"
-#     ,"naive_check_tt"
-#     ]
-
-# s_tests_2 = [
-#     "optimal1_long"
-#     ,"optimal2_long"
-#     ]
-
-
-
-
-# "long" refers to a game with longer instructions
+def data_turntime_naive_vs_opt():
+    return [
+            "tt_naive"
+            ,"tt_opt"
+            ]
+    
 
 # Doc --------------------------------------------------------------
 
@@ -561,6 +508,9 @@ if __name__ == "__main__":
     ap.add_argument("--verboseparams", action="store_true")
     ap.add_argument("--longgame", action="store_true")
     ap.add_argument("--shortgame", action="store_true")
+    ap.add_argument("--multialgosummary", action="store_true")
+    ap.add_argument("--turntimenaivevsopt", action="store_true")
+
     args = vars(ap.parse_args())
 
     
@@ -579,13 +529,27 @@ if __name__ == "__main__":
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
         s_tests = data_all_algos()
-
         main1(s_tests, s_instructions)
 
         s_tests = data_turntime_baseline_vs_naive()
-
         main2(s_tests, s_instructions)
 
+
+    if args["multialgosummary"]:
+        
+        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+        s_tests = data_all_algos()
+        main1(s_tests, s_instructions)
+
+    
+    if args["turntimenaivevsopt"]:
+        
+        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+
+        s_tests = data_turntime_naive_vs_opt()
+        main2(s_tests, s_instructions)
+
+    
     print 'done.'
         
 

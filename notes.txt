@@ -1037,7 +1037,7 @@ board should store edge cases:
                 [ ] s_instructions
                 [ ] num of plies
                 [ ] comments from each s_test e.g. "this is naive, it run naive_filter"
-            [ ] s_tests returned by named function
+            [x] s_tests returned by named function
             [ ] Currently timing Game's init() not just play()
                 [ ] change this with decorators?
                 [ ] use indv turn time summing, and take the difference
