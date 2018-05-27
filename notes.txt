@@ -1022,12 +1022,16 @@ board should store edge cases:
             [x] are play() kwargs correct in select_function()? no, fix!
             [x] ss (set line 20) needs a short move
             [ ] remove header print in interpret_turn_time_data()
-            [ ] opt_game_log (381) is mis-named
+            [x] opt_game_log (381) is mis-named
             [ ] why does var3 take less  time than opt
 
             Add Features:
-            [ ] select_function takes s_insturction as arg
+            [x] select_function takes s_insturction as arg
+            [ ] game_init in separate function
+            [ ] play 0th move init'd ?
             [ ] need a way to do pgn_instructions
+                [ ] but pgn requires compute time to deduce, should have a 
+                    conversion called pgn->A1 pre-timing
             [ ] interpert_xxx_data() saves number data as string?
             [ ] print out meta-data header for reports
                 [ ] s_instructions
@@ -1037,9 +1041,11 @@ board should store edge cases:
             [ ] Currently timing Game's init() not just play()
                 [ ] change this with decorators?
                 [ ] use indv turn time summing, and take the difference
+            [ ] Currently perf_test times get_log_data() at end of play()
             
             Add Analysis:
-            [ ] add a check_for_check analysis
+            [x] add a check_for_check analysis
+            [ ] add a warm-up and cool-down analysis
             [ ] add num_irregluar to turntime logging and reporting
             [ ] add b_bypass analysis ?
             

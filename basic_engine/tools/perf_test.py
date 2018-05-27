@@ -10,57 +10,50 @@ from src.main import Game
 
 # s_insturction params -----------------------------------------------
 
-#These are in old (incorrect A1 format)
-# ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
-# mm_long = [((6, 0), (4, 0)), ((1, 0), (3, 0)), ((6, 1), (4, 1)), ((1, 2), (3, 2)), ((4, 1), (3, 2)), ((1, 5), (3, 5)), ((6, 4), (4, 4)), ((0, 1), (2, 2)), ((7, 3), (3, 7)), ((1, 6), (2, 6)), ((7, 5), (2, 0)), ((0, 0), (2, 0)), ((7, 0), (5, 0)), ((0, 5), (2, 7)), ((7, 6), (5, 5)), ((1, 1), (3, 1)), ((7, 2), (6, 1)), ((0, 4), (0, 5)), ((4, 0), (3, 1)), ((2, 7), (3, 6)), ((3, 7), (2, 6)), ((3, 6), (4, 5)), ((7, 4), (7, 6)), ((1, 7), (2, 7)), ((6, 2), (4, 2)), ((4, 5), (1, 2)), ((6, 6), (4, 6)), ((2, 2), (4, 3)), ((2, 6), (1, 6)), ((0, 5), (0, 4)), ((1, 6), (2, 6)), ((2, 0), (2, 6)), ((3, 1), (2, 1)), ((1, 3), (3, 3)), ((5, 5), (4, 3)), ((3, 5), (4, 4)), ((7, 1), (5, 2)), ((2, 7), (3, 7)), ((5, 0), (3, 0)), ((2, 6), (2, 3))]
-# ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '
-
-#Correct format
-# ss = '1. a2 a4'
-ss = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
-ss_long = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+SS = "1. b1 c3"
+SS_LONG = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
 
 # Different Experiments --------------------------------------------------
 #  an s_test string causes a different style of Game and play to happen
 
-def select_function(s_function):
+def select_function(s_function, s_instructions=SS_LONG):
     ''' input: s_function (string)
         output: [optional] usually a GameLog but really completely dynamic
         This string choses a way to:
-             init Game(), param's for play(), possible return value.'''
+             init Game(), param's for play(), pos_instructionsible return value.'''
     
     if s_function == "baseline_nk":
         
         # no check_for_check, no filter_check at all
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False)    
 
     if s_function == "baseline_yk":
         
         # yes check_for_check, no filter_check at all
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=False)    
         
     if s_function == "naive_nk":
 
         #no check_for_check, filter_check
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "naive_yk":
     
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "opt_nk":
     
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=True)
 
     if s_function == "opt_yk":
         
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=True)
 
     
@@ -68,34 +61,34 @@ def select_function(s_function):
 
     if s_function == "var0":
         
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy=True)
 
     if s_function == "var1":
         
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply=True)
 
     if s_function == "var2":
             
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_2=True)
 
     if s_function == "var3":
             
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_3=True)
 
     if s_function == "var4":
             
-        game = Game(s_instructions = ss)
+        game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
 
     # still unexamined below ...
     
     if s_function == "baseline_tt":
         
-        game = Game(s_instructions = ss
+        game = Game(s_instructions = s_instructions
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
@@ -104,7 +97,7 @@ def select_function(s_function):
     
     if s_function == "naive_check_tt":
 
-        game = Game(s_instructions = ss
+        game = Game(s_instructions = s_instructions
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
@@ -113,7 +106,7 @@ def select_function(s_function):
 
     if s_function == "baseline_long":
             
-        game = Game(s_instructions = ss_long
+        game = Game(s_instructions = s_instructions
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
@@ -122,7 +115,7 @@ def select_function(s_function):
     
     if s_function == "naive_long":
 
-        game = Game(s_instructions = ss_long
+        game = Game(s_instructions = s_instructions
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
@@ -131,7 +124,7 @@ def select_function(s_function):
 
     if s_function == "optimal1_long":
             
-        game = Game(s_instructions = ss_long
+        game = Game(s_instructions = s_instructions
                     ,b_log_turn_time = True
                     ,b_log_num_available = True 
                     )  
@@ -140,7 +133,7 @@ def select_function(s_function):
     
     if s_function == "optimal2_long":
 
-        game = Game(s_instructions = ss_long
+        game = Game(s_instructions = s_instructions
             ,b_log_turn_time = True
             ,b_log_num_available = True 
             )  
@@ -378,6 +371,7 @@ def print_results(results, **kwargs):
 
 
 def perf_test(s_tests
+                ,s_instructions=SS_LONG
                 ,n=10 
                 ,b_trial_time=False
                 ,b_num_available=False
@@ -406,15 +400,15 @@ def perf_test(s_tests
         for trial_i in range(n):
             
             t0_trial = time()
-            opt_game_log = select_function(s_test)  # Main
+            game_log = select_function(s_test, s_instructions)  # MAIN FUNCTION
             t1_trial = time()
 
             if b_trial_time:    
                 trial_time.append(t1_trial - t0_trial)        
             if b_turn_time:
-                trial_turn_time.append( opt_game_log.get_log_turn_time() )
+                trial_turn_time.append( game_log.get_log_turn_time() )
             if b_num_available:
-                trial_num_available.append( opt_game_log.get_log_num_available() )
+                trial_num_available.append( game_log.get_log_num_available() )
                     
         t1 = time() 
          
@@ -444,39 +438,50 @@ def perf_test(s_tests
 
 #TODO - add ss_insturctions here
 
-s_tests = [
-    "baseline"
-    ,"naive_check"
-    ,"test_copy"
-    ,"test_copy_apply"
-    ,"test_c_apply_2"
-    ,"test_c_apply_3"
-    ,"test_c_apply_4"
-    ,"check_optimal"
-    ,"check_optimal_2"
-    ]
+def data_all_algos():
+    
+    ''' These are all the algo styles available in play.
+        'nk' is for check_for_check off; 'yk' means its on '''
+
+    return [
+            "baseline_nk"
+            ,"baseline_yk"
+            ,"naive_nk"
+            ,"naive_yk"
+            ,"opt_nk"
+            ,"opt_yk"
+            ,"var0"
+            ,"var1"
+            ,"var2"
+            ,"var3"
+            ,"var4"
+            ]
+
+def data_turntime_baseline_vs_naive():
+    ''' examines turntimes for baseline vs naive '''
+    return [
+        "baseline_long"
+        ,"naive_long"
+        ]
 
 # s_tests = [
 #     "baseline_long"
 #     ,"naive_long"
 #     ]
 
-
-#Type 2...
-s_tests_2 = [
-    "baseline_tt"
-    ,"naive_check_tt"
-    ]
-
-s_tests_2 = [
-    "baseline_long"
-    ,"naive_long"
-    ]
+# s_tests_2 = [
+#     "baseline_tt"
+#     ,"naive_check_tt"
+#     ]
 
 # s_tests_2 = [
 #     "optimal1_long"
 #     ,"optimal2_long"
 #     ]
+
+
+
+
 # "long" refers to a game with longer instructions
 
 # Doc --------------------------------------------------------------
@@ -515,18 +520,30 @@ s_tests_2 = [
 
 # Main Functions  ---------------------------------------------------
 
-def main1(s_tests):
+def main1(s_tests, s_instructions):
     ''' Type 1 - AlgoStlye by row, SummaryStats by col (Avg Min Max)'''
-    results = perf_test(s_tests, n=10, b_trial_time=True)
+    
+    results = perf_test(s_tests
+                        ,s_instructions
+                        ,n=10
+                        ,b_trial_time=True
+                        )
     print('')
     print_results(results, b_basic=True)
     print('')
     print_results(results, b_basic_variation=True)
     print('')
 
-def main2(s_tests):
+def main2(s_tests, s_instructions):
     ''' Type 2 - TurnAttribute by row (NumAvailable Time), AlgoStyle by col '''
-    results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
+    
+    results = perf_test(s_tests
+                        ,s_instructions 
+                        ,n=30 
+                        ,b_turn_time=True
+                        ,b_num_available=True
+                        )
+    
     print_results(results, b_turn_time=True)
 
 # Cmds -------------------------------------------------------------
@@ -542,37 +559,32 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--verboseparams", action="store_true")
+    ap.add_argument("--longgame", action="store_true")
+    ap.add_argument("--shortgame", action="store_true")
     args = vars(ap.parse_args())
 
     
     if args["verboseparams"] or args["demo"]:
         pass
             
+    if args["longgame"]:
+        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
+    if args["shortgame"]:
+        s_instructions = "1. b1 c3"
+
+    
     if args["demo"]:
         
-        s_tests = [
-                "baseline_nk"
-                ,"baseline_yk"
-                ,"naive_nk"
-                ,"naive_yk"
-                ,"opt_nk"
-                ,"opt_yk"
-                ,"var0"
-                ,"var1"
-                ,"var2"
-                ,"var3"
-                ,"var4"
-                ]
+        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
-        main1(s_tests)
+        s_tests = data_all_algos()
 
-        s_tests = [
-                "baseline_long"
-                ,"naive_long"
-                ]
+        main1(s_tests, s_instructions)
 
-        main2(s_tests)
+        s_tests = data_turntime_baseline_vs_naive()
+
+        main2(s_tests, s_instructions)
 
     print 'done.'
         
