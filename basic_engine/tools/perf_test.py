@@ -1,6 +1,10 @@
+import sys
 from time import time
-from main import Game
 import copy
+sys.path.append('../')
+
+from src.main import Game
+
 
 
 #TODO's here:
@@ -8,10 +12,15 @@ import copy
 #add in git hashes, etc
 #add in a plot to compare N to King_in_Check(N)
 
-ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
-
+#These are in old (incorrect A1 format)
+# ss = "1. h7 f8 2. b1 c1 3. g5 e5 4. b2 c2 5. h6 f4 6. b3 c3 7. h5 h6 8. b4 c4 9. h6 h5 10. b5 c5"
 # mm_long = [((6, 0), (4, 0)), ((1, 0), (3, 0)), ((6, 1), (4, 1)), ((1, 2), (3, 2)), ((4, 1), (3, 2)), ((1, 5), (3, 5)), ((6, 4), (4, 4)), ((0, 1), (2, 2)), ((7, 3), (3, 7)), ((1, 6), (2, 6)), ((7, 5), (2, 0)), ((0, 0), (2, 0)), ((7, 0), (5, 0)), ((0, 5), (2, 7)), ((7, 6), (5, 5)), ((1, 1), (3, 1)), ((7, 2), (6, 1)), ((0, 4), (0, 5)), ((4, 0), (3, 1)), ((2, 7), (3, 6)), ((3, 7), (2, 6)), ((3, 6), (4, 5)), ((7, 4), (7, 6)), ((1, 7), (2, 7)), ((6, 2), (4, 2)), ((4, 5), (1, 2)), ((6, 6), (4, 6)), ((2, 2), (4, 3)), ((2, 6), (1, 6)), ((0, 5), (0, 4)), ((1, 6), (2, 6)), ((2, 0), (2, 6)), ((3, 1), (2, 1)), ((1, 3), (3, 3)), ((5, 5), (4, 3)), ((3, 5), (4, 4)), ((7, 1), (5, 2)), ((2, 7), (3, 7)), ((5, 0), (3, 0)), ((2, 6), (2, 3))]
-ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '
+# ss_long = '1. g1 e1 2. b1 d1 3. g2 e2 4. b3 d3 5. e2 d3 6. b6 d6 7. g5 e5 8. a2 c3 9. h4 d8 10. b7 c7 11. h6 c1 12. a1 c1 13. h1 f1 14. a6 c8 15. h7 f6 16. b2 d2 17. h3 g2 18. a5 a6 19. e1 d2 20. c8 d7 21. d8 c7 22. d7 e6 23. h5 h7 24. b8 c8 25. g3 e3 26. e6 b3 27. g7 e7 28. c3 e4 29. c7 b7 30. a6 a5 31. b7 c7 32. c1 c7 33. d2 c2 34. b4 d4 35. f6 e4 36. d6 e5 37. h2 f3 38. c8 d8 39. f1 d1 40. c7 c4 '
+
+#Correct format
+ss = '1. a2 a4'
+ss_long = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+ss = ss_long
 
 def select_function(s_function):
     ''' input: s_function (string)
@@ -445,6 +454,36 @@ s_tests = [
 
 results = perf_test(s_tests, n=30, b_turn_time=True, b_num_available=True)
 print_results(results, b_turn_time=True)
+
+#5/27
+
+# BASECAMP results on refactor
+
+# $ python perf_test.py
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#   baseline_long             0.02230                      n/a        10               0.223
+#      naive_long             0.32090                     14.3        10               3.209
+
+#      Test Name:           Avg Time:     Min Trial Time:     Max Trial Time:
+#   baseline_long             0.02230             0.01500             0.04099
+#      naive_long             0.32090             0.31000             0.34599
+
+# Test A:  optimal1_long
+# Test B:  optimal2_long
+# N tests:  30
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            1.766            18.56
+#          2             20            2.099            18.63
+#          3             22            1.366            19.50
+#          4             21            1.433            18.66
+#          5             28            2.766            24.96
+#          6             22            1.799            21.10
+#          7             25            2.066            23.29
+#          8             21            1.266            19.83
+#          9             35            2.499            30.50
+#         10             22            2.933            20.63
 
 
 

@@ -958,9 +958,70 @@ board should store edge cases:
                 [ ] adding a return_ncalls type printout
                 [ ] a way to look at other functions than just get_available_moves
               
-            [ ] cleanup directory of unused files
+            [x] cleanup directory of unused files
             [ ] write some notes of whats needed next
+
+
+        Review of the worksapce as of 5/25:
+
+            Little things:
+
+                [x] alter the vscode fileexplorer to hide:
+                    .cache (from pytest)
+                    .ipynb_checkpoints
+                    .code-workspace
+                [x] get your settings and keyboard_vs up into a git repo
+                [ ] TurnStage(513): b_bypass implemented in filter_check_naive()
+                    appears to be wrong
+                        fix this when implemnting final touches on profile_test
+                [ ] How to update params on batchverify; add this to cmds-list.txt
+                [ ] Can finally delete basic:print2() and remove its references
+
             
+            Medium Things:
+            
+                [ ] Next step is rewriting(?)/running perf_test
+                    [ ] Need some kind of baseline saved in data/
+                    [ ] different game logging attributes
+                    [ ] we're headed towards switching b/w naive and opt
+                        at some low piece count on board. Think with that in mind.
+
+                [ ] Have a proof of concept of altering engine code and re-baselining
+
+                [ ] How to get sensible width terminal is vscode?
+
+                [ ] start implementing blog post of vscode customization
+
+            Major things:
+
+                There's half a dozen concepts like Enums and static-typing that I'd like to
+                implement into this.
+                        This will require going to py3
+                        Also it would be nice to get timing data baseline in py2 first
+                    [ ] Let's get a list of things that we want to implement
+
+                There's other libraries we want to use like stockfish:
+
+                There's the whole 'select_move' module to build out
+
+                There's the kivo/web-app etc build stuff to add
+                    and the MVC concept into Game.play()
+
+            5/27
+            
+            perf_test.py 
+
+            [x] bug - second test does not print
+
+                [ ] add a unit test after fix
+                [ ] add appropriate s_instructions
+
+            Other TODOs
+
+                [ ] a test runner to run all the tests
+                [ ] profile_test is using wrong A1 format on line 290
+
+
 
 
         HOWTOs
