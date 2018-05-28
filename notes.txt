@@ -1014,7 +1014,7 @@ board should store edge cases:
             [x] bug - second test does not print
 
                 [ ] add a unit test after fix
-                [ ] add appropriate s_instructions
+                [x] add appropriate s_instructions
 
             Cleaup:
             [x] add clarifying comments
@@ -1046,7 +1046,11 @@ board should store edge cases:
             Add Analysis:
             [x] add a check_for_check analysis
             [ ] add a warm-up and cool-down analysis
+            [ ] an init analysis, calling game constructor before
+                [ ] also calling test_exit_moves=1 on play() before.
+            [ ] a pgn vs s_instruction analysis
             [ ] add num_irregluar to turntime logging and reporting
+            [ ] add num pieces
             [ ] add b_bypass analysis ?
             
 

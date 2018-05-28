@@ -17,43 +17,57 @@ SS_LONG = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 
 # Different Experiments --------------------------------------------------
 #  an s_test string causes a different style of Game and play to happen
 
-def select_function(s_function, s_instructions=SS_LONG):
-    ''' input: s_function (string)
-        output: [optional] usually a GameLog but really completely dynamic
-        This string choses a way to:
-             init Game(), param's for play(), pos_instructionsible return value.'''
+def game_init(s_instructions, b_turn_log=False, b_init_zero_move=False):
+    ''' This consturcts the Game object so it doesnt get counted in timer. '''
+    
+    game = Game(s_instructions = s_instructions
+                ,b_log_turn_time = b_turn_log
+                ,b_log_num_available=b_turn_log
+                )
+    
+    if b_init_zero_move:
+        # pieces init'd but has not made a move yet
+        game.play(test_exit_moves=1)    
+        
+    return game
+
+def select_function(s_function, game):
+    ''' input: s_function (string) - choses param's for play()
+               game       (obj)    - a Game obj with insturction and initd already
+        output: [optional] - a GameLog or None
+         '''
     
     if s_function == "baseline_nk":
         
         # no check_for_check, no filter_check at all
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False)    
 
     if s_function == "baseline_yk":
         
         # yes check_for_check, no filter_check at all
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=False)    
         
     if s_function == "naive_nk":
 
         #no check_for_check, filter_check
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "naive_yk":
     
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "opt_nk":
     
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=True)
 
     if s_function == "opt_yk":
         
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=True)
 
     
@@ -61,54 +75,54 @@ def select_function(s_function, s_instructions=SS_LONG):
 
     if s_function == "var0":
         
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy=True)
 
     if s_function == "var1":
         
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply=True)
 
     if s_function == "var2":
             
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_2=True)
 
     if s_function == "var3":
             
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_3=True)
 
     if s_function == "var4":
             
-        game = Game(s_instructions = s_instructions)
+        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
 
 
     if s_function == "tt_baseline":
             
-        game = Game(s_instructions = s_instructions
-                    ,b_log_turn_time = True
-                    ,b_log_num_available = True 
-                    )  
+        # game = Game(s_instructions = s_instructions
+        #             ,b_log_turn_time = True
+        #             ,b_log_num_available = True 
+        #             )  
         game.play(filter_check_opt=False)    
         return game.get_gamelog()
     
     if s_function == "tt_naive":
 
-        game = Game(s_instructions = s_instructions
-            ,b_log_turn_time = True
-            ,b_log_num_available = True 
-            )  
+        # game = Game(s_instructions = s_instructions
+        #     ,b_log_turn_time = True
+        #     ,b_log_num_available = True 
+        #     )  
         game.play(filter_check_naive=True, filter_check_opt=False)    
         return game.get_gamelog()
 
     if s_function == "tt_opt":
             
-        game = Game(s_instructions = s_instructions
-                    ,b_log_turn_time = True
-                    ,b_log_num_available = True 
-                    )  
+        # game = Game(s_instructions = s_instructions
+        #             ,b_log_turn_time = True
+        #             ,b_log_num_available = True 
+        #             )  
         game.play()    
         return game.get_gamelog()
     
@@ -338,6 +352,7 @@ def perf_test(s_tests
                 ,b_trial_time=False
                 ,b_num_available=False
                 ,b_turn_time=False
+                ,b_time_init=False
                 ):
 
     '''main function to take a list of s_test, and log the time perf
@@ -362,7 +377,17 @@ def perf_test(s_tests
         for trial_i in range(n):
             
             t0_trial = time()
-            game_log = select_function(s_test, s_instructions)  # MAIN FUNCTION
+            
+            _game = game_init(s_instructions
+                              ,b_turn_time
+                              ,False
+                              )
+
+            if not(b_time_init):
+                t0_trial = time()
+
+            game_log = select_function(s_test, _game)  # MAIN FUNCTION
+            
             t1_trial = time()
 
             if b_trial_time:    
@@ -380,7 +405,7 @@ def perf_test(s_tests
         test['test_name'] = s_test
         test['order'] = i_test      #to print out results in correct order
         test['n'] = n
-        test['total_time'] = t1 - t0
+        test['total_time'] = t1 - t0    #TODO - make this sum of trial times
         
         #by trial
         if b_trial_time:
@@ -873,3 +898,21 @@ if __name__ == "__main__":
 
 # Unit Tests --------------------------------------------------------
 
+def test_basic_perf_pattern():
+    ''' Test invoking a Game and play '''
+    
+    _game = game_init(s_instructions=SS_LONG)
+    assert _game.__class__.__name__ == "Game"
+
+    _gameLog = select_function("baseline_nk",_game)
+    assert _gameLog is None
+
+    _game = game_init(s_instructions=SS_LONG, b_turn_log=True)
+    _gameLog = select_function("tt_opt", _game)
+    assert _gameLog.__class__.__name__ == "GameLog"
+
+    _log_turn_time = _gameLog.get_log_turn_time()
+    assert len(_log_turn_time) == 10                
+    # WHY 10 and not 12? because this one is suppoed to fail on turn 11
+
+    
