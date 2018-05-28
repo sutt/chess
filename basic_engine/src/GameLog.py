@@ -244,7 +244,9 @@ class GameLog:
         self.b_turn_time = kwargs.get('b_turn_time',False)
         self.log_turn_time = []
         self.t0 = time.time()
-        
+
+    def set_t0(self):
+        self.t0 = time.time()
 
     def add_turn_log(self
                      ,move

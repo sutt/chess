@@ -26,107 +26,73 @@ def game_init(s_instructions, b_turn_log=False, b_init_zero_move=False):
                 )
     
     if b_init_zero_move:
-        # pieces init'd but has not made a move yet
-        game.play(test_exit_moves=1)    
+        game.initialize(init_to_save=True)
         
     return game
 
 def select_function(s_function, game):
-    ''' input: s_function (string) - choses param's for play()
-               game       (obj)    - a Game obj with insturction and initd already
-        output: [optional] - a GameLog or None
+    ''' input:  s_function (string) - choses param's for play()
+                game       (obj)    - a Game obj with insturction and initd already
+        output: a GameLog or None
          '''
     
+        #TODO - build a decorator that call init_load into play()
+
     if s_function == "baseline_nk":
         
-        # no check_for_check, no filter_check at all
-        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False)    
 
     if s_function == "baseline_yk":
         
-        # yes check_for_check, no filter_check at all
-        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=False)    
         
     if s_function == "naive_nk":
 
-        #no check_for_check, filter_check
-        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "naive_yk":
-    
-        # game = Game(s_instructions = s_instructions)
+
         game.play(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
 
     if s_function == "opt_nk":
     
-        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=False, filter_check_opt=True)
 
     if s_function == "opt_yk":
         
-        # game = Game(s_instructions = s_instructions)
         game.play(check_for_check=True, filter_check_opt=True)
 
-    
-    #all vars below are yk - they do check_for_check
+    if s_function == "load_base_nk":
+        
+        game.play(check_for_check=False, filter_check_opt=False, init_load=True)    
+
+    if s_function == "load_opt_yk":
+        
+        game.play(init_load=True)
 
     if s_function == "var0":
         
-        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy=True)
 
     if s_function == "var1":
         
-        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply=True)
 
     if s_function == "var2":
             
-        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_2=True)
 
     if s_function == "var3":
             
-        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_apply_3=True)
 
     if s_function == "var4":
             
-        # game = Game(s_instructions = s_instructions)
         game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
 
 
-    if s_function == "tt_baseline":
-            
-        # game = Game(s_instructions = s_instructions
-        #             ,b_log_turn_time = True
-        #             ,b_log_num_available = True 
-        #             )  
-        game.play(filter_check_opt=False)    
-        return game.get_gamelog()
-    
-    if s_function == "tt_naive":
+    return game
 
-        # game = Game(s_instructions = s_instructions
-        #     ,b_log_turn_time = True
-        #     ,b_log_num_available = True 
-        #     )  
-        game.play(filter_check_naive=True, filter_check_opt=False)    
-        return game.get_gamelog()
-
-    if s_function == "tt_opt":
-            
-        # game = Game(s_instructions = s_instructions
-        #             ,b_log_turn_time = True
-        #             ,b_log_num_available = True 
-        #             )  
-        game.play()    
-        return game.get_gamelog()
-    
-    return None     #to show that the function is no returning a test exit data
 
 
 #Pretty Print Helper Functions ------------------
@@ -207,9 +173,12 @@ def interpret_basic_data(results):
     xdiff_col = 2
     avgtime_baseline = temp[0][avgtime_col]
     for i in range(1,len(temp)):
-         xdiff = float(temp[i][avgtime_col]) / float(avgtime_baseline)
-         s_xdiff = str(xdiff)
-         temp[i][xdiff_col] = s_xdiff
+        if avgtime_baseline == 0:
+            xdiff = float(0)
+        else:
+            xdiff = float(temp[i][avgtime_col]) / float(avgtime_baseline)
+        s_xdiff = str(xdiff)
+        temp[i][xdiff_col] = s_xdiff
     return temp
 
 def interpret_variation_data(results):
@@ -344,15 +313,15 @@ def print_results(results, **kwargs):
 
 
 
-
-
 def perf_test(s_tests
                 ,s_instructions=SS_LONG
                 ,n=10 
                 ,b_trial_time=False
                 ,b_num_available=False
                 ,b_turn_time=False
+                ,b_by_init_time=False
                 ,b_time_init=False
+                ,b_piece_init=False
                 ):
 
     '''main function to take a list of s_test, and log the time perf
@@ -362,6 +331,12 @@ def perf_test(s_tests
                 test         - a set of full games for one test
                     trial    - one full game
                         turn - one move in the game
+        
+        b_time_init - if true, time starting before Game() constructor call
+                      if false, time after constructor, only counting play()
+        b_piece_init - if true, call game.initialize() to set pieces
+                        if false, initialize on play, first move. 
+
     '''
 
     result = {}
@@ -372,6 +347,7 @@ def perf_test(s_tests
         trial_turn_time = []
         trial_num_available = []
 
+        t_trial_sum = float(0)
         t0 = time()
         
         for trial_i in range(n):
@@ -380,15 +356,19 @@ def perf_test(s_tests
             
             _game = game_init(s_instructions
                               ,b_turn_time
-                              ,False
+                              ,b_piece_init
                               )
 
             if not(b_time_init):
                 t0_trial = time()
 
-            game_log = select_function(s_test, _game)  # MAIN FUNCTION
+            game = select_function(s_test, _game)  # MAIN FUNCTION
             
             t1_trial = time()
+            t_trial_sum += (t1_trial - t0_trial)
+
+            if b_turn_time:
+              game_log = game.get_gamelog()
 
             if b_trial_time:    
                 trial_time.append(t1_trial - t0_trial)        
@@ -401,11 +381,21 @@ def perf_test(s_tests
          
         test = {}
 
+        if b_time_init:
+            #including game_init in timing
+            total_time = t1 - t0
+        else:
+            #removes timing on game_init
+            total_time = t_trial_sum    
+
+        if b_by_init_time:
+            total_init_time = (t1 - t0) - t_trial_sum
+        
         #by test
         test['test_name'] = s_test
         test['order'] = i_test      #to print out results in correct order
         test['n'] = n
-        test['total_time'] = t1 - t0    #TODO - make this sum of trial times
+        test['total_time'] = total_time
         
         #by trial
         if b_trial_time:
@@ -416,6 +406,10 @@ def perf_test(s_tests
             test['turn_time'] = copy.copy(trial_turn_time)
         if b_num_available:
             test['num_available'] = copy.copy(trial_num_available)        
+
+        #by init_time
+        if b_by_init_time:
+            test['init_time'] = total_init_time
 
         result[s_test] = test
     
@@ -429,12 +423,12 @@ def data_all_algos():
         'nk' is for check_for_check off; 'yk' means its on '''
 
     return [
-            "baseline_nk"
+            "opt_yk"
+            ,"opt_nk"
+            ,"baseline_nk"
             ,"baseline_yk"
             ,"naive_nk"
             ,"naive_yk"
-            ,"opt_nk"
-            ,"opt_yk"
             ,"var0"
             ,"var1"
             ,"var2"
@@ -445,14 +439,14 @@ def data_all_algos():
 def data_turntime_baseline_vs_naive():
     ''' examines turntimes for baseline vs naive '''
     return [
-            "tt_baseline"
-            ,"tt_naive"
+            "baseline_yk"
+            ,"naive_yk"
             ]
 
 def data_turntime_naive_vs_opt():
     return [
-            "tt_naive"
-            ,"tt_opt"
+            "naive_yk"
+            ,"opt_yk"
             ]
     
 
@@ -492,38 +486,52 @@ def data_turntime_naive_vs_opt():
 
 # Main Functions  ---------------------------------------------------
 
-def main1(s_tests, s_instructions):
+def analysis1(s_tests, s_instructions, **kwargs):
     ''' Type 1 - AlgoStlye by row, SummaryStats by col (Avg Min Max)'''
     
     results = perf_test(s_tests
                         ,s_instructions
-                        ,n=10
+                        ,n=kwargs.get('n', 10)
                         ,b_trial_time=True
+                        ,b_time_init=kwargs.get('b_time_init', False)
+                        ,b_piece_init=kwargs.get('b_piece_init', False)
                         )
     print('')
     print_results(results, b_basic=True)
+    
+    if kwargs.get('b_just_basic', False):
+        return None
+    
     print('')
     print_results(results, b_basic_variation=True)
     print('')
 
-def main2(s_tests, s_instructions):
+def analysis2(s_tests, s_instructions, **kwargs):
     ''' Type 2 - TurnAttribute by row (NumAvailable Time), AlgoStyle by col '''
     
     results = perf_test(s_tests
                         ,s_instructions 
-                        ,n=30 
+                        ,n=kwargs.get('n', 30)
                         ,b_turn_time=True
                         ,b_num_available=True
+                        ,b_time_init=kwargs.get('b_time_init', False)
+                        ,b_piece_init=kwargs.get('b_piece_init', False)
                         )
     
     print_results(results, b_turn_time=True)
 
+def analysis3(s_tests, s_instructions, **kwargs):
+    ''' Type 3 - '''
+    pass
+
+
+
 # Cmds -------------------------------------------------------------
 
 # > python perf_test.py --demo
-
 # > python perf_test.py --multialgosummary
 # > python perf_test.py --turntimenaivevsopt
+# > python perf_test.py --gameinitdemo
 
 if __name__ == "__main__":
     
@@ -535,6 +543,7 @@ if __name__ == "__main__":
     ap.add_argument("--shortgame", action="store_true")
     ap.add_argument("--multialgosummary", action="store_true")
     ap.add_argument("--turntimenaivevsopt", action="store_true")
+    ap.add_argument("--gameinitdemo", action="store_true")
 
     args = vars(ap.parse_args())
 
@@ -554,27 +563,57 @@ if __name__ == "__main__":
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
         s_tests = data_all_algos()
-        main1(s_tests, s_instructions)
+        analysis1(s_tests, s_instructions, n=10)
 
         s_tests = data_turntime_baseline_vs_naive()
-        main2(s_tests, s_instructions)
+        analysis2(s_tests, s_instructions)
 
 
     if args["multialgosummary"]:
         
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
         s_tests = data_all_algos()
-        main1(s_tests, s_instructions)
+        analysis1(s_tests, s_instructions)
 
     
     if args["turntimenaivevsopt"]:
         
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
-
         s_tests = data_turntime_naive_vs_opt()
-        main2(s_tests, s_instructions)
+        analysis2(s_tests, s_instructions)
 
-    
+    if args["gameinitdemo"]:
+        
+        # s_instructions = "1. b1 c3"
+        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4"
+        s_tests = ["load_base_nk", "load_opt_yk"]
+        b_piece_init=True
+
+        N = 250
+        print '\n Just Play Timing \n'
+        analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                    ,b_time_init=False)
+        print '\n With Consturctor Timing \n'
+        analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                    ,b_time_init=True)
+        print '\n Just Play Timing (again) \n'
+        analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                    ,b_time_init=False)
+        print '\n With Consturctor Timing (again) \n'
+        analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                    ,b_time_init=True)
+
+        for N in (1, 250):
+            #Maybe high n normalizes turn 1 time
+            print '\n With Consturctor Timing \n'
+            s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+            s_tests_2 = ["baseline_nk", "opt_yk"]   #they dont call play(b_load)
+            analysis2(s_tests_2, s_instructions, n=N, b_piece_init=False)
+            
+            print '\n Just Play Timing \n'
+            s_tests_1 = ["base_nk_load", "load_opt_yk"]   #they do call play(b_load)
+            analysis2(s_tests_1, s_instructions, n=N, b_piece_init=True)
+
     print 'done.'
         
 
@@ -582,6 +621,118 @@ if __name__ == "__main__":
 
 
 # Scratchpad ---------------------------------------------------------
+
+#5/28
+
+# >python perf_test.py --gameinitdemo
+
+# Game init is 30-45ms  = (.00225 - .00180) or (.00506 - .00474)
+
+#  Just Play Timing
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#    base_nk_load             0.00188                      n/a       250               0.470
+#     load_opt_yk             0.00474                     2.51       250               1.185
+
+#  With Consturctor Timing
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#    base_nk_load             0.00225                      n/a       250               0.562
+#     load_opt_yk             0.00506                     2.24       250               1.265
+
+#  Just Play Timing (again)
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#    base_nk_load             0.00180                      n/a       250               0.452
+#     load_opt_yk             0.00474                     2.62       250               1.187
+
+#  With Consturctor Timing (again)
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#    base_nk_load             0.00225                      n/a       250               0.562
+#     load_opt_yk             0.00506                     2.24       250               1.265
+
+
+# ###### You can see a slight increase in 1st move time with "just play" timing
+
+#  With Consturctor Timing
+
+# Test A:  baseline_nk
+# Test B:  opt_yk
+# N tests:  1
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20              0.0              0.0
+#          2             20              0.0              0.0
+#          3             22              0.0              0.0
+#          4             21              0.0              0.0
+#          5             28            15.99              0.0
+#          6             22              0.0              0.0
+#          7             25              0.0              0.0
+#          8             21              0.0              0.0
+#          9             35              0.0            17.00
+#         10             22              0.0            3.999
+
+#  Just Play Timing
+
+# Test A:  base_nk_load
+# Test B:  load_opt_yk
+# N tests:  1
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20              0.0            3.999
+#          2             20              0.0            3.999
+#          3             22              0.0              0.0
+#          4             21              0.0              0.0
+#          5             28              0.0            3.999
+#          6             22            4.000            3.999
+#          7             25              0.0              0.0
+#          8             21              0.0            4.000
+#          9             35              0.0            3.999
+#         10             22              0.0            7.999
+
+#  With Consturctor Timing
+
+# Test A:  baseline_nk
+# Test B:  opt_yk
+# N tests:  250
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            0.548            1.640
+#          2             20            0.460            1.459
+#          3             22            0.324            1.427
+#          4             21            0.527            1.264
+#          5             28            0.335            1.751
+#          6             22            0.463            1.315
+#          7             25            0.428            2.223
+#          8             21            0.347            1.383
+#          9             35            0.600            3.039
+#         10             22            0.251            3.112
+
+#  Just Play Timing
+
+# Test A:  base_nk_load
+# Test B:  load_opt_yk
+# N tests:  250
+
+#  Turn Num:     Num Moves:     Test A (ms):     Test B (ms):
+#          1             20            0.412            1.536
+#          2             20            0.567            1.791
+#          3             22            0.239            1.675
+#          4             21            0.351            0.360
+#          5             28            0.684            2.244
+#          6             22            0.156            1.820
+#          7             25            0.496            1.199
+#          8             21            0.395            1.735
+#          9             35            0.364            3.280
+#         10             22            0.427            2.828
+# done.
+
+# wsutt@DESKTOP-5VTC260 MINGW64 ~/Desktop/files/chess/basic_engine/tools (perf-test-1)
 
 #5/27
 
@@ -915,4 +1066,3 @@ def test_basic_perf_pattern():
     assert len(_log_turn_time) == 10                
     # WHY 10 and not 12? because this one is suppoed to fail on turn 11
 
-    

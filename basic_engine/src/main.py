@@ -71,6 +71,8 @@ class Game():
         self.init_board = copy.deepcopy(init_board)
         self.init_pieces = copy.deepcopy(init_pieces)
 
+        self.saved_state = {}
+
         self.display = Display(b_show_opponent = b_display_show_opponent
                                ,b_never_print = b_display_never_print
                                ,b_always_print = b_display_always_print
@@ -126,7 +128,7 @@ class Game():
         return move
 
 
-    def initialize(self):
+    def initialize(self, init_to_save=False):
         ''' '''
         _board = Board()
         
@@ -151,23 +153,35 @@ class Game():
         
         self.init_switch = False
 
+        if init_to_save:
+            self.save(_board,_pieces,_player)
+
         return _board, _pieces, _player
 
 
     def load(self):
         ''' load relevant state from Game into play '''
-        pass
+        return (
+                self.saved_state['board']
+                ,self.saved_state['pieces']
+                ,self.saved_state['player']
+            )
 
 
-    def save(self):
+    def save(self, board, pieces, player):
         ''' save relevant state from play into Game '''
-        pass
+        self.saved_state['board'] = board
+        self.saved_state['pieces'] = pieces
+        self.saved_state['player'] = player
         
 
     def play(self, **kwargs):
 
         if self.init_switch:
             board, pieces, player = self.initialize()
+        if kwargs.get('init_load', False):
+            board, pieces, player = self.load()
+            self.log.set_t0()
 
         game_going = True
         
