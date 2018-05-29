@@ -1027,8 +1027,8 @@ board should store edge cases:
 
             Add Features:
             [x] select_function takes s_insturction as arg
-            [ ] game_init in separate function
-            [ ] play 0th move init'd ?
+            [x] game_init in separate function
+            [x] play 0th move init'd ?
             [ ] need a way to do pgn_instructions
                 [ ] but pgn requires compute time to deduce, should have a 
                     conversion called pgn->A1 pre-timing
@@ -1038,16 +1038,16 @@ board should store edge cases:
                 [ ] num of plies
                 [ ] comments from each s_test e.g. "this is naive, it run naive_filter"
             [x] s_tests returned by named function
-            [ ] Currently timing Game's init() not just play()
-                [ ] change this with decorators?
-                [ ] use indv turn time summing, and take the difference
-            [ ] Currently perf_test times get_log_data() at end of play()
+            [x] Currently timing Game's init() not just play()
+                [x] change this with decorators?
+                [x] use indv turn time summing, and take the difference
+            [x] Currently perf_test times get_log_data() at end of play()
             
             Add Analysis:
             [x] add a check_for_check analysis
             [ ] add a warm-up and cool-down analysis
-            [ ] an init analysis, calling game constructor before
-                [ ] also calling test_exit_moves=1 on play() before.
+            [x] an init analysis, calling game constructor before
+                [x] also calling test_exit_moves=1 on play() before.
             [ ] a pgn vs s_instruction analysis
             [ ] add num_irregluar to turntime logging and reporting
             [ ] add num pieces
@@ -1064,7 +1064,7 @@ board should store edge cases:
             
             Advanced Concepts:
             [ ] how to handle "zero" turn times?
-                [ ] - demonstrate how to get them
+                [x] - demonstrate how to get them
                         n=1, b_turn_time should do it
 
             [ ] Ultimately, this data can be used to build a regression:
@@ -1079,6 +1079,18 @@ board should store edge cases:
                 [ ] Run a regression in R
                 [ ] Compare SSE to a priori results discovered via profile_test
 
+
+        5/28
+
+            Add unit tests:
+            [ ] that basic demo works
+            [ ] that init_time > 0
+
+            Cleanup:
+            [x] add decorator to replace load_init
+                [x] remove load_ in select_function()
+
+            
 
             Other TODOs
 

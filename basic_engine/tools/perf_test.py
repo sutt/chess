@@ -8,14 +8,11 @@ from src.main import Game
 
 
 
-# s_insturction params -----------------------------------------------
 
-SS = "1. b1 c3"
-SS_LONG = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
 
 # Different Experiments --------------------------------------------------
-#  an s_test string causes a different style of Game and play to happen
+#  
 
 def game_init(s_instructions, b_turn_log=False, b_init_zero_move=False):
     ''' This consturcts the Game object so it doesnt get counted in timer. '''
@@ -30,67 +27,72 @@ def game_init(s_instructions, b_turn_log=False, b_init_zero_move=False):
         
     return game
 
-def select_function(s_function, game):
+def select_function(s_function, game, b_init_load=False):
     ''' input:  s_function (string) - choses param's for play()
-                game       (obj)    - a Game obj with insturction and initd already
+                game        (obj)   - a Game obj with insturction and initd already
+                b_init_load (bool)  - pass in b_init_load as kwarg to play()
         output: a GameLog or None
          '''
     
-        #TODO - build a decorator that call init_load into play()
-
-    if s_function == "baseline_nk":
-        
-        game.play(check_for_check=False, filter_check_opt=False)    
-
-    if s_function == "baseline_yk":
-        
-        game.play(check_for_check=True, filter_check_opt=False)    
-        
-    if s_function == "naive_nk":
-
-        game.play(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
-
-    if s_function == "naive_yk":
-
-        game.play(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
-
-    if s_function == "opt_nk":
+    def run_play(kw_pass_in):
+        if b_init_load:
+            kw_pass_in['init_load'] = True
+        game.play(**kw_pass_in)
     
-        game.play(check_for_check=False, filter_check_opt=True)
+    def _(*args, **kw):
+        run_play(kw)
+    
+    def __(function_return_params):
+        return function_return_params(s_function)
 
-    if s_function == "opt_yk":
+    @__
+    def return_params(s_function):
         
-        game.play(check_for_check=True, filter_check_opt=True)
-
-    if s_function == "load_base_nk":
-        
-        game.play(check_for_check=False, filter_check_opt=False, init_load=True)    
-
-    if s_function == "load_opt_yk":
-        
-        game.play(init_load=True)
-
-    if s_function == "var0":
-        
-        game.play(filter_check_opt=False, filter_check_test_copy=True)
-
-    if s_function == "var1":
-        
-        game.play(filter_check_opt=False, filter_check_test_copy_apply=True)
-
-    if s_function == "var2":
+        if s_function == "baseline_nk":
             
-        game.play(filter_check_opt=False, filter_check_test_copy_apply_2=True)
+            return _(check_for_check=False, filter_check_opt=False)    
 
-    if s_function == "var3":
+        if s_function == "baseline_yk":
             
-        game.play(filter_check_opt=False, filter_check_test_copy_apply_3=True)
-
-    if s_function == "var4":
+            return _(check_for_check=True, filter_check_opt=False)    
             
-        game.play(filter_check_opt=False, filter_check_test_copy_opt=True)
+        if s_function == "naive_nk":
 
+            return _(check_for_check=False, filter_check_opt=False, filter_check_naive=True)
 
+        if s_function == "naive_yk":
+
+            return _(check_for_check=True, filter_check_opt=False, filter_check_naive=True)
+
+        if s_function == "opt_nk":
+        
+            return _(check_for_check=False, filter_check_opt=True)
+
+        if s_function == "opt_yk":
+            
+            return _(check_for_check=True, filter_check_opt=True)
+
+        if s_function == "var0":
+            
+            return _(filter_check_opt=False, filter_check_test_copy=True)
+
+        if s_function == "var1":
+            
+            return _(filter_check_opt=False, filter_check_test_copy_apply=True)
+
+        if s_function == "var2":
+                
+            return _(filter_check_opt=False, filter_check_test_copy_apply_2=True)
+
+        if s_function == "var3":
+                
+            return _(filter_check_opt=False, filter_check_test_copy_apply_3=True)
+
+        if s_function == "var4":
+                
+            return _(filter_check_opt=False, filter_check_test_copy_opt=True)
+
+    # the reference to this object hasnt changed
     return game
 
 
@@ -314,7 +316,7 @@ def print_results(results, **kwargs):
 
 
 def perf_test(s_tests
-                ,s_instructions=SS_LONG
+                ,s_instructions
                 ,n=10 
                 ,b_trial_time=False
                 ,b_num_available=False
@@ -362,7 +364,7 @@ def perf_test(s_tests
             if not(b_time_init):
                 t0_trial = time()
 
-            game = select_function(s_test, _game)  # MAIN FUNCTION
+            game = select_function(s_test, _game, b_piece_init)  # MAIN FUNCTION
             
             t1_trial = time()
             t_trial_sum += (t1_trial - t0_trial)
@@ -586,7 +588,7 @@ if __name__ == "__main__":
         
         # s_instructions = "1. b1 c3"
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4"
-        s_tests = ["load_base_nk", "load_opt_yk"]
+        s_tests = ["baseline_nk", "opt_yk"]
         b_piece_init=True
 
         N = 250
@@ -604,15 +606,15 @@ if __name__ == "__main__":
                     ,b_time_init=True)
 
         for N in (1, 250):
-            #Maybe high n normalizes turn 1 time
-            print '\n With Consturctor Timing \n'
+            
             s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
-            s_tests_2 = ["baseline_nk", "opt_yk"]   #they dont call play(b_load)
-            analysis2(s_tests_2, s_instructions, n=N, b_piece_init=False)
+            s_tests = ["baseline_nk", "opt_yk"]   #they dont call play(b_load)
+            
+            print '\n With Consturctor Timing \n'
+            analysis2(s_tests, s_instructions, n=N, b_piece_init=False)
             
             print '\n Just Play Timing \n'
-            s_tests_1 = ["base_nk_load", "load_opt_yk"]   #they do call play(b_load)
-            analysis2(s_tests_1, s_instructions, n=N, b_piece_init=True)
+            analysis2(s_tests, s_instructions, n=N, b_piece_init=True)
 
     print 'done.'
         
@@ -1051,15 +1053,19 @@ if __name__ == "__main__":
 
 def test_basic_perf_pattern():
     ''' Test invoking a Game and play '''
-    
+
+    SS_LONG = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+
     _game = game_init(s_instructions=SS_LONG)
     assert _game.__class__.__name__ == "Game"
 
-    _gameLog = select_function("baseline_nk",_game)
-    assert _gameLog is None
+    _game = select_function("baseline_nk",_game)
+    assert _game.__class__.__name__ == "Game"
 
     _game = game_init(s_instructions=SS_LONG, b_turn_log=True)
-    _gameLog = select_function("tt_opt", _game)
+    _game = select_function("opt_yk", _game)
+
+    _gameLog = _game.get_gamelog()
     assert _gameLog.__class__.__name__ == "GameLog"
 
     _log_turn_time = _gameLog.get_log_turn_time()
