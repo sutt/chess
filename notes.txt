@@ -1029,8 +1029,8 @@ board should store edge cases:
             [x] select_function takes s_insturction as arg
             [x] game_init in separate function
             [x] play 0th move init'd ?
-            [ ] need a way to do pgn_instructions
-                [ ] but pgn requires compute time to deduce, should have a 
+            [x] need a way to do pgn_instructions
+                [x] but pgn requires compute time to deduce, should have a 
                     conversion called pgn->A1 pre-timing
             [ ] interpert_xxx_data() saves number data as string?
             [ ] print out meta-data header for reports
@@ -1045,10 +1045,10 @@ board should store edge cases:
             
             Add Analysis:
             [x] add a check_for_check analysis
-            [ ] add a warm-up and cool-down analysis
+            [x] add a warm-up and cool-down analysis
             [x] an init analysis, calling game constructor before
                 [x] also calling test_exit_moves=1 on play() before.
-            [ ] a pgn vs s_instruction analysis
+            [x] a pgn vs s_instruction analysis
             [ ] add num_irregluar to turntime logging and reporting
             [ ] add num pieces
             [ ] add b_bypass analysis ?
@@ -1090,18 +1090,24 @@ board should store edge cases:
             [x] add decorator to replace load_init
                 [x] remove load_ in select_function()
 
-            
+        5/29
+
+            [x] pgn_conversion in utils
+            [x] pgn_conversion in perf_test
+            [ ] batch perf_test
+                [ ] log_schema for output
 
             Other TODOs
 
                 [ ] a test runner to run all the tests
                 [ ] profile_test is using wrong A1 format on line 290
                 [ ] conversion functions:
-                    [ ] A1-movelog <-> PGN-movelog
+                    [x] A1-movelog <-> PGN-movelog
                     [ ] Get board state at certain move nums
                         [ ] output as a python / json format
                         [ ] output as a console
                         [ ] how to handle board_state
+                        [ ] output move_log as pgn
 
 
 

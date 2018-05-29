@@ -4,20 +4,33 @@ import copy
 sys.path.append('../')
 
 from src.main import Game
-
-
-
-
+from utils import convert_pgn_to_a1
 
 
 
 # Different Experiments --------------------------------------------------
 #  
 
-def game_init(s_instructions, b_turn_log=False, b_init_zero_move=False):
+def game_init(s_instructions
+                ,b_turn_log=False
+                ,b_init_zero_move=False
+                ,b_pgn_use=False
+                ,b_pgn_convert=False
+                ):
     ''' This consturcts the Game object so it doesnt get counted in timer. '''
+
+    if b_pgn_use:
+        s_instruct = ""
+        s_pgn_instruct = s_instructions
+    elif b_pgn_convert:
+        s_instruct = convert_pgn_to_a1(s_instructions)
+        s_pgn_instruct = ""
+    else:
+        s_instruct = s_instructions
+        s_pgn_instruct = ""
     
-    game = Game(s_instructions = s_instructions
+    game = Game(s_instructions = s_instruct
+                ,s_pgn_instructions = s_pgn_instruct
                 ,b_log_turn_time = b_turn_log
                 ,b_log_num_available=b_turn_log
                 )
@@ -324,6 +337,8 @@ def perf_test(s_tests
                 ,b_by_init_time=False
                 ,b_time_init=False
                 ,b_piece_init=False
+                ,b_pgn_use=False
+                ,b_pgn_convert=False
                 ):
 
     '''main function to take a list of s_test, and log the time perf
@@ -359,6 +374,8 @@ def perf_test(s_tests
             _game = game_init(s_instructions
                               ,b_turn_time
                               ,b_piece_init
+                              ,b_pgn_use
+                              ,b_pgn_convert
                               )
 
             if not(b_time_init):
@@ -497,6 +514,8 @@ def analysis1(s_tests, s_instructions, **kwargs):
                         ,b_trial_time=True
                         ,b_time_init=kwargs.get('b_time_init', False)
                         ,b_piece_init=kwargs.get('b_piece_init', False)
+                        ,b_pgn_use=kwargs.get('b_pgn_use', False)
+                        ,b_pgn_convert=kwargs.get('b_pgn_convert', False)
                         )
     print('')
     print_results(results, b_basic=True)
@@ -546,6 +565,7 @@ if __name__ == "__main__":
     ap.add_argument("--multialgosummary", action="store_true")
     ap.add_argument("--turntimenaivevsopt", action="store_true")
     ap.add_argument("--gameinitdemo", action="store_true")
+    ap.add_argument("--pgndemo", action="store_true")
 
     args = vars(ap.parse_args())
 
@@ -616,6 +636,44 @@ if __name__ == "__main__":
             print '\n Just Play Timing \n'
             analysis2(s_tests, s_instructions, n=N, b_piece_init=True)
 
+    
+    if args["pgndemo"]:
+        
+        s_tests = ["baseline_nk", "opt_yk"]
+        s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
+        N = 20
+        B_PIECE_INIT = False
+
+        sA = '\n Using PGN Instructions without conversion \n'
+        sB = '\n Converting PGN before play \n'
+
+        for i_trial in range(4):
+
+            # Do two comparisons of testA vs testB to account for warm-up time.
+
+            testType = "a" if i_trial % 2 == 0 else "b"
+
+            if testType == "a":
+                print sA
+                testUsePgn, testConvertPgn = True, False
+            elif testType == "b":
+                print sB
+                testUsePgn, testConvertPgn = False, True
+
+            analysis1(s_tests
+                        ,s_instructions
+                        ,n=N
+                        ,b_just_basic=True
+                        ,b_piece_init=B_PIECE_INIT
+                        ,b_time_init=False             # if this were true, no diff
+                        ,b_pgn_use=testUsePgn          # changing var
+                        ,b_pgn_convert=testConvertPgn  # changing var
+                        )
+
+        
+
+
+    
     print 'done.'
         
 
@@ -624,11 +682,47 @@ if __name__ == "__main__":
 
 # Scratchpad ---------------------------------------------------------
 
+#5/29
+
+# Using b_pgn_convert saves 10-20ms (= .04275 - .04055 to .29079 - 28030)
+# for a ~130 ply game. So, 0.1 - 0.2 ms per turn to convert a pgn_move, 
+# so roughly one 1/10 of one ply (~2ms) is rough total comp cost of conversion
+
+# $ python perf_test.py --pgndemo
+
+#  Using PGN Instructions without conversion
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#     baseline_nk             0.04275                      n/a        20               0.855
+#          opt_yk             0.28005                     6.55        20               5.601
+#  Converting PGN before play
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#     baseline_nk             0.04055                      n/a        20               0.811
+#          opt_yk             0.28959                     7.14        20               5.791
+
+#  Using PGN Instructions without conversion
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#     baseline_nk             0.04275                      n/a        20               0.855
+#          opt_yk             0.29079                     6.80        20               5.815
+
+#  Converting PGN before play
+
+
+#      Test Name:           Avg Time:      Diff from baseline:        n:         Total Time:
+#     baseline_nk             0.04090                      n/a        20               0.818
+#          opt_yk             0.28030                     6.85        20               5.606
+
+
+
 #5/28
 
 # >python perf_test.py --gameinitdemo
 
-# Game init is 30-45ms  = (.00225 - .00180) or (.00506 - .00474)
+# Game init is 0.30-0.45ms  = (.00225 - .00180) or (.00506 - .00474)
 
 #  Just Play Timing
 
