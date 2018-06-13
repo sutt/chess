@@ -1052,6 +1052,7 @@ board should store edge cases:
             [ ] add num_irregluar to turntime logging and reporting
             [ ] add num pieces
             [ ] add b_bypass analysis ?
+            [ ] add num_king_moves
             
 
             Module Architecture:
@@ -1096,20 +1097,53 @@ board should store edge cases:
             [x] pgn_conversion in perf_test
             [ ] batch perf_test
                 [ ] log_schema for output
+            [ ] adding variables to gamelog
+            [ ] architecture: run first logging all the variables
+                then second time logging turn times
+                [ ] how to tie the two runs together?
+            [ ] add a current timing benchmark utility:
+                see if a change in engine has a statistically significant
+                change in perf
+                [ ] multiple game types
+                [ ] log in multiple computational situations for the variance
+                    in 
+                [ ] warm-up phase
+                [ ] git based comparison
 
-            Other TODOs
+        5/30
 
-                [ ] a test runner to run all the tests
-                [ ] profile_test is using wrong A1 format on line 290
-                [ ] conversion functions:
-                    [x] A1-movelog <-> PGN-movelog
-                    [ ] Get board state at certain move nums
-                        [ ] output as a python / json format
-                        [ ] output as a console
-                        [ ] how to handle board_state
-                        [ ] output move_log as pgn
+            [ ] Analysis on b_full_log: True vs. False
+                how much time does it take to log?
+
+            [ ] Idea for wram-up and baselining, do some non-custom known actions
+                like adding 1M items to a list, summing it, etc...
+                    -This will see the natural temporal variation on your 
+                     computing/python env
 
 
+        Other TODOs
+
+            [ ] a test runner to run all the tests
+            [ ] profile_test is using wrong A1 format on line 290
+            [ ] conversion functions:
+                [x] A1-movelog <-> PGN-movelog
+                [ ] Get board state at certain move nums
+                    [ ] output as a python / json format
+                    [ ] output as a console
+                    [ ] how to handle board_state
+                    [ ] output move_log as pgn
+            [ ] build random game play data
+                [ ] control the randomness to lean towards capture, etc...
+                [ ] build randomness from low-piece-initial-state
+
+        6/12
+
+            There are ways to defeat the filter_check algo?
+                what if opponent piece could kill you but is pinned to his own king?
+                This counter-case doesn't work, you can't move into where an oppoent
+                piece can kill you next turn, even if that leaves him in check the next
+                turn.
+            Maybe something about putting him in check?
 
 
         HOWTOs
