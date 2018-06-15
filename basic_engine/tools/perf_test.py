@@ -389,6 +389,7 @@ def perf_test(s_tests
             if b_turn_time:
               game_log = game.get_gamelog()
 
+
             if b_trial_time:    
                 trial_time.append(t1_trial - t0_trial)        
             if b_turn_time:
@@ -503,9 +504,9 @@ def data_turntime_naive_vs_opt():
 
 # How arparse or callable function work
 
-# Main Functions  ---------------------------------------------------
+# Analysis Functions  ---------------------------------------------------
 
-def analysis1(s_tests, s_instructions, **kwargs):
+def analysis1(s_tests, s_instructions, b_return_results=False, **kwargs):
     ''' Type 1 - AlgoStlye by row, SummaryStats by col (Avg Min Max)'''
     
     results = perf_test(s_tests
@@ -517,6 +518,10 @@ def analysis1(s_tests, s_instructions, **kwargs):
                         ,b_pgn_use=kwargs.get('b_pgn_use', False)
                         ,b_pgn_convert=kwargs.get('b_pgn_convert', False)
                         )
+    
+    if b_return_results:
+        return results
+    
     print('')
     print_results(results, b_basic=True)
     
@@ -527,7 +532,8 @@ def analysis1(s_tests, s_instructions, **kwargs):
     print_results(results, b_basic_variation=True)
     print('')
 
-def analysis2(s_tests, s_instructions, **kwargs):
+
+def analysis2(s_tests, s_instructions, b_return_results=False, **kwargs):
     ''' Type 2 - TurnAttribute by row (NumAvailable Time), AlgoStyle by col '''
     
     results = perf_test(s_tests
@@ -536,8 +542,13 @@ def analysis2(s_tests, s_instructions, **kwargs):
                         ,b_turn_time=True
                         ,b_num_available=True
                         ,b_time_init=kwargs.get('b_time_init', False)
+                        ,b_pgn_use=kwargs.get('b_pgn_use', False)
+                        ,b_pgn_convert=kwargs.get('b_pgn_convert', False)
                         ,b_piece_init=kwargs.get('b_piece_init', False)
                         )
+    
+    if b_return_results:
+        return results
     
     print_results(results, b_turn_time=True)
 
@@ -545,7 +556,203 @@ def analysis3(s_tests, s_instructions, **kwargs):
     ''' Type 3 - '''
     pass
 
+# Batch Analysis -----------------------------------------------------
 
+import json
+# import time
+
+class TimeAnalysisSchema:
+    '''
+    Games - a list of instructions: [ "1. c4...", "1. e4...", ...]
+    for each game: {
+                  log: {
+                       // these are "X" in regression
+                      'num_avaialble' : [20,22,26,...,0]
+                      'king_moves'    : [0,0,2,...,0]    
+                          ...
+                      }
+                  trials: [
+                  
+                    trial: {
+                        meta: {
+                            // these are used to aggregate separate runs
+                            // only needed for Y runs, X is always the same for particular pgn
+                            'N'             : 250        //number of trials run and aggregated
+                            'algo_style'    : 'baseline_yk'
+                            'analysis_type' : 'analysis2'   //by turn times 
+                            'data-time-run' : 2018-6-13-13-12-22-345  //runs strated here
+                            }
+                        data: {
+                            // this is "Y" in regression
+                            avg-turn-time: [0.028, 0.031, 0.051, ..., 0.288]  //index by turn-num
+                            }
+                          }
+                    , trial: {...}
+                    , trial: {...}
+                    ,...
+                    ]
+                  }
+    '''
+    
+    def __init__(self):
+        
+        self.log = None
+        
+        self.N = None
+        self.algo_style = None
+        self.analysis_type = None
+        self.date_time_run = None
+
+        self.trials = []
+
+    def set_meta(self, N, algo_style, analysis_type):
+        
+        self.N = N
+        self.algo_style = algo_style
+        self.analysis_type = analysis_type
+        self.date_time_run = time()        #TODO - better choice?
+
+    def init_data(self, data):
+        pass
+
+    def load_log(self, log_data):
+        pass
+
+    @staticmethod
+    def aggregate_y(data):
+        ''' average each i-th element together'''
+        try:
+            assert len(data) > 1
+            len0  = len(data[0])
+            assert all(map(lambda data_i: len(data_i) == len0, data))
+        except AssertionError:
+            print 'data fed to aggregate_y is of different length; cant aggregate that.'
+            return None
+        try:
+            temp = []
+            n = len(data)
+            j = len(data[0])
+            for _j in range(j):
+                sum_elems = sum(map(lambda d: d[_j], data))
+                avg_elems = float(sum_elems) / float(n)
+                temp.append(avg_elems)
+            return temp
+        except:
+            print 'failed to aggregate, but did not catch in exception'
+            return None
+
+    def add_trial(self, analysis_results):
+        ''' add results of analysis to TAS'''
+        self.trials.append(
+            self.aggregate_y(analysis_results['turn_time'])
+        )
+
+    def to_json(self, data_dir=None, data_fn=None):
+        ''' return json string or write to json file '''
+        
+        tas = {}
+        tas['log'] = self.log
+        
+        temp_meta = {}
+        temp_meta['N'] = self.N
+        temp_meta['algo_style'] = self.algo_style
+        temp_meta['analysis_type'] = self.analysis_type
+        temp_meta['date_time_run'] = self.date_time_run
+        tas['meta'] = temp_meta
+        
+        tas['trials'] = self.trials
+        
+        if data_dir is None:
+            return json.dumps(tas)
+        else:
+            data_dir = '../data/perf/'
+            data_fn = 'demo.tas'
+            try:
+                with open(data_dir + data_fn, 'w') as f:
+                    json.dump(tas, f)
+            except:
+                print 'failed to write file output'
+                return None
+            print 'wrote output to: ', data_dir, data_fn
+            
+
+            
+            
+
+    def _scratch_pad(self):
+        pass
+        
+        #### For a Fresh Run, you can init a blank schema...
+        # data_schema = TimeAnalysisSchema()
+        # data_schema.set_meta(N=)
+
+        #### To continue adding data to ana existing schema...
+        # data_schema = TimeAnalysisSchema()
+        # data_schema.from_json(data_fn = "../data/perf/hello.tas")
+        # s_instructions = data_schema.get_log_instructions()
+        # results = batch_analyze(s_instructions)
+        # data_schema.add_data(results)
+
+
+def batch_analyze():
+    ''' analyze mulitple games and log them '''
+
+    #TODO - build a repo of different scenrios
+
+    INPUT_DATA_DIR = "../data/"
+    INPUT_DATA = "GarryKasparov.txt"
+    INPUT_DATA_DIR + INPUT_DATA
+
+    OUTPUT_DATA_DIR = "../data/perf/"
+
+    #TODO - different option flags for algo style
+    s_tests = ["opt_yk"]
+    
+    
+    s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
+
+    # for analysis1, results['opt_yk']['trial_time'] will give (list) of each
+    #                                                full-game-run time.
+    # results = analysis1(s_tests
+    #                     ,s_instructions
+    #                     ,b_return_results=True
+    #                     ,n = 10
+    #                     ,b_pgn_convert=True
+    #                     # ,b_piece_init=True
+    #                     )
+
+    # print results
+    # print len(results)
+
+    data_schema = TimeAnalysisSchema()
+
+    # TODO - can't do logging when timing: turn it off in this style
+    # results['opt_yk']['turn_time']: [ [0.01,0.02,...],[0.01,0.02,...]]
+
+    N = 2
+    s_test = ["opt_yk"]
+    s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
+
+    #Build X
+
+    
+    #Build Y
+    data_schema.set_meta(N = N, algo_style = s_test[0], analysis_type = 'analysis2')
+
+    # TODO - turn off logging
+    results = analysis2(s_test
+                        ,s_instructions
+                        ,n=N
+                        ,b_return_results=True
+                        ,b_pgn_convert=True
+                        ,b_piece_init=True
+                        )
+    
+    data_schema.add_trial(results[s_test[0]])
+    
+    data_schema.to_json(data_dir='../data/perf/')
+    
+    
 
 # Cmds -------------------------------------------------------------
 
@@ -553,6 +760,7 @@ def analysis3(s_tests, s_instructions, **kwargs):
 # > python perf_test.py --multialgosummary
 # > python perf_test.py --turntimenaivevsopt
 # > python perf_test.py --gameinitdemo
+# > python perf_test.py --batchdemo
 
 if __name__ == "__main__":
     
@@ -566,6 +774,7 @@ if __name__ == "__main__":
     ap.add_argument("--turntimenaivevsopt", action="store_true")
     ap.add_argument("--gameinitdemo", action="store_true")
     ap.add_argument("--pgndemo", action="store_true")
+    ap.add_argument("--batchdemo", action="store_true")
 
     args = vars(ap.parse_args())
 
@@ -670,7 +879,9 @@ if __name__ == "__main__":
                         ,b_pgn_convert=testConvertPgn  # changing var
                         )
 
-        
+    if args["batchdemo"]:
+        batch_analyze()
+
 
 
     
@@ -1166,3 +1377,26 @@ def test_basic_perf_pattern():
     assert len(_log_turn_time) == 10                
     # WHY 10 and not 12? because this one is suppoed to fail on turn 11
 
+def test_tas_aggregate_y():
+    ''' testing TimeAnalysisSchema.aggregate_y which averages all turn times'''
+    
+    dummy_turn_times =  [
+                             [ 0.1, 0.2, 0.1, 0.0]
+                            ,[ 0.1, 0.2, 0.2, 0.2]
+                        ]
+    
+    tas = TimeAnalysisSchema()
+    
+    aggregated_y = tas.aggregate_y(dummy_turn_times)
+    rounded_aggregated_y = map(lambda x: round(x, 2), aggregated_y)
+    #TODO - from numpy import double or import decimal *
+    
+    assert rounded_aggregated_y == [0.1, 0.2, 0.15, 0.1]
+
+    dummy_turn_times =  [
+                             [ 0.1, 0.2, 0.1, 0.0]
+                            ,[ 0.1, 0.2, 0.1, 0.2, 0.2]      # wrong length
+                        ]
+
+    aggregated_y = tas.aggregate_y(dummy_turn_times)
+    assert aggregated_y is None

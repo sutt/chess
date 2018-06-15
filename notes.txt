@@ -1135,6 +1135,10 @@ board should store edge cases:
             [ ] build random game play data
                 [ ] control the randomness to lean towards capture, etc...
                 [ ] build randomness from low-piece-initial-state
+            [ ] Get the whole app running in linux env
+                [ ] WSL, etc?
+                [ ] path utilities, etc...
+
 
         6/12
 
@@ -1144,6 +1148,51 @@ board should store edge cases:
                 piece can kill you next turn, even if that leaves him in check the next
                 turn.
             Maybe something about putting him in check?
+
+        6/13
+
+            Need to build batch() in perf_test
+
+                [ ] Build a Schema for results
+                    [ ] output it to json
+                    [ ] give it an extension name
+                    [ ] load it from json
+                
+                [ ] Get an ipython notebook plotting the data
+                    [x] notebook plotting random data
+                    [ ] notebook reading a schema and 
+                    [ ] do a basic regression
+                    [ ] pandas
+                    [ ] aggregation if needed
+
+                [ ] Misc Cool Stuff
+                    [ ] assertions amidst code, with exceptions
+
+            There's something wrong with schema: different batch runs of N-trials need
+            separate 
+
+        6/15
+
+            [ ] add unittests of all flagged commands
+            [ ] separate utils.xpgn_to_pgn into separate file, along with its tests
+                [ ] and it references throughout repository
+            [ ] use sqlite and ORM to get TAS into
+            [ ] how to build warning messages into these utilites, e.g. pytest as example
+            [ ] how to handle double, decimals, etc.
+
+        OK, the whole point of the TimeAnalysisSchema, and perf_test is to generate
+        data to run regressions on turn time, and create different conditions to reveal
+        how
+
+        It's also a model of how to build processing pipelines:
+            class based schema
+            scenarios / "forcings" - as input files
+            a blackbox with logging multi-dim output
+            need to align the inputs and output logs and find the relationships
+
+            
+
+
 
 
         HOWTOs
