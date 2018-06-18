@@ -559,7 +559,6 @@ def analysis3(s_tests, s_instructions, **kwargs):
 # Batch Analysis -----------------------------------------------------
 
 import json
-# import time
 
 class TurnAttributeSchema:
     
@@ -620,24 +619,31 @@ class TimeAnalysisSchema:
     '''
     Games - a list of instructions: [ "1. c4...", "1. e4...", ...]
     for each game: {
+                  
+                  meta_analysis: {
+                      // these hold must be held constant for different trials to make sense
+                      'algo_style':     : 'baseline_yk'
+                      'analysis_type'   : 'analysis2'   //by turn times 
+                        }
+                  
                   log: {
                        // these are "X" in regression
                       'num_avaialble' : [20,22,26,...,0]
                       'king_moves'    : [0,0,2,...,0]    
                           ...
                       }
+                  
                   trials: [
                   
-                    trial: {
-                        meta: {
+                    [trial]: {  //unnamed as the dict is simply an element in a list
+                        
+                        trial_meta: {
                             // these are used to aggregate separate runs
-                            // only needed for Y runs, X is always the same for particular pgn
                             'N'             : 250        //number of trials run and aggregated
-                            'algo_style'    : 'baseline_yk'
-                            'analysis_type' : 'analysis2'   //by turn times 
                             'data-time-run' : 2018-6-13-13-12-22-345  //runs strated here
                             }
-                        data: {
+
+                        trial_data: {
                             // this is "Y" in regression
                             avg-turn-time: [0.028, 0.031, 0.051, ..., 0.288]  //index by turn-num
                             }
@@ -653,36 +659,49 @@ class TimeAnalysisSchema:
         
         self.log = None
         
-        self.N = None
+        self.meta_analysis = None
         self.algo_style = None
         self.analysis_type = None
-        self.date_time_run = None
-
-        # TODO - these are elements of "trials":
-        # self.meta = {}
-        # self.data = None
 
         self.trials = []
+
+        self.trial = None
+        
+        self.trial_meta = None
+        self.N = None
+        self.date_time_run = None
+
+        self.trial_data = None
 
     
     def get_all(self):
         
         temp = {}
         temp['log'] = self.log
-        temp['N'] = self.N
-        temp['algo_style'] = self.algo_style
-        temp['analysis_type'] = self.analysis_type
-        temp['date_time_run'] = self.date_time_run
+        temp['meta_analysis'] = self.meta_analysis
         temp['trials'] = copy.deepcopy(self.trials)
         
         return copy.deepcopy(temp)
 
-    def set_meta(self, N, algo_style, analysis_type):
+    def set_meta_analysis(self, algo_style, analysis_type):
         
-        self.N = N
         self.algo_style = algo_style
         self.analysis_type = analysis_type
-        self.date_time_run = time()        #TODO - better choice?
+
+        self.meta_analysis = {}
+        self.meta_analysis['algo_style'] = self.algo_style
+        self.meta_analysis['analysis_type'] = self.analysis_type
+        
+
+    def set_trial_meta(self, N, **kwargs):
+        
+        self.N = N
+        self.date_time_run = time()
+        
+        self.trial_meta = {}
+        self.trial_meta['N'] = self.N
+        self.trial_meta['data_time_run'] = self.date_time_run
+        
 
 
     def set_log(self, log_data):
@@ -712,40 +731,39 @@ class TimeAnalysisSchema:
             return None
 
 
-    def add_trial(self, analysis_results):
-        ''' add results of analysis to TAS'''
-        self.trials.append(
-            self.aggregate_y(analysis_results['turn_time'])
-        )
+    def set_trial_data(self, analysis_results):
+        ''' set results of analysis to temp var: trial_data'''
+        self.trial_data = self.aggregate_y(analysis_results['turn_time'])
+
+
+    def add_trial(self):
+        ''' append trial_meta and trial_data onto trials '''
+        self.trial = {}
+        self.trial['trial_meta'] = self.trial_meta
+        self.trial['trial_data'] = self.trial_data
+
+        self.trials.append(self.trial)
+        
 
 
     def to_json(self, data_dir=None, data_fn=None):
         ''' return json string or write to json file '''
         
-        tas = {}
-        tas['log'] = self.log
-        
-        temp_meta = {}
-        temp_meta['N'] = self.N
-        temp_meta['algo_style'] = self.algo_style
-        temp_meta['analysis_type'] = self.analysis_type
-        temp_meta['date_time_run'] = self.date_time_run
-        tas['meta'] = temp_meta
-        
-        tas['trials'] = self.trials
+        tas = self.get_all()
         
         if data_dir is None:
             return json.dumps(tas)
-        else:
-            data_dir = '../data/perf/'
-            data_fn = 'demo.tas'
-            try:
-                with open(data_dir + data_fn, 'w') as f:
-                    json.dump(tas, f)
-            except:
-                print 'failed to write file output'
-                return None
-            print 'wrote output to: ', data_dir, data_fn
+    
+        #write to output
+        data_dir = '../data/perf/'
+        data_fn = 'demo.tas'
+        try:
+            with open(data_dir + data_fn, 'w') as f:
+                json.dump(tas, f)
+        except:
+            print 'failed to write file output'
+            return None
+        print 'wrote output to: ', data_dir, data_fn
 
     
     def from_json(self, path_fn="../data/perf/demo.tas"):
@@ -759,10 +777,7 @@ class TimeAnalysisSchema:
 
         try:
             self.log = d_tas['log']
-            self.N = d_tas['meta']['N']
-            self.algo_style = d_tas['meta']['algo_style']
-            self.analysis_type = d_tas['meta']['analysis_type']
-            self.date_time_run = d_tas['meta']['date_time_run']
+            self.meta_analysis = d_tas['meta_analysis']
             self.trials = d_tas['trials']
 
         except:
@@ -805,10 +820,14 @@ def batch_analyze():
 
 
     #Batch Parameters
-    N = 2
     s_test = ["opt_yk"]   #TODO - different option flags for algo style
-    s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
+    # s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
+    s_instructions = "1. d4 e6 2. Nf3 Nf6"
+    N = 2
 
+    #Set Y-meta_analysis
+    analysis_schema.set_meta_analysis(algo_style = s_test[0], analysis_type = 'analysis2')
+    
     #Build X
     turn_attributes = TurnAttributeSchema()
     turn_attributes.load_instructions(s_instructions)
@@ -817,8 +836,8 @@ def batch_analyze():
     #Set X
     analysis_schema.set_log(turn_attributes.get_data())
 
-    #Set Y-meta
-    analysis_schema.set_meta(N = N, algo_style = s_test[0], analysis_type = 'analysis2')
+    #Set Y-(trial)-meta
+    analysis_schema.set_trial_meta(N = N)
 
     #Build Y-data
     results = analysis2(s_test
@@ -830,8 +849,10 @@ def batch_analyze():
                         )
     
     #Set Y-data
-    analysis_schema.add_trial(results[s_test[0]])
-    
+    analysis_schema.set_trial_data(results[s_test[0]])
+
+    #Append trial to trials
+    analysis_schema.add_trial()
     
     #FileSystem Save / Return data-structure
     analysis_schema.to_json(data_dir='../data/perf/')
@@ -839,7 +860,14 @@ def batch_analyze():
     
     #Hack
     d_data = analysis_schema.get_all()
-    print d_data['log']
+    import pprint
+    # json_data = analysis_schema.to_json()
+    pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(json_data)
+    pp.pprint(d_data)
+    # print d_data
+    # print d_data['log']
+    
     
     
 
@@ -1503,7 +1531,7 @@ def test_tas_load_1():
     assert type(d_from_json) == types.DictionaryType 
     
     assert d_from_json.get('trials', None) is not None
-    assert d_from_json.get('N', None) is not None    
+    assert d_from_json.get('meta_analysis', None) is not None    
     assert d_from_json.has_key('log')
 
 
