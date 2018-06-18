@@ -1179,6 +1179,8 @@ board should store edge cases:
             [ ] use sqlite and ORM to get TAS into
             [ ] how to build warning messages into these utilites, e.g. pytest as example
             [ ] how to handle double, decimals, etc.
+            [ ] build "weighted aggregate" for trials: account for different N.
+            [ ] build a zero turn time parser / warning
 
         OK, the whole point of the TimeAnalysisSchema, and perf_test is to generate
         data to run regressions on turn time, and create different conditions to reveal
@@ -1189,6 +1191,18 @@ board should store edge cases:
             scenarios / "forcings" - as input files
             a blackbox with logging multi-dim output
             need to align the inputs and output logs and find the relationships
+
+        6/18
+
+            [ ] TAS is still different b/w json and class:
+                [ ] There's no meta
+                [ ] There's only one meta, instead one for each trial
+
+            [ ] Need to build-X
+                [ ] first try a dummy pgn_to_xpgn()
+                [ ] then try a "new info" pgn_to_xpgn()
+                [ ] then incorporate that stuff into batch_analyze()
+
 
             
 

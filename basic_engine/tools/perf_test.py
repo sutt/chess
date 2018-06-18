@@ -603,7 +603,24 @@ class TimeAnalysisSchema:
         self.analysis_type = None
         self.date_time_run = None
 
+        # TODO - these are elements of "trials":
+        # self.meta = {}
+        # self.data = None
+
         self.trials = []
+
+    
+    def get_all(self):
+        
+        temp = {}
+        temp['log'] = self.log
+        temp['N'] = self.N
+        temp['algo_style'] = self.algo_style
+        temp['analysis_type'] = self.analysis_type
+        temp['date_time_run'] = self.date_time_run
+        temp['trials'] = copy.deepcopy(self.trials)
+        
+        return copy.deepcopy(temp)
 
     def set_meta(self, N, algo_style, analysis_type):
         
@@ -641,11 +658,13 @@ class TimeAnalysisSchema:
             print 'failed to aggregate, but did not catch in exception'
             return None
 
+
     def add_trial(self, analysis_results):
         ''' add results of analysis to TAS'''
         self.trials.append(
             self.aggregate_y(analysis_results['turn_time'])
         )
+
 
     def to_json(self, data_dir=None, data_fn=None):
         ''' return json string or write to json file '''
@@ -674,10 +693,31 @@ class TimeAnalysisSchema:
                 print 'failed to write file output'
                 return None
             print 'wrote output to: ', data_dir, data_fn
-            
 
-            
-            
+    
+    def from_json(self, path_fn="../data/perf/demo.tas"):
+        ''' load the TAS from json file'''
+        try:
+            with open(path_fn, "r") as f:
+                d_tas = json.load(f)
+        except:
+            print 'could not load json from: ', str(path_fn)
+            return None
+
+        try:
+            self.log = d_tas['log']
+            self.N = d_tas['meta']['N']
+            self.algo_style = d_tas['meta']['algo_style']
+            self.analysis_type = d_tas['meta']['analysis_type']
+            self.date_time_run = d_tas['meta']['date_time_run']
+            self.trials = d_tas['trials']
+
+        except:
+            print 'could not convert json to TAS'
+            return None
+
+        return 0
+
 
     def _scratch_pad(self):
         pass
@@ -734,9 +774,14 @@ def batch_analyze():
     s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
 
     #Build X
-
+    log_data = {}
+    log_data['s_instructions'] = s_instructions
+    # in pgn_to_xpgn(): game-schema entry in the dictionary captures all info
     
-    #Build Y
+
+    data_schema.load_log(log_data)
+    
+    #Build Y-meta
     data_schema.set_meta(N = N, algo_style = s_test[0], analysis_type = 'analysis2')
 
     # TODO - turn off logging
@@ -748,6 +793,7 @@ def batch_analyze():
                         ,b_piece_init=True
                         )
     
+    #Build Y-data
     data_schema.add_trial(results[s_test[0]])
     
     data_schema.to_json(data_dir='../data/perf/')
@@ -1400,3 +1446,20 @@ def test_tas_aggregate_y():
 
     aggregated_y = tas.aggregate_y(dummy_turn_times)
     assert aggregated_y is None
+
+def test_tas_load_1():
+    ''' test loading the TAS from json'''
+    import types
+
+    tas = TimeAnalysisSchema()
+
+    tas.from_json(path_fn="../data/perf/demo.tas")
+
+    d_from_json = tas.get_all()
+
+    assert type(d_from_json) == types.DictionaryType 
+    
+    assert d_from_json.get('trials', None) is not None
+    assert d_from_json.get('N', None) is not None    
+    assert d_from_json.has_key('log')
+
