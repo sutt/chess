@@ -561,6 +561,61 @@ def analysis3(s_tests, s_instructions, **kwargs):
 import json
 # import time
 
+class TurnAttributeSchema:
+    
+    def __init__(self):
+        self.s_instructions = None
+        self.s_pgn_instructions = None
+        
+        self.num_available = None
+        self.num_player_pieces = None
+
+    def load_instructions(self, insturctions, b_pgn=True):
+        ''' load the insturctions and note whether they are boolean '''
+        if b_pgn:
+            self.s_pgn_instructions = insturctions
+        else:
+            self.s_instructions = insturctions
+
+    def data_from_gamelog(self, gameLog):
+        ''' input a gameLog object to extract trun attributes '''
+        self.num_available = gameLog.get_log_num_available()
+        self.num_player_pieces = gameLog.get_log_num_player_pieces()
+        
+    
+    def create_data(self, **kwargs):
+        ''' run a game using instructions and pass the gameLog into'''
+
+        if self.s_instructions is not None:
+            game = Game(s_instructions=self.s_instructions
+                        ,b_log_full=True)            
+        elif self.s_pgn_instructions is not None:
+            game = Game(s_pgn_instructions=self.s_pgn_instructions
+                        ,b_log_full=True)
+        else:
+            print 'could not find instructions to run create_data()'
+            return None
+
+        game.play()
+
+        self.data_from_gamelog(game.get_gamelog())
+
+
+    def get_data(self,**kwargs):
+        ''' return data asa a dict '''
+        data = {}
+        
+        if self.s_instructions is not None:
+            data['s_instructions'] = self.s_instructions
+        else:
+            data['s_instructions'] = self.s_pgn_instructions
+
+        data['num_available'] = self.num_available
+        data['num_player_pieces'] = self.num_player_pieces
+        
+        return data
+
+
 class TimeAnalysisSchema:
     '''
     Games - a list of instructions: [ "1. c4...", "1. e4...", ...]
@@ -629,11 +684,9 @@ class TimeAnalysisSchema:
         self.analysis_type = analysis_type
         self.date_time_run = time()        #TODO - better choice?
 
-    def init_data(self, data):
-        pass
 
-    def load_log(self, log_data):
-        pass
+    def set_log(self, log_data):
+        self.log = copy.deepcopy(log_data)
 
     @staticmethod
     def aggregate_y(data):
@@ -764,7 +817,7 @@ def batch_analyze():
     # print results
     # print len(results)
 
-    data_schema = TimeAnalysisSchema()
+    analysis_schema = TimeAnalysisSchema()
 
     # TODO - can't do logging when timing: turn it off in this style
     # results['opt_yk']['turn_time']: [ [0.01,0.02,...],[0.01,0.02,...]]
@@ -774,17 +827,16 @@ def batch_analyze():
     s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
 
     #Build X
-    log_data = {}
-    log_data['s_instructions'] = s_instructions
-    # in pgn_to_xpgn(): game-schema entry in the dictionary captures all info
+    turn_attributes = TurnAttributeSchema()
+    turn_attributes.load_instructions(s_instructions)
+    turn_attributes.create_data()
     
-
-    data_schema.load_log(log_data)
+    analysis_schema.set_log(turn_attributes.get_data())
     
     #Build Y-meta
-    data_schema.set_meta(N = N, algo_style = s_test[0], analysis_type = 'analysis2')
+    analysis_schema.set_meta(N = N, algo_style = s_test[0], analysis_type = 'analysis2')
 
-    # TODO - turn off logging
+    # TODO - turn off logging for everything except turn time
     results = analysis2(s_test
                         ,s_instructions
                         ,n=N
@@ -794,9 +846,13 @@ def batch_analyze():
                         )
     
     #Build Y-data
-    data_schema.add_trial(results[s_test[0]])
+    analysis_schema.add_trial(results[s_test[0]])
     
-    data_schema.to_json(data_dir='../data/perf/')
+    analysis_schema.to_json(data_dir='../data/perf/')
+
+    d_data = analysis_schema.get_all()
+
+    print d_data['log']
     
     
 
@@ -1463,3 +1519,15 @@ def test_tas_load_1():
     assert d_from_json.get('N', None) is not None    
     assert d_from_json.has_key('log')
 
+
+def test_turn_attribute_1():
+    ''' test using the class with example from main:test_log_schema_check_schedule_2()'''
+    
+    s_pgn = '1. Nf3 e6 2. c4 b6 3. g3 Bb7 4. Bg2 c5 5. O-O Nf6 6. Nc3 Be7 7. d4 cxd4 8. Qxd4 Nc6 9. Qf4 O-O 10. Rd1 Qb8 11. e4 d6 12. b3 a6 13. Bb2 Rd8 14. Qe3 Qa7 15. Ba3 Bf8 16. h3 b5 17. Qxa7 Nxa7 18. e5 dxe5 19. Bxf8 Kxf8 20. Nxe5 Bxg2 21. Kxg2 bxc4 22. bxc4 Ke8 23. Rab1 Rxd1 24. Nxd1 Ne4 25. Rb7 Nd6 26. Rc7 Nac8 27. c5 Ne4 28. Rxf7 Ra7 29. Rf4 Nf6 30. Ne3 Rc7 31. Rc4 Ne7 32. f4 Nc6 33. N3g4 Nd5 34. Nxc6 Rxc6 35. Kf3 Rc7 36. Ne5 Kd8 37. c6 Ke7 38. Ra4 Ra7 39. Kf2 Kd6 40. h4 a5 41. Kf3 Nc3 42. Rd4+ Nd5 43. Ke4 g6 44. g4 Kc7 45. Rd2 a4 46. f5 Nf6+ 47. Kf4 exf5 48. gxf5 Ra5 49. fxg6 hxg6 50. Rb2 Nd5+ 51. Ke4 Nb6 52. Rf2 a3 53. Rf7+ Kc8 54. Nxg6 Ra4+ 55. Ke5 Rb4 56. Ne7+ Kd8 57. c7+ Ke8 58. Rh7 Rc4 59. Nd5 Rc5 60. Rh8+ Kd7 61. Rd8+'
+
+    tas = TurnAttributeSchema()
+    tas.load_instructions(s_pgn)
+    tas.create_data()
+    d_data = tas.get_data()
+
+    assert d_data['num_player_pieces'] == [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 9, 8, 9, 8, 9, 8, 9, 8, 9, 8, 9, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 7, 6, 7, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6]

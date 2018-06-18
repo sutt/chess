@@ -1199,10 +1199,21 @@ board should store edge cases:
                 [ ] There's only one meta, instead one for each trial
 
             [ ] Need to build-X
-                [ ] first try a dummy pgn_to_xpgn()
-                [ ] then try a "new info" pgn_to_xpgn()
-                [ ] then incorporate that stuff into batch_analyze()
+                [x] first try a dummy pgn_to_xpgn()
+                [-] then try a "new info" pgn_to_xpgn()
+                [x] build a new game-schema:
+                [x] then incorporate that stuff into batch_analyze()
+                [ ] add the actual functions for this in GameLog:add_turn_log()
 
+
+            Notes:
+                GameLog:GameSchema is only about parsing pgn-instructions for extra info
+                                    like check and capture.
+                
+                it's GameLog:GameLog that has the info we need.
+
+
+                
 
             
 
