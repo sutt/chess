@@ -701,8 +701,6 @@ class TimeAnalysisSchema:
         self.trial_meta = {}
         self.trial_meta['N'] = self.N
         self.trial_meta['data_time_run'] = self.date_time_run
-        
-
 
     def set_log(self, log_data):
         self.log = copy.deepcopy(log_data)
@@ -729,6 +727,36 @@ class TimeAnalysisSchema:
         except:
             print 'failed to aggregate, but did not catch in exception'
             return None
+
+    @staticmethod
+    def weighted_avg(list_n, list_list_y):
+        
+        num_elems = len(list_n)
+        num_turns = len(list_list_y[0])
+        total_n = sum(list_n)
+        
+        cum_sum_y = [0 for j in range(num_turns)]
+        
+        for i in range(num_elems):
+            weighted_y = map(lambda elem: elem * float(list_n[i]), list_list_y[i])
+            cum_sum_y = [cum_sum_y[j] + weighted_y[j] for j in range(num_turns)]
+
+        avg_y = [float(cum_sum_y[j]) / float(total_n) for j in range(num_turns)]
+
+        return avg_y
+
+        
+    def weighted_avg_trials(self):
+        
+        list_n = []
+        list_list_y = []
+        
+        for trial in range(len(self.trials)):
+            
+            list_n.append(trial['trial_meta']['N'])
+            list_list_y.append(trial['trial_data'])
+
+        return self.weighted_avg(list_n, list_list_y)
 
 
     def set_trial_data(self, analysis_results):
@@ -1546,3 +1574,20 @@ def test_turn_attribute_1():
     d_data = tas.get_data()
 
     assert d_data['num_player_pieces'] == [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 9, 8, 9, 8, 9, 8, 9, 8, 9, 8, 9, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 7, 6, 7, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6, 4, 6]
+
+def test_tas_weighted_avg_1():
+
+    tas = TimeAnalysisSchema()
+
+    list_n = [1,9]
+    list_list_y = [
+                     [0.1, 0.2, 0.4]
+                    ,[0.2, 0.2, 0.1]
+                ]
+
+    weighted_y = tas.weighted_avg(list_n, list_list_y)
+
+    rounded_weighted_y = map(lambda x: round(x, 3), weighted_y)
+
+    assert rounded_weighted_y == [0.19, 0.2, 0.13]
+    
