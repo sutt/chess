@@ -1224,8 +1224,8 @@ board should store edge cases:
             
             10am
 
-            [ ] now get into sql, do a hello world demo
-            [ ] then get a rudimentary tas example
+            [x] now get into sql, do a hello world demo
+            [x] then get a rudimentary tas example
 
             12pm
 
@@ -1238,6 +1238,14 @@ board should store edge cases:
                 [ ] use git with subprocess and sql to benchmark
                 [ ] then compare to current perf
                 [ ] also need 
+
+            Notes:
+
+                TAS doesn't save well db, needs to be split up
+
+                one_analysis() only needs to perform log once, add that option in
+
+                batch_analysis() needs to know if its first time or not
 
 
 
