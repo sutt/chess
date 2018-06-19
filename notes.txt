@@ -1194,9 +1194,9 @@ board should store edge cases:
 
         6/18
 
-            [ ] TAS is still different b/w json and class:
-                [ ] There's no meta
-                [ ] There's only one meta, instead one for each trial
+            [x] TAS is still different b/w json and class:
+                [x] There's no meta
+                [x] There's only one meta, instead one for each trial
 
             [ ] Need to build-X
                 [x] first try a dummy pgn_to_xpgn()
@@ -1211,6 +1211,35 @@ board should store edge cases:
                                     like check and capture.
                 
                 it's GameLog:GameLog that has the info we need.
+
+        6/19
+
+            [x] First get all the hello world features of batch_analyze()
+            
+            [ ] Then, concentrate on getting "stateful" batch analyze
+                [ ] Load from saved tas, then add trials, then add trials
+                [x] R/W
+                [x] batch work
+            [ ] Finally end it with some unittests
+            
+            10am
+
+            [ ] now get into sql, do a hello world demo
+            [ ] then get a rudimentary tas example
+
+            12pm
+
+            [ ] get the ipython notebook setup
+            [ ] plot the 
+
+            2pm 
+
+            [ ] circle back and finish off with a current perf test
+                [ ] use git with subprocess and sql to benchmark
+                [ ] then compare to current perf
+                [ ] also need 
+
+
 
 
                 
