@@ -1230,14 +1230,25 @@ board should store edge cases:
             12pm
 
             [ ] get the ipython notebook setup
-            [ ] plot the 
+            [ ] plot the data
 
             2pm 
 
             [ ] circle back and finish off with a current perf test
                 [ ] use git with subprocess and sql to benchmark
                 [ ] then compare to current perf
-                [ ] also need 
+                [ ] also need non-chess type perf-benchmark to deal
+                    with different cpu load regimes.
+
+            [ ] Program Flow for Stateful Batch Analysis
+                [ ] how to do an update as opposed to insert
+
+            [ ] Analysis Module
+                [ ] Perform weighted_avg
+                [ ] Function which returns ply_num
+                    [ ] Plot by ply_num
+                [ ] function which returns data.table of X and Y
+
 
             Notes:
 

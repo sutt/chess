@@ -1,13 +1,14 @@
 import sqlite3
 import os
 import json
-from perf_test import TimeAnalysisSchema
+from schema_module import TimeAnalysisSchema
 
 DATA_DIR = "../data/perf/db_perf.db"
 
 class DBDriver:
 
     def check_table(self, table_name):
+        
         try:
             s = "SELECT * FROM "
             s += table_name
@@ -30,7 +31,7 @@ class DBDriver:
             print "connected to: ", DATA_DIR
         except:
             print "could not connect to db"
-            return -1
+            # return -1
 
         self.c = self.conn.cursor()
 
@@ -58,7 +59,39 @@ class DBDriver:
 
         self.conn.commit()
 
+    def close_conn(self):
+        try:
+            self.c.close()
+            self.conn.close()
+            print 'closed cursor and conn'
+        except:
+            print "couldnt close conn"
+
     
+    def drop_table_basic_tas(self):
+        try:
+            self.c.execute("drop table basic_tas")
+            self.conn.commit()
+            return 0
+        except:
+            print "could not drop basic_tas table"
+            return -1
+
+    def drop_table_tas_table(self):
+        pass
+
+    def build_games_table(self, games_fn):
+        ''' take a pgn file and create a table with an id and insturctions '''
+        pass
+    
+    def check_for_tas_record(self, tas_id):
+        ''' return True if record already exists, False otherwise '''
+        pass
+
+    def update_tas_record(self, tas_id, trials_data):
+        ''' update instead of insert '''
+        pass
+
     def add_tas_record(self, tas, tas_id = "DUMMY"):
         
         tas_tuple = (tas_id, tas['log'], tas['meta_analysis'], tas['trials'])
@@ -72,17 +105,17 @@ class DBDriver:
         self.conn.commit()
         return 0
 
-    def add_basic_record(self, s_tas, id = "DUMMY"):
+    def add_basic_record(self, s_tas, tas_id = "DUMMY"):
         
-        tas_tuple = (id, s_tas)
+        tas_tuple = (tas_id, s_tas)
         s = "INSERT INTO basic_tas VALUES (?,?)"
         try:
             self.c.execute(s, tas_tuple)
+            self.conn.commit()
         except:
-            print "failed to add_tas_record"
+            print "failed to add_basic_record"
             return -1
 
-        self.conn.commit()
         return 0
 
     def select_all_tas(self):
