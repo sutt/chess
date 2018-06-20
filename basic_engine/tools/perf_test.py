@@ -9,6 +9,8 @@ from utils import convert_pgn_to_a1
 from schema_module import TimeAnalysisSchema
 from schema_module import TurnAttributeSchema
 
+from db_module import DBDriver
+
 
 
 # Different Experiments --------------------------------------------------
@@ -626,9 +628,6 @@ def one_analysis(   s_instructions
         return analysis_schema
 
 
-from db_module import DBDriver
-
-
 def batch_analyze(   input_fn="GarryKasparovGames.txt"
                     ,output_fn="demo_batch.tas"
                     ,max_lines=None
@@ -650,8 +649,9 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
     INPUT_DATA_DIR = "../data/"
     OUTPUT_DATA_DIR = "../data/perf/"
     
+    db = None
     if (output_fn is None) or (input_fn is None):
-        db = DBDriver(b_noisy=False)
+        db = DBDriver()
 
     b_insert = True if input_fn is not None else False  #insert or update
 
@@ -688,7 +688,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
             results[key_name] = ret.get_all()
         else:
             results[key_name] = ret.to_json()
-            
+
         if b_noisy:
             print '\n'+ key_name + '\n'
     
@@ -706,7 +706,9 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
             for _k in results.keys():
                 db.add_basic_record(s_tas = results[_k] ,tas_id = _k)
 
-            db.close_conn()
+            
+    if db is not None:
+        db.closeConn()
             
 
 
@@ -741,6 +743,7 @@ if __name__ == "__main__":
     ap.add_argument("--batchdemo", action="store_true")
     ap.add_argument("--batchdemosave", action="store_true")
     ap.add_argument("--batchdemodb", action="store_true")
+    ap.add_argument("--demodb", action="store_true")
     ap.add_argument("--singledemo", action="store_true")
 
     args = vars(ap.parse_args())
@@ -852,12 +855,23 @@ if __name__ == "__main__":
     if args["batchdemosave"]:
         batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True)
 
+    if args["demodb"]:
+        
+        db = DBDriver()
+
+    
     if args["batchdemodb"]:
+        
+        #setup db stage
         db = DBDriver()
         db.drop_table_basic_tas()
-        db.close_conn()
+        db.closeConn()
+
+        #run batch with output to db
         batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True
                         ,output_fn=None)
+        
+        #verify db results
         db = DBDriver()
         ret = db.select_all_basic()
         print ret

@@ -1258,6 +1258,30 @@ board should store edge cases:
 
                 batch_analysis() needs to know if its first time or not
 
+        6/20
+
+            [ ] Do an update instead of insert
+                [x] hello update
+                
+            [ ] Refactor with Classes, etc
+                [ ] get rid of print-cruft
+                [ ] use a wrapper for try catch
+                [ ] rename functions camelcase
+                [ ] how to not instatiate tryWrap in module instead of the class?
+                [ ] add sqlite3.Row factory for fetchall
+
+            430-530 Get perf_test running
+
+
+            Notes:
+
+                https://docs.python.org/2.7/library/sqlite3.html
+                https://www.pythoncentral.io/introduction-to-sqlite-in-python/
+                https://www.sqlite.org/datatype3.html
+            
+                https://docs.python.org/2.7/tutorial/classes.html
+                https://medium.com/@vadimpushtaev/decorator-inside-python-class-1e74d23107f6
+
 
 
 
