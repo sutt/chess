@@ -9,7 +9,7 @@ from utils import convert_pgn_to_a1
 from schema_module import TimeAnalysisSchema
 from schema_module import TurnAttributeSchema
 
-from db_module import DBDriver
+from db_module import TasPerfDB
 
 
 
@@ -583,6 +583,7 @@ def one_analysis(   s_instructions
     if existing_tas is not None:
 
         analysis_schema = existing_tas
+        b_build_x = False
 
     else:
     
@@ -658,7 +659,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
     
     db = None
     if (output_fn is None) or (input_fn is None):
-        db = DBDriver()
+        db = TasPerfDB()
 
     b_insert = not(b_update)
 
@@ -889,7 +890,7 @@ if __name__ == "__main__":
     if args["batchdemodb"]:
         
         #setup db stage
-        db = DBDriver()
+        db = TasPerfDB()
         db.drop_table_basic_tas()
         db.closeConn()
 
@@ -898,14 +899,14 @@ if __name__ == "__main__":
                         ,output_fn=None)
         
         #verify db results
-        db = DBDriver()
+        db = TasPerfDB()
         ret = db.select_all_basic()
         print len(ret)
 
     if args["batchdemodbupdate"]:
         
         #setup db stage
-        db = DBDriver()
+        db = TasPerfDB()
         db.drop_table_basic_tas()
         db.closeConn()
 
@@ -915,7 +916,7 @@ if __name__ == "__main__":
         
         
         #Verify game-1 has **1** trial in trials
-        db = DBDriver()
+        db = TasPerfDB()
         ret = db.select_all_basic()
         tas = TimeAnalysisSchema()
         tas.from_json(s_json = ret[0][1], path_fn=None)
@@ -927,7 +928,7 @@ if __name__ == "__main__":
                         ,output_fn=None, b_update=True)
 
         #Now verify game-1 has **2** trial(s) in trials
-        db = DBDriver()
+        db = TasPerfDB()
         ret = db.select_all_basic()
         tas = TimeAnalysisSchema()
         tas.from_json(s_json = ret[0][1], path_fn=None)

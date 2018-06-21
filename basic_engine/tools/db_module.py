@@ -3,30 +3,32 @@ import os
 import json
 from schema_module import TimeAnalysisSchema
 
+
 DATA_DIR = "../data/perf/db_perf.db"
 ERR_CODE = -1
 
 
-class DBDriverErrLog:
+class DBErrLog:
     
     ''' used to track db operation failures without printing to console '''
     
-    def __init__(self):
+    def __init__(self, verbose=False):
         self.msgList = []
+        self.verbose = verbose
 
-    def addMsg(self, msg):
-        self.msgList.append(msg)
-        #TODO - dictionary of message:
-            # calling_function
-            # calling_function_args
-            # err
-            # err.Msg
-            # stacktrace
-
-        #TODO - test that those those are received in full detail by the wrapper
-            # e.g.  stacktrace might exit the offending db_sub_module and come
-            #       back into calling function, and then back into wrapper, so
-            #       we'd lose depth down to the offending LOC.
+    def addMsg(self
+                ,method_name=None
+                ,method_args=None
+                ,exception_class=None
+                ):
+        ''' add a dict of info about the exception thrown '''
+        msgDict = {}
+        msgDict['method_name'] = method_name
+        msgDict['method_args'] = method_args
+        msgDict['exception_msg'] = exception_class.message
+        #TODO - stacktrace
+        
+        self.msgList.append(msgDict)
 
     def getMsgList(self):
         return self.msgList
@@ -39,43 +41,73 @@ class DBDriverErrLog:
         def call(*args, **kwargs):
             try:
                 result = wrappedMethod(*args, **kwargs)
-            except:
-                #TODO - Exception as e: / raise Exception()?
-                #TODO - Logging
-                #TODO - log args, e.g verifyTable, we want to 
-                #                   know what table throws err
-                #TODO - add verbose
+            
+            except Exception as e:
+                
                 result = ERR_CODE
-                print 'failure: ', str(wrappedMethod.__name__)
+                
+                method_name = wrappedMethod.__name__
+                
+                self.addMsg( method_name = method_name
+                            ,method_args = args
+                            ,exception_class = e
+                            )
+                
+                if self.verbose:
+                    print 'failure: ', str(method_name)
+                
             return result
         return call
 
 
 #Instantiate now, and pass into DBDriver
-errLog = DBDriverErrLog()
+errLog = DBErrLog()
 tryWrap = errLog.tryWrap
 
 
 class DBDriver:
-
-    #TODO - remove this
     
-    def __init__(self, **kwargs):
+    def __init__(self, data_dir=DATA_DIR, **kwargs):
 
         self.conn = None
         self.c = None
 
-        #TODO - add this for reporting errLog at end
-        # self.log = ErrLog()
+        self.errLog = errLog
         
         @tryWrap
         def initConnect():
             #TODO - allow different db connections
-            self.conn = sqlite3.connect(DATA_DIR)
+            self.conn = sqlite3.connect(data_dir)
             self.c = self.conn.cursor()
         initConnect()
 
-        #TODO - this doesnt have to be default
+    
+    @tryWrap
+    def verifyTable(self, tbl_name):
+        ''' see if tbl_name exists '''
+        s = ("SELECT * FROM " + tbl_name)
+        self.c.execute(s)
+        
+    @tryWrap
+    def closeConn(self):
+        self.c.close()
+        self.conn.close()
+
+    @tryWrap
+    def execStr(self, s_sql, b_commit=False, b_fetch=False):
+        self.c.execute(s_sql)
+        if b_commit:
+            self.conn.commit()
+        if b_fetch:
+            return self.c.fetchall()
+
+
+class TasPerfDB(DBDriver):
+
+    def __init__(self, data_dir=DATA_DIR):
+
+        DBDriver.__init__(self, data_dir = data_dir)
+
         @tryWrap
         def initCreateTas():
             s = """CREATE TABLE tas_table
@@ -97,25 +129,11 @@ class DBDriver:
 
         self.conn.commit()
 
-    
-    @tryWrap
-    def verifyTable(self, tbl_name):
-        ''' see if tbl_name exists '''
-        s = ("SELECT * FROM " + tbl_name)
-        self.c.execute(s)
-        
-    @tryWrap
-    def closeConn(self):
-        self.c.close()
-        self.conn.close()
 
-    @tryWrap
     def drop_table_basic_tas(self):
         self.c.execute("drop table basic_tas")
         self.conn.commit()
         return 0
-
-    #unrepetant ----------
 
     def drop_table_tas_table(self):
         pass
@@ -197,19 +215,6 @@ class DBDriver:
 
 
 
-    #SCRATCHPAD
-
-        #CREATE the record for the first time
-        
-        #Read the record for reporting
-            #select * where 
-
-        #Read the record
-
-        #Also we need more characteristics on the game like num_turns, etc...
-            #put this in meta_tas_table with left join on id
-
-
 if __name__ == "__main__":
     
     
@@ -289,4 +294,31 @@ def test_class_wrapper_1():
     assert mc.calc(1,2) == 1
     assert mc.calc(1,0) == -1
     assert mc.calc(1,2) == 1
+
+
+def test_inherit_dbdriver_1():
+    ''' build a class ontop of generic DBDriver '''
+    pass
+
+
+def test_errlog_msg_1():
+    ''' Testing how the errlog '''
+
+    mock_data_dir = "../data/perf/mock_db.db"
+
+    db = DBDriver(data_dir=mock_data_dir)
+
+    #use execStr for some successful and some failure operations
+    #...
+
+
+def test_errlog_msg_2():
+    ''' Build a DB class that inherits DBDriver, like TasPerfDB, check msgList '''
+    pass
+
+
+def test_err_execmany_1():
+    ''' what happens when one of the many executemany() ops fails? 
+        in an insert? in a select? '''
+    pass
 

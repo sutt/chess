@@ -1289,6 +1289,11 @@ board should store edge cases:
 
             For now, 9:00 - 9:45 get an update running
             9:45 - 10:45 - refactor batch analysis
+            [x] Add the true error handling to ErrLog
+            [x] inheritance for specific db's
+            [ ] Use destructor in class to closeConn
+                https://stackoverflow.com/questions/865115/how-do-i-correctly-clean-up-a-python-object
+            [ ]
 
 
         HOWTOs
