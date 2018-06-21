@@ -1282,14 +1282,13 @@ board should store edge cases:
                 https://docs.python.org/2.7/tutorial/classes.html
                 https://medium.com/@vadimpushtaev/decorator-inside-python-class-1e74d23107f6
 
+        6/21
 
+            I think the abstraction that's needed is to have one object handle
+            writing the data to filesystem or db
 
-
-                
-
-            
-
-
+            For now, 9:00 - 9:45 get an update running
+            9:45 - 10:45 - refactor batch analysis
 
 
         HOWTOs

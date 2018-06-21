@@ -184,14 +184,24 @@ class TimeAnalysisSchema:
         print 'wrote output to: ', data_dir, data_fn
 
     
-    def from_json(self, path_fn="../data/perf/demo.tas"):
+    def from_json(self, path_fn="../data/perf/demo.tas", s_json=None):
         ''' load the TAS from json file'''
-        try:
-            with open(path_fn, "r") as f:
-                d_tas = json.load(f)
-        except:
-            print 'could not load json from: ', str(path_fn)
-            return None
+        
+        if path_fn is not None:
+            try:
+                with open(path_fn, "r") as f:
+                    d_tas = json.load(f)
+            except:
+                print 'could not load json from: ', str(path_fn)
+                return None
+
+        if s_json is not None:
+            try:
+                d_tas = json.loads(s_json)
+            except:
+                print 'could not load json from string.' 
+                print 'arg of type: ', str(type(s_json))
+                return None
 
         try:
             self.log = d_tas['log']

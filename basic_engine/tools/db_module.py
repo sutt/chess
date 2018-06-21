@@ -65,6 +65,7 @@ class DBDriver:
         self.conn = None
         self.c = None
 
+        #TODO - add this for reporting errLog at end
         # self.log = ErrLog()
         
         @tryWrap
@@ -74,6 +75,7 @@ class DBDriver:
             self.c = self.conn.cursor()
         initConnect()
 
+        #TODO - this doesnt have to be default
         @tryWrap
         def initCreateTas():
             s = """CREATE TABLE tas_table
@@ -82,6 +84,7 @@ class DBDriver:
             self.conn.commit()
         initCreateTas()
 
+        #TODO - this doesnt have to be default
         @tryWrap
         def initCreateBasic():
             s = """CREATE TABLE basic_tas (id text, tas text)"""
@@ -146,6 +149,19 @@ class DBDriver:
         
         tas_tuple = (tas_id, s_tas)
         s = "INSERT INTO basic_tas VALUES (?,?)"
+        try:
+            self.c.execute(s, tas_tuple)
+            self.conn.commit()
+        except:
+            print "failed to add_basic_record"
+            return -1
+
+        return 0
+
+    def update_basic_record(self, id, s_tas):
+        
+        tas_tuple = (s_tas, id)
+        s = "update basic_tas set tas=? where id=?"
         try:
             self.c.execute(s, tas_tuple)
             self.conn.commit()

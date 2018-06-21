@@ -575,18 +575,24 @@ def one_analysis(   s_instructions
                     ,b_return_tas=False
                     ,b_write_out=False
                     ,b_build_x=True
+                    ,existing_tas=None
                     ):
     
     ''' run analysis2 to create Y-data, run create_data() to create X-data()'''
 
-    analysis_schema = TimeAnalysisSchema()
+    if existing_tas is not None:
 
-    #Set Y-meta_analysis
-    analysis_schema.set_meta_analysis(   algo_style = algo_style
-                                        ,analysis_type = 'analysis2'
-                                        )
+        analysis_schema = existing_tas
+
+    else:
     
-    
+        analysis_schema = TimeAnalysisSchema()
+
+        #Set Y-meta_analysis
+        analysis_schema.set_meta_analysis(   algo_style = algo_style
+                                            ,analysis_type = 'analysis2'
+                                            )
+
     if b_build_x:
         
         #Build X
@@ -635,6 +641,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
                     ,algo_style="opt_yk"
                     ,b_noisy=False
                     ,b_write_out=False
+                    ,b_update=False
                     ):
     
     ''' analyze mulitple games and log them '''
@@ -653,7 +660,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
     if (output_fn is None) or (input_fn is None):
         db = DBDriver()
 
-    b_insert = True if input_fn is not None else False  #insert or update
+    b_insert = not(b_update)
 
     if input_fn is not None:
         input_data = INPUT_DATA_DIR + input_fn
@@ -666,12 +673,27 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
     num_lines = len(lines) if max_lines is None else min(len(lines), max_lines)
     games = lines[:num_lines]
 
+    if b_update:
+        list_existing_tas = db.select_all_basic()
+        
     #Hold the data
     results = {}
     
     #Loop
     for i, s_instruct in enumerate(games):
         
+        if b_update:
+            existingTas = TimeAnalysisSchema()
+            
+            source_key = input_fn + "-" + str(i+1)
+            s_tas_i = filter(lambda tup: tup[0] == source_key, list_existing_tas)[0]
+
+            existingTas.from_json(path_fn=None, s_json=s_tas_i[1])
+        else:
+            existingTas = None
+        
+        
+        #Pass in TAS to function, then pass it back out.
         ret = one_analysis(  s_instructions = s_instruct
                             ,b_pgn=True
                             ,algo_style=algo_style
@@ -680,6 +702,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
                             ,b_return_tas=True
                             ,b_write_out=False
                             ,b_build_x=b_insert
+                            ,existing_tas=existingTas
                             )
 
         key_name = input_fn + "-" + str(i+1)
@@ -690,9 +713,9 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
             results[key_name] = ret.to_json()
 
         if b_noisy:
-            print '\n'+ key_name + '\n'
+            print '\n'+ key_name + '\n'     #TODO - remove
     
-    if b_noisy:
+    if b_noisy:                             #TODO - remove
         print results
         print 'done with batch_analyze'
 
@@ -703,8 +726,15 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
                 json.dump(results, f)
 
         if output_fn is None:
-            for _k in results.keys():
-                db.add_basic_record(s_tas = results[_k] ,tas_id = _k)
+            
+            if b_insert:
+                for _k in results.keys():
+                    db.add_basic_record(s_tas = results[_k] ,tas_id = _k)
+            
+            if b_update:
+                print 'here!'
+                for _k in results.keys():
+                    db.update_basic_record(id = _k, s_tas = results[_k])
 
             
     if db is not None:
@@ -743,7 +773,7 @@ if __name__ == "__main__":
     ap.add_argument("--batchdemo", action="store_true")
     ap.add_argument("--batchdemosave", action="store_true")
     ap.add_argument("--batchdemodb", action="store_true")
-    ap.add_argument("--demodb", action="store_true")
+    ap.add_argument("--batchdemodbupdate", action="store_true")
     ap.add_argument("--singledemo", action="store_true")
 
     args = vars(ap.parse_args())
@@ -855,10 +885,6 @@ if __name__ == "__main__":
     if args["batchdemosave"]:
         batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True)
 
-    if args["demodb"]:
-        
-        db = DBDriver()
-
     
     if args["batchdemodb"]:
         
@@ -874,7 +900,43 @@ if __name__ == "__main__":
         #verify db results
         db = DBDriver()
         ret = db.select_all_basic()
-        print ret
+        print len(ret)
+
+    if args["batchdemodbupdate"]:
+        
+        #setup db stage
+        db = DBDriver()
+        db.drop_table_basic_tas()
+        db.closeConn()
+
+        #run batch with output to db
+        batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True
+                        ,output_fn=None)
+        
+        
+        #Verify game-1 has **1** trial in trials
+        db = DBDriver()
+        ret = db.select_all_basic()
+        tas = TimeAnalysisSchema()
+        tas.from_json(s_json = ret[0][1], path_fn=None)
+        d_tas = tas.get_all()
+        print 'LEN: ', len(d_tas['trials'])
+
+        #Tell it to update
+        batch_analyze(max_lines=2, n=3, b_noisy=False, b_write_out=True
+                        ,output_fn=None, b_update=True)
+
+        #Now verify game-1 has **2** trial(s) in trials
+        db = DBDriver()
+        ret = db.select_all_basic()
+        tas = TimeAnalysisSchema()
+        tas.from_json(s_json = ret[0][1], path_fn=None)
+        d_tas = tas.get_all()
+        print 'LEN: ', len(d_tas['trials'])
+
+        print d_tas['trials']
+        
+
 
     if args["singledemo"]:
         s_instructions = "1. d4 e6 2. Nf3 Nf6"
