@@ -33,6 +33,9 @@ class DBErrLog:
     def getMsgList(self):
         return self.msgList
 
+    def resetMsgList(self):
+        self.msgList = []
+
     def tryWrap(self, wrappedMethod):
     
         ''' Wrap wrappedMethod in try/except, logs function +  errMsg.
@@ -73,14 +76,18 @@ class DBDriver:
         self.c = None
 
         self.errLog = errLog
+        self.errLog.resetMsgList()      #From Previous Driver instances
         
         @tryWrap
         def initConnect():
-            #TODO - allow different db connections
+            #TODO - allow different db connectionts
             self.conn = sqlite3.connect(data_dir)
             self.c = self.conn.cursor()
         initConnect()
 
+    
+    def getErrLog(self):
+        return self.errLog.getMsgList()
     
     @tryWrap
     def verifyTable(self, tbl_name):
@@ -116,7 +123,6 @@ class TasPerfDB(DBDriver):
             self.conn.commit()
         initCreateTas()
 
-        #TODO - this doesnt have to be default
         @tryWrap
         def initCreateBasic():
             s = """CREATE TABLE basic_tas (id text, tas text)"""
@@ -126,8 +132,6 @@ class TasPerfDB(DBDriver):
 
         self.verifyTable("tas_table")
         self.verifyTable("basic_tas")
-
-        self.conn.commit()
 
 
     def drop_table_basic_tas(self):
@@ -311,6 +315,18 @@ def test_errlog_msg_1():
     #use execStr for some successful and some failure operations
     #...
 
+def test_different_errlogs_respectively_1():
+    ''' if you create 2 db drivers, then do you have different errLogs?'''
+    
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+    db.execStr("select * from BAD_TABLE", b_fetch=True)
+    db.execStr("select * from BAD_TABLE", b_fetch=True)
+    assert len(db.getErrLog()) == 2
+
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+    db.execStr("select * from BAD_TABLE", b_fetch=True)
+    print db.getErrLog()
+    assert len(db.getErrLog()) == 1
 
 def test_errlog_msg_2():
     ''' Build a DB class that inherits DBDriver, like TasPerfDB, check msgList '''
