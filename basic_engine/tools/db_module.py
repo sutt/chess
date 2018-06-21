@@ -174,14 +174,8 @@ class TasPerfDB(DBDriver):
         
         tas_tuple = (tas_id, tas['log'], tas['meta_analysis'], tas['trials'])
         s = "INSERT INTO tas_table VALUES (?,?,?,?)"
-        try:
-            self.c.execute(s, tas_tuple)
-        except:
-            print "failed to add_tas_record"
-            return -1
-
+        self.c.execute(s, tas_tuple)
         self.conn.commit()
-        return 0
 
     @tryWrap
     def add_basic_record(self, s_tas, tas_id = "DUMMY"):
@@ -204,7 +198,6 @@ class TasPerfDB(DBDriver):
         s = "select * from tas_table"
         self.c.execute(s)
         ret = self.c.fetchall()
-        print ret
 
         tas_list = []
 
@@ -288,7 +281,7 @@ def test_different_errlogs_respectively_1():
 
     db = DBDriver(data_dir="../data/perf/mock_db.db")
     db.execStr("select * from BAD_TABLE", b_fetch=True)
-    print db.getErrLog()
+    
     assert len(db.getErrLog()) == 1
 
 

@@ -1506,4 +1506,25 @@ def test_tas_weighted_avg_1():
     rounded_weighted_y = map(lambda x: round(x, 3), weighted_y)
 
     assert rounded_weighted_y == [0.19, 0.2, 0.13]
+
+
+def test_imported_dbdriver_errlog_1():
+    ''' make sure the single instantiated DBErrLog at the module level
+        doesnt bite us here with multiple instantiated DBDriver instances.
+        Similiar to db_module:test_different_errlogs_respectively_1() '''
+
+    from db_module import DBDriver
+    
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+    db.execStr("select * from BAD_TABLE", b_fetch=True)
+    db.execStr("select * from BAD_TABLE", b_fetch=True)
+    assert len(db.getErrLog()) == 2
+
+    db2 = DBDriver(data_dir="../data/perf/mock_db.db")
+    db2.execStr("select * from BAD_TABLE", b_fetch=True)
+    
+    assert len(db2.getErrLog()) == 1
+
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+    assert len(db.getErrLog()) == 0
     
