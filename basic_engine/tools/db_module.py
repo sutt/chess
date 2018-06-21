@@ -19,12 +19,14 @@ class DBErrLog:
     def addMsg(self
                 ,method_name=None
                 ,method_args=None
+                ,method_kwargs=None
                 ,exception_class=None
                 ):
         ''' add a dict of info about the exception thrown '''
         msgDict = {}
         msgDict['method_name'] = method_name
         msgDict['method_args'] = method_args
+        msgDict['method_kwargs'] = method_kwargs
         msgDict['exception_msg'] = exception_class.message
         #TODO - stacktrace
         
@@ -53,6 +55,7 @@ class DBErrLog:
                 
                 self.addMsg( method_name = method_name
                             ,method_args = args
+                            ,method_kwargs = kwargs
                             ,exception_class = e
                             )
                 
@@ -64,11 +67,17 @@ class DBErrLog:
 
 
 #Instantiate now, and pass into DBDriver
+# Note: handling this at module level means only one DBErrLog will be created,
+#       while multiple intances of DBDriver may be created in modules
+#       where it is imported, e.g. inside perf_test
+
 errLog = DBErrLog()
 tryWrap = errLog.tryWrap
 
 
 class DBDriver:
+
+    ''' A generic db class for inheritance into task-specific-db class'''
     
     def __init__(self, data_dir=DATA_DIR, **kwargs):
 
@@ -76,11 +85,10 @@ class DBDriver:
         self.c = None
 
         self.errLog = errLog
-        self.errLog.resetMsgList()      #From Previous Driver instances
+        self.errLog.resetMsgList()
         
         @tryWrap
         def initConnect():
-            #TODO - allow different db connectionts
             self.conn = sqlite3.connect(data_dir)
             self.c = self.conn.cursor()
         initConnect()
@@ -109,6 +117,8 @@ class DBDriver:
             return self.c.fetchall()
 
 
+#Task specific DB classes ---------------------------------------------
+
 class TasPerfDB(DBDriver):
 
     def __init__(self, data_dir=DATA_DIR):
@@ -134,26 +144,32 @@ class TasPerfDB(DBDriver):
         self.verifyTable("basic_tas")
 
 
+    @tryWrap
     def drop_table_basic_tas(self):
         self.c.execute("drop table basic_tas")
         self.conn.commit()
         return 0
 
+    @tryWrap
     def drop_table_tas_table(self):
         pass
 
+    @tryWrap
     def build_games_table(self, games_fn):
         ''' take a pgn file and create a table with an id and insturctions '''
         pass
     
+    @tryWrap
     def check_for_tas_record(self, tas_id):
         ''' return True if record already exists, False otherwise '''
         pass
 
+    @tryWrap
     def update_tas_record(self, tas_id, trials_data):
         ''' update instead of insert '''
         pass
 
+    @tryWrap
     def add_tas_record(self, tas, tas_id = "DUMMY"):
         
         tas_tuple = (tas_id, tas['log'], tas['meta_analysis'], tas['trials'])
@@ -167,32 +183,23 @@ class TasPerfDB(DBDriver):
         self.conn.commit()
         return 0
 
+    @tryWrap
     def add_basic_record(self, s_tas, tas_id = "DUMMY"):
         
         tas_tuple = (tas_id, s_tas)
         s = "INSERT INTO basic_tas VALUES (?,?)"
-        try:
-            self.c.execute(s, tas_tuple)
-            self.conn.commit()
-        except:
-            print "failed to add_basic_record"
-            return -1
+        self.c.execute(s, tas_tuple)
+        self.conn.commit()
 
-        return 0
-
+    @tryWrap
     def update_basic_record(self, id, s_tas):
         
         tas_tuple = (s_tas, id)
         s = "update basic_tas set tas=? where id=?"
-        try:
-            self.c.execute(s, tas_tuple)
-            self.conn.commit()
-        except:
-            print "failed to add_basic_record"
-            return -1
+        self.c.execute(s, tas_tuple)
+        self.conn.commit()
 
-        return 0
-
+    @tryWrap
     def select_all_tas(self):
         s = "select * from tas_table"
         self.c.execute(s)
@@ -212,6 +219,7 @@ class TasPerfDB(DBDriver):
 
         return tas_list
 
+    @tryWrap
     def select_all_basic(self):
         s = "select * from basic_tas"
         self.c.execute(s)
@@ -220,38 +228,8 @@ class TasPerfDB(DBDriver):
 
 
 if __name__ == "__main__":
+    pass
     
-    
-    db = DBDriver()
-    if "db_perf.db" in os.listdir("../data/perf/"):
-        print "db is there"
-    else:
-        print "could not find db"
-
-    dummy_tas = {}
-    dummy_tas['log'] = "dummy log"
-    dummy_tas['meta_analysis'] = "dummy meta"
-    dummy_tas['trials'] = "dummy trials"
-
-    db.add_tas_record(dummy_tas)
-
-    db.check_table("tas_table")
-
-    ret = db.select_all_tas()
-
-    print 'My TAS ENTRY-0:'
-    print ret[0].get_all()
-
-
-    tas = TimeAnalysisSchema()
-    tas.from_json("../data/perf/demo.tas")
-
-    print 'GET ALL from Obj:'
-    print tas.get_all()
-
-    db.add_basic_record(tas.to_json())
-
-    db.select_all_basic()
 
 #Unit Tests ----------------------------------------------------------
 
@@ -300,21 +278,6 @@ def test_class_wrapper_1():
     assert mc.calc(1,2) == 1
 
 
-def test_inherit_dbdriver_1():
-    ''' build a class ontop of generic DBDriver '''
-    pass
-
-
-def test_errlog_msg_1():
-    ''' Testing how the errlog '''
-
-    mock_data_dir = "../data/perf/mock_db.db"
-
-    db = DBDriver(data_dir=mock_data_dir)
-
-    #use execStr for some successful and some failure operations
-    #...
-
 def test_different_errlogs_respectively_1():
     ''' if you create 2 db drivers, then do you have different errLogs?'''
     
@@ -328,9 +291,65 @@ def test_different_errlogs_respectively_1():
     print db.getErrLog()
     assert len(db.getErrLog()) == 1
 
-def test_errlog_msg_2():
+
+def test_errlog_msg_1():
     ''' Build a DB class that inherits DBDriver, like TasPerfDB, check msgList '''
-    pass
+    
+    class MockDB(DBDriver):
+        def __init__(self, data_dir):
+            DBDriver.__init__(self, data_dir)
+        @tryWrap
+        def good_calc(self):
+            return 1
+        @tryWrap
+        def bad_calc(self):
+            return (1/0)
+
+    db = MockDB("../data/perf/mock_db.db")
+    assert len(db.getErrLog()) == 0
+    db.good_calc()
+    assert len(db.getErrLog()) == 0
+    db.bad_calc()
+    assert len(db.getErrLog()) == 1
+    
+
+
+def test_errlog_msg_2():
+    ''' verify args and function name are present in in errLog.'''
+    
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+
+    db.execStr("select * from BAD_TABLE")
+    errLog = db.getErrLog()
+
+    e1 = errLog[0]
+    assert e1['method_name'] == "execStr"
+    assert e1['method_args'][1] == "select * from BAD_TABLE"
+    assert e1['method_kwargs'] == {}
+    assert e1['exception_msg'] == 'no such table: BAD_TABLE'
+
+
+
+def test_errlog_msg_3():
+    ''' verify args and function name are present in in errLog.'''
+    
+    db = TasPerfDB()
+    
+    db.add_basic_record(s_tas="s", tas_id=(1,1))    #Tas id not a tuple
+
+    errLog = db.getErrLog()
+
+    badOperationItem = None
+    for errItem in errLog:
+        if errItem.get('method_name', None) == 'add_basic_record':
+            badOperationItem = errItem
+            break
+    
+    assert badOperationItem is not None
+
+    assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
+
+    assert badOperationItem['method_kwargs'] == {'tas_id': (1, 1), 's_tas': 's'}
 
 
 def test_err_execmany_1():
@@ -338,3 +357,7 @@ def test_err_execmany_1():
         in an insert? in a select? '''
     pass
 
+
+if __name__ == "__main__":
+    # test_errlog_msg_2()
+    pass

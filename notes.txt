@@ -1293,7 +1293,7 @@ board should store edge cases:
             [x] inheritance for specific db's
             [ ] Use destructor in class to closeConn
                 https://stackoverflow.com/questions/865115/how-do-i-correctly-clean-up-a-python-object
-            [ ]
+            [ ] do a if exists in sql create table
 
 
         HOWTOs
