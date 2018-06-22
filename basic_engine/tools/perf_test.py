@@ -1,6 +1,9 @@
 import sys
 from time import time
+import json
+import pprint
 import copy
+
 sys.path.append('../')
 
 from src.main import Game
@@ -561,17 +564,174 @@ def analysis3(s_tests, s_instructions, **kwargs):
     ''' Type 3 - '''
     pass
 
+
+
 # Batch Analysis -----------------------------------------------------
 
-import json
-import pprint
+
+class BatchAnalysis:
+    '''
+    class to run stateful batch analysis on collection of games and 
+    interface with db for input/output on these analysises.     
+    '''
+    
+    self __init__(self
+                    ,n=2
+                    ,algo_style="opt_yk"
+                    ,games_requested=range(5)
+                    ):
+        
+        #Params
+        self.n = n
+        self.algo_style = algo_style
+        self.gamesList = []
+
+        #HoldingVars
+        self.collected_batch = None
+        self.results = {}
+        self.instructions = None
+
+        self.db = TasPerfDB()
+
+    def setDB(self):
+        pass
+        
+    
+    def setGames(self, games):
+        self.games = games
+    
+    def collect_batch(self):
+        ''' 
+        populate self.gamesList:
+                item: [0]: game_id (str), [1]: b_new (bool), [2]: tas [tas] optional
+        '''
+        temp_games = self.db.get
+
+
+
+        #filesystem loading
+
+    def one_analysis(self, input_tas=None, instructions=None):
+        ''' 
+        returns: tas with <trials> with an additional item
+        input:   set either input_tas [tas]     - existing record, or,
+                            instructions [str]  - new record
+        This allows either a new TAS to be created, or an existing
+        TAS-class to be appended onto <trials>
+        '''
+        
+        if input_tas is None:
+
+            tas = TimeAnalysisSchema()
+            
+            tas.set_meta_analysis(  
+                                    algo_style = self.algo_style
+                                    ,analysis_type = 'analysis2'
+                                 )
+            
+            tas.set_log(
+                          self.build_x(instructions)
+                        )
+
+        else:
+
+            tas = input_tas
+            
+            instructions = tas.get_instructions()
+
+        
+        results = analysis2([self.algo_style]
+                            ,instructions
+                            ,n=self.n
+                            ,b_return_results=True
+                            ,b_pgn_convert=True
+                            ,b_piece_init=True
+                            )
+
+
+        tas.set_trial_meta(N = self.n)
+        tas.set_trial_data(results[algo_style])
+        tas.add_trial()
+        
+        return tas
+
+
+    def set_trial(self):
+        pass
+
+
+    @staticmethod
+    def build_x(s_instruction):
+        ''' Run a game and log attributes of the move/piece attributes at each turn'''
+    
+        turn_attributes = TurnAttributeSchema()
+        turn_attributes.load_instructions(s_instructions, b_pgn=True)
+        turn_attributes.create_data()
+    
+        return turn_attributes.get_data()
+        
+
+    def runBatch(self, b_write=False):
+        ''' Run the items in collected_batch through one_analysis.'''
+
+        for item in self.collected_batch:
+
+            game_id = item[0]
+            b_new = item[1]
+
+            if b_new:
+                tas_result = self.one_analysis(instructions=s_instructions)
+            else:
+                loaded_tas = item[2]
+                tas_result = self.one_analysis(input_tas=loaded_tas)
+
+            results[game_id] = tas_result
+        
+        if b_write:
+            self.writeOut()
+            # self.writeOut(b_new)
+
+    
+    def writeOut(self):
+        with self.db as db:
+            db.add_basic_record(self.results)
+
+    def getResults(self):
+        return self.results
+
+    def resetResults(self):
+        self.results = {}
+
+    def previewResults(self):
+        #show games_requested
+        #show batch_collect
+        #show results preview
+        #show historical summary
+        #show historical records
+        #show deviation from historical
+        pass    
+    
+    def interactiveWrite(self):
+        ''' wait until after runBatch and a print to verify writing '''
+        input_return = input("'y' to save to db:" + str(self.db.conn) + ' >')
+        if "y" in input_return:
+            self.writeOut()
+
+
+ba = BatchAnalysis()
+ba.setGames()
+ba.setDB()
+ba.collect_batch()
+ba.runBatch()
+ba.writeOut()
+ba.getResults()
+
 
 
 def one_analysis(   s_instructions
                     ,b_pgn=True
                     ,algo_style="opt_yk"
                     ,n=2
-                    ,b_noisy=False
                     ,b_return_tas=False
                     ,b_write_out=False
                     ,b_build_x=True
@@ -712,13 +872,6 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
             results[key_name] = ret.get_all()
         else:
             results[key_name] = ret.to_json()
-
-        if b_noisy:
-            print '\n'+ key_name + '\n'     #TODO - remove
-    
-    if b_noisy:                             #TODO - remove
-        print results
-        print 'done with batch_analyze'
 
     if b_write_out:
         
@@ -911,7 +1064,7 @@ if __name__ == "__main__":
         db.closeConn()
 
         #run batch with output to db
-        batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True
+        batch_analyze(max_lines=2, n=2, b_write_out=True
                         ,output_fn=None)
         
         
@@ -941,8 +1094,8 @@ if __name__ == "__main__":
 
     if args["singledemo"]:
         s_instructions = "1. d4 e6 2. Nf3 Nf6"
-        # s_instructions = "1. d4 e6 2. Nf3 Nf6 3. c4 Bb4+ 4. Nc3 b6 5. Qb3 Qe7 6. Bf4 d5 7. e3 Bb7 8. a3 Bxc3+ 9. Qxc3 O-O 10. Be2 dxc4 11. Qxc4 Rc8 12. O-O Ba6 13. Qc2 Bxe2 14. Qxe2 c5 15. Rac1 Nbd7 16. Qa6 h6 17. h3 Qe8 18. Bh2 cxd4 19. Nxd4 Nc5 20. Qe2 Qa4 21. Rc4 Qe8 22. Rfc1 a5 23. f3 a4 24. e4 Nfd7 25. Nb5 Qe7 26. Qe3 Qf6 27. e5 Qg6 28. Nd6 Rd8 29. Rg4 Qh7 30. Bf4 Kf8 31. Rd1 f5 32. exf6 Nxf6 33. Rh4 Nd5 34. Qe5 Nxf4 35. Rxf4+ Kg8 36. Rfd4 Rd7 37. Ne4 Rxd4 38. Rxd4 Qf5 39. Qxf5 exf5 40. Nxc5 bxc5 41. Rd5 Ra5 42. Rxf5 Rb5 43. Rf4 Rxb2 44. Rxa4 Ra2 45. h4 c4 46. Rxc4 Rxa3 47. Rc5 Ra4 48. h5 Ra2 49. Kh2 Rb2 50. Kh3 Rd2 51. g4 Rd1 52. Kg3 Rd4 53. Rc7 Ra4 54. Re7 Kf8 55. Re4 Ra5 56. Kf4 Kf7 57. Re5 Ra3 58. Ke4 Rb3 59. f4 Rb4+ 60. Kf5 Rb7 61. Rc5 Ra7 62. g5 hxg5 63. fxg5 g6+ 64. hxg6+ Kg7 65. Rc6 Ra5+ 66. Kg4 Ra1"
-        one_analysis(s_instructions, b_noisy=True)
+        ret = one_analysis(s_instructions)
+        print ret
         
 
 
@@ -1528,3 +1681,28 @@ def test_imported_dbdriver_errlog_1():
     db = DBDriver(data_dir="../data/perf/mock_db.db")
     assert len(db.getErrLog()) == 0
     
+
+def test_order_of_functions_1():
+    ''' Testing Design Pattern: function can be called from above within class '''
+
+    class MyClass:
+        def __init__(self):
+            self.data = 0
+        def funcA(self):
+            self.funcB()
+        def funcB(self):
+            self.data = 1
+    mc = MyClass()
+    mc.funcA()
+    assert mc.data == 1
+
+
+def test_batch_class_collect_batch_1():
+    ''' Test BatchAnalysis loading games from filesystem '''
+    ba = BatchAnalysis()
+    ba.setDB()
+    ba.collect_batch()
+    collected_batch = ba.collected_batch
+
+    assert True
+

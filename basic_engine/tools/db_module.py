@@ -119,9 +119,12 @@ class DBDriver:
 
 #Task specific DB classes ---------------------------------------------
 
+POPULATE_GAMES_DATA_DIR = "../data/"
+POPULATE_GAMES_DATA_FN = "GarryKasparovGames.txt"
+
 class TasPerfDB(DBDriver):
 
-    def __init__(self, data_dir=DATA_DIR):
+    def __init__(self, data_dir=DATA_DIR, populate=False):
 
         DBDriver.__init__(self, data_dir = data_dir)
 
@@ -143,6 +146,66 @@ class TasPerfDB(DBDriver):
         self.verifyTable("tas_table")
         self.verifyTable("basic_tas")
 
+        @tryWrap
+        def initCreateGamesTable():
+            s = """CREATE TABLE games (game_id text, game_instructions text)"""
+            self.c.execute(s)
+            self.conn.commit()
+        initCreateGamesTable()
+
+        self.verifyTable("games")
+
+        @tryWrap
+        def initPopulateGamesTable():
+            
+            s = "SELECT * FROM games"
+            self.c.execute(s)
+            if len(self.c.fetchall()) > 1:
+                return
+            
+            print 'Populating games table:'
+            fn = POPULATE_GAMES_DATA_DIR + POPULATE_GAMES_DATA_FN
+            with open(fn,'r') as f:
+                instructions = f.readlines()
+            game_records = [ (
+                                POPULATE_GAMES_DATA_FN + "-" + str(i+1)
+                                ,instructions[i]
+                             )
+                             for i in range(len(instructions))
+                            ]
+
+            # print game_records[:3]
+            
+            self.insert_many_games(game_records)
+
+            self.conn.commit()
+            
+            s = "SELECT * FROM games"
+            self.c.execute(s)
+            rows = self.c.fetchall()
+            numRows = len(rows)
+            if numRows < 1:
+                print 'failed to load!'
+                errLog = self.getErrLog()
+                print 'ErrLog length: ', str(len(errLog))
+                # print 'first seven errors: '
+                # print errLog[:min(len(errLog), 7)]
+            else:
+                print 'Num Rows in game table: ', str(numRows)
+                print 'First 3 rows...'
+                print rows[:3]
+
+        if populate:
+            initPopulateGamesTable()
+            
+            
+            
+    @tryWrap
+    def insert_many_games(self, game_records):
+        s = """INSERT INTO games(game_id, game_instructions) VALUES(?,?)"""
+        self.c.executemany(s, game_records)
+        self.conn.commit()
+        
 
     @tryWrap
     def drop_table_basic_tas(self):
@@ -343,6 +406,35 @@ def test_errlog_msg_3():
     assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
 
     assert badOperationItem['method_kwargs'] == {'tas_id': (1, 1), 's_tas': 's'}
+
+
+def test_execmany_1():
+    ''' what happens when one of the many executemany() ops fails? 
+        in an insert? in a select? '''
+    db = DBDriver(data_dir="../data/perf/mock_db.db")
+    db.execStr("drop table mocktbl")
+    db.execStr("create table mocktbl (id int, s str)")
+    vals = [(1,"a"),(2,"b")]
+    db.c.executemany("insert into mocktbl(id, s) values(?,?)", vals)
+    db.conn.commit()
+    fetched = db.execStr("select * from mocktbl", b_fetch=True)
+    assert len(fetched) == 2
+    assert fetched[1][1] == "b"
+
+
+def test_populate_games_table_1():
+    
+    db = TasPerfDB(data_dir = "../data/perf/mock_db.db", populate=False)
+    db.execStr("drop table games")
+    
+    fetched = db.execStr("select * from games", b_fetch=True)
+    assert fetched == -1
+    
+    db = TasPerfDB(data_dir = "../data/perf/mock_db.db", populate=True)
+
+    fetched = db.execStr("select * from games", b_fetch=True)
+    assert len(fetched) > 1
+
 
 
 def test_err_execmany_1():

@@ -73,6 +73,9 @@ class TimeAnalysisSchema:
         
         return copy.deepcopy(temp)
 
+    def get_instructions(self):
+        return self.log['s_instructions']
+
     def set_meta_analysis(self, algo_style, analysis_type):
         
         self.algo_style = algo_style
