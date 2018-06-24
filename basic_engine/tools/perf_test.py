@@ -626,7 +626,6 @@ class BatchAnalysis:
                 _itemList = [ _gameId, not(_bExists), _item2 ]
                 
                 temp_collected.append( _itemList )
-
         
         self.collected_batch = temp_collected
             
@@ -677,12 +676,8 @@ class BatchAnalysis:
         return tas
 
 
-    def set_trial(self):
-        pass
-
-
     @staticmethod
-    def build_x(s_instruction):
+    def build_x(s_instructions):
         ''' Run a game and log attributes of the move/piece attributes at each turn'''
     
         turn_attributes = TurnAttributeSchema()
@@ -701,7 +696,7 @@ class BatchAnalysis:
             b_new = item[1]
 
             if b_new:
-                s_instructions = item[2]
+                s_instructions = str(item[2])
                 tas_result = self.one_analysis(instructions=s_instructions)
             else:
                 loaded_tas = item[2]
@@ -719,7 +714,6 @@ class BatchAnalysis:
         for triplet in self.collected_batch:
             d_collected[triplet[0]] = triplet[1]
         
-        # with self.db as db:
         for _gameId in self.results:
             if d_collected[_gameId]:
                 self.db.add_basic_record(_gameId
@@ -729,8 +723,6 @@ class BatchAnalysis:
                 self.db.update_basic_record(_gameId
                                             ,self.results[_gameId].to_json(data_dir=None)
                                             )
-
-        print self.db.getErrLog()
 
     def getResults(self):
         return copy.deepcopy(self.results)
@@ -949,18 +941,22 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
 # > python perf_test.py --batchdemodb
 # > python perf_test.py --singledemo
 
+# > python perf_test.py --batchdemoclassupdate1 --gamesrequested 2,3,4 --mockrun --verbose
+# > python perf_test.py --batchdemoclassupdate1 --gamesrequested 2,3,4 --n 100
+
+
 if __name__ == "__main__":
     
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", action="store_true")
-    ap.add_argument("--verboseparams", action="store_true")
     ap.add_argument("--longgame", action="store_true")
     ap.add_argument("--shortgame", action="store_true")
     ap.add_argument("--multialgosummary", action="store_true")
     ap.add_argument("--turntimenaivevsopt", action="store_true")
     ap.add_argument("--gameinitdemo", action="store_true")
     ap.add_argument("--pgndemo", action="store_true")
+    
     ap.add_argument("--batchdemo", action="store_true")
     ap.add_argument("--batchdemosave", action="store_true")
     ap.add_argument("--batchdemodb", action="store_true")
@@ -968,13 +964,17 @@ if __name__ == "__main__":
     ap.add_argument("--batchdemodbupdate", action="store_true")
     ap.add_argument("--populategames", action="store_true")
     ap.add_argument("--singledemo", action="store_true")
+    ap.add_argument("--batchdemoclass1", action="store_true")
+    ap.add_argument("--batchdemoclassupdate1", action="store_true")
+    
+    ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--gamesrequested", type=str)
+    ap.add_argument("--n", type=int)
+    ap.add_argument("--mockrun", action="store_true")
 
     args = vars(ap.parse_args())
 
-    
-    if args["verboseparams"] or args["demo"]:
-        pass
-            
+
     if args["longgame"]:
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
 
@@ -1147,6 +1147,77 @@ if __name__ == "__main__":
         s_instructions = "1. d4 e6 2. Nf3 Nf6"
         ret = one_analysis(s_instructions)
         print ret
+
+    if args["batchdemoclass1"]:
+        
+        ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
+        ba.setGames([1,12])
+        ba.collect_batch()
+        print 'Running analysis on games: '
+        print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
+
+        print 'Running batch...'
+        ba.runBatch(b_write=False)
+
+        results = ba.getResults()
+        gameIds = map(lambda item: str(item[0]), copy.copy(ba.collected_batch))
+        tas0 = results[gameIds[0]]
+
+        print 'Num Results: ', str(len(results.keys()))
+
+        s_tas0 = str(tas0.get_all())
+        print 'preview of TAS 0:'
+        print s_tas0[:min(len(s_tas0), 1000)]
+
+        print 'num_trials: ', str(len(tas0.get_all()['trials']))
+
+    if args["batchdemoclassupdate1"]:
+
+        if args["gamesrequested"]:
+            s_cmd = args["gamesrequested"]
+            cmd_games_requested = map(int, s_cmd.split(","))
+            #TODO - single game
+            #TODO - range of games
+        else:
+            cmd_games_requested = range(1,11) #[1,2,3]
+
+        if args["n"]:
+            cmd_n = int(args["n"])
+        else:
+            cmd_n = 2
+
+        if args["mockrun"]:
+            cmd_pth_db = "../data/perf/staging_db.db"      #non-impact to production
+            cmd_n = 2
+        else:
+            cmd_pth_db = "../data/perf/perf_db.db"         #Production
+            cmd_n = cmd_n
+        
+        ba = BatchAnalysis(path_db=cmd_pth_db, n=cmd_n)
+        ba.setGames(cmd_games_requested)
+        ba.collect_batch()
+        
+        if args["verbose"]:
+            print 'Running analysis on games: '
+            print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
+            print 'Running batch...'
+            t0 = time()
+        
+        ba.runBatch(b_write=True)
+
+        results = ba.getResults()
+
+        if args["verbose"]:
+            print 'Total Time: ', str(time() - t0)
+            print 'Num Results: ', str(len(results.keys()))
+
+            for k in results.keys():
+                print str(k), " trials: ", str(len(results[k].get_all()['trials']))
+
+    
+    
+
+
         
 
 

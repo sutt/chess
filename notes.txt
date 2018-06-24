@@ -1307,8 +1307,14 @@ board should store edge cases:
             x delete one db_perf / perf_db
             x all tests passing
             x then make the games table load in main db
-            need to finish class based batch_analysis()
-            start running BatchAnalysis on perf_db.db
+            x need to finish class based batch_analysis()
+            fix tas to/from json as mainly a string operation
+            x use cmdline args for gameRequest
+            x batchdemoclassupdate1
+            x mockdb
+            x start running BatchAnalysis on perf_db.db
+            delete old batchanalysis funcs and cmds
+            
 
 
         HOWTOs
