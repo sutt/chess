@@ -15,7 +15,6 @@ from schema_module import TurnAttributeSchema
 from db_module import TasPerfDB
 
 
-
 # Different Experiments --------------------------------------------------
 #  
 
@@ -575,45 +574,67 @@ class BatchAnalysis:
     interface with db for input/output on these analysises.     
     '''
     
-    self __init__(self
+    def __init__(self
                     ,n=2
                     ,algo_style="opt_yk"
-                    ,games_requested=range(5)
+                    ,games_requested=range(1,6)
+                    ,path_db=None
                     ):
         
         #Params
         self.n = n
         self.algo_style = algo_style
         self.gamesList = []
+        self.analysis_tbl = "basic_tas"
+        self.id_str = "GarryKasparovGames.txt-"
 
         #HoldingVars
         self.collected_batch = None
         self.results = {}
         self.instructions = None
 
-        self.db = TasPerfDB()
+        if path_db is None:
+            self.db = TasPerfDB()
+        else:
+            self.db = TasPerfDB(data_dir = path_db)
 
-    def setDB(self):
-        pass
-        
     
-    def setGames(self, games):
-        self.games = games
+    def setGames(self, games_requested):
+        self.games_requested = games_requested
     
     def collect_batch(self):
         ''' 
-        populate self.gamesList:
+        populate self.collected_batch:
                 item: [0]: game_id (str), [1]: b_new (bool), [2]: tas [tas] optional
         '''
-        temp_games = self.db.get
+        self.gamesList = [self.id_str + str(i) for i in self.games_requested]
 
+        temp_collected = []
 
+        for _gameId in self.gamesList:
+            
+            _bExists = self.db.check_for_basic_record(_gameId)
 
-        #filesystem loading
+            if _bExists:
+                _item2 = self.db.get_tas_from_basic(_gameId)
+            else:
+                _item2 = self.db.get_instructions_from_games(_gameId)
+
+            
+            if _item2 is not None:
+
+                _itemList = [ _gameId, not(_bExists), _item2 ]
+                
+                temp_collected.append( _itemList )
+
+        
+        self.collected_batch = temp_collected
+            
+
 
     def one_analysis(self, input_tas=None, instructions=None):
         ''' 
-        returns: tas with <trials> with an additional item
+        returns: tas with a <trials> element  with an additional item
         input:   set either input_tas [tas]     - existing record, or,
                             instructions [str]  - new record
         This allows either a new TAS to be created, or an existing
@@ -680,6 +701,7 @@ class BatchAnalysis:
             b_new = item[1]
 
             if b_new:
+                s_instructions = item[2]
                 tas_result = self.one_analysis(instructions=s_instructions)
             else:
                 loaded_tas = item[2]
@@ -689,7 +711,6 @@ class BatchAnalysis:
         
         if b_write:
             self.writeOut()
-            # self.writeOut(b_new)
 
     
     def writeOut(self):
@@ -718,13 +739,13 @@ class BatchAnalysis:
             self.writeOut()
 
 
-ba = BatchAnalysis()
-ba.setGames()
-ba.setDB()
-ba.collect_batch()
-ba.runBatch()
-ba.writeOut()
-ba.getResults()
+# ba = BatchAnalysis()
+# ba.setGames()
+# ba.setDB()
+# ba.collect_batch()
+# ba.runBatch()
+# ba.writeOut()
+# ba.getResults()
 
 
 
@@ -736,6 +757,7 @@ def one_analysis(   s_instructions
                     ,b_write_out=False
                     ,b_build_x=True
                     ,existing_tas=None
+                    ,b_noisy=False
                     ):
     
     ''' run analysis2 to create Y-data, run create_data() to create X-data()'''
@@ -803,6 +825,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
                     ,b_noisy=False
                     ,b_write_out=False
                     ,b_update=False
+                    ,db_data_dir="../data/perf/perf_db.db"
                     ):
     
     ''' analyze mulitple games and log them '''
@@ -819,7 +842,7 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
     
     db = None
     if (output_fn is None) or (input_fn is None):
-        db = TasPerfDB()
+        db = TasPerfDB(db_data_dir)
 
     b_insert = not(b_update)
 
@@ -927,7 +950,9 @@ if __name__ == "__main__":
     ap.add_argument("--batchdemo", action="store_true")
     ap.add_argument("--batchdemosave", action="store_true")
     ap.add_argument("--batchdemodb", action="store_true")
+    ap.add_argument("--usemockdb", action="store_true")
     ap.add_argument("--batchdemodbupdate", action="store_true")
+    ap.add_argument("--populategames", action="store_true")
     ap.add_argument("--singledemo", action="store_true")
 
     args = vars(ap.parse_args())
@@ -1037,24 +1062,34 @@ if __name__ == "__main__":
         batch_analyze(max_lines=5, n=5, b_noisy=True, b_write_out=False)
 
     if args["batchdemosave"]:
-        batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True)
+        batch_analyze(max_lines=3, n=2, b_noisy=False, b_write_out=True)
 
     
     if args["batchdemodb"]:
         
+        #establish input_data_dir
+        if args["usemockdb"]:
+            input_data_dir = "../data/perf/mock_db.db"
+        else:
+            input_data_dir = "../data/perf/perf_db.db"
+        
         #setup db stage
-        db = TasPerfDB()
+        db = TasPerfDB(data_dir=input_data_dir)
         db.drop_table_basic_tas()
         db.closeConn()
 
         #run batch with output to db
-        batch_analyze(max_lines=2, n=2, b_noisy=False, b_write_out=True
-                        ,output_fn=None)
+        batch_analyze(max_lines=3
+                        ,n=2
+                        ,b_write_out=True
+                        ,output_fn=None
+                        ,db_data_dir=input_data_dir
+                        )
         
         #verify db results
-        db = TasPerfDB()
+        db = TasPerfDB(data_dir=input_data_dir)
         ret = db.select_all_basic()
-        print len(ret)
+        print "\n\n".join(map(str,ret))
 
     if args["batchdemodbupdate"]:
         
@@ -1064,7 +1099,7 @@ if __name__ == "__main__":
         db.closeConn()
 
         #run batch with output to db
-        batch_analyze(max_lines=2, n=2, b_write_out=True
+        batch_analyze(max_lines=3, n=2, b_write_out=True
                         ,output_fn=None)
         
         
@@ -1077,7 +1112,7 @@ if __name__ == "__main__":
         print 'LEN: ', len(d_tas['trials'])
 
         #Tell it to update
-        batch_analyze(max_lines=2, n=3, b_noisy=False, b_write_out=True
+        batch_analyze(max_lines=3, n=3, b_noisy=False, b_write_out=True
                         ,output_fn=None, b_update=True)
 
         #Now verify game-1 has **2** trial(s) in trials
@@ -1087,10 +1122,12 @@ if __name__ == "__main__":
         tas.from_json(s_json = ret[0][1], path_fn=None)
         d_tas = tas.get_all()
         print 'LEN: ', len(d_tas['trials'])
-
         print d_tas['trials']
         
-
+    if args["populategames"]:
+        db = TasPerfDB(data_dir = "../data/perf/perf_db.db", populate=True)
+        db.closeConn()
+        print 'done with populate'
 
     if args["singledemo"]:
         s_instructions = "1. d4 e6 2. Nf3 Nf6"
@@ -1570,6 +1607,9 @@ if __name__ == "__main__":
 
 # Unit Tests --------------------------------------------------------
 
+import types
+from db_module import DBDriver
+
 def test_basic_perf_pattern():
     ''' Test invoking a Game and play '''
 
@@ -1698,11 +1738,51 @@ def test_order_of_functions_1():
 
 
 def test_batch_class_collect_batch_1():
-    ''' Test BatchAnalysis loading games from filesystem '''
-    ba = BatchAnalysis()
-    ba.setDB()
+    ''' Test BatchAnalysis loading a new TAS from games table '''
+    
+    #Make sure the these three records in basic_tas table in mock_db are blank
+    db = DBDriver(data_dir = "../data/perf/mock_db.db")
+    db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-102",))
+    db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-103",))
+    db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-104",))
+    print db.getErrLog()    # if test fails, dump errlog
+    
+    #Request games of the ones which are blank
+    ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
+    ba.setGames(range(102,105))
+    assert ba.games_requested[2] == 104
+    
+    #Analyze the triplet data structure of collected_batch list
     ba.collect_batch()
-    collected_batch = ba.collected_batch
+    _collected_batch = ba.collected_batch
+    assert _collected_batch[0]== [ 
+                                    "GarryKasparovGames.txt-102" 
+                                    ,True
+                                    ,"1. d4 Nf6 2. c4 e6 3. g3 d5 4. Bg2 dxc4 5. Nf3 c5 6. O-O Nc6 7. Ne5 Bd7 8. Na3 cxd4 9. Naxc4 Rc8 10. Qb3 Nxe5 11. Nxe5 Bc6 12. Nxc6 bxc6 13. Rd1 c5 14. e3 Bd6 15. exd4 c4 16. Qb5+ Qd7 17. a4 O-O 18. Be3 Rc7 19. d5 e5 20. Rdc1 Rfc8 21. Bf1 g6 22. Bxc4 Qxb5 23. Bxb5 Nxd5 24. Ba6 Rxc1+ 25. Rxc1 Rxc1+ 26. Bxc1 Bc5 27. Bc4 Nb6 28. Bb3 Kf8 29. a5 Nd7 30. Ba4 Nf6 31. Bd2 Nd5 32. Bb3 Nb4 33. Bc4 Ke7 34. Kg2 h5 35. f3 Nc6 36. Bd5 Nb4 \n"
+                                     ]
+    
 
-    assert True
+def test_batch_class_collect_batch_2():
+    ''' Test BatchAnalysis loading existing TAS from basic_tas '''
 
+    #Make sure these three records are in basic_tas table
+    # >python perf_test.py --batchdemodb --usemockdb
+
+    #Request games which are in basic_tas
+    ba = BatchAnalysis(path_db="../data/perf/mock_db.db")
+    ba.setGames(range(1,4))
+    ba.collect_batch()
+    _collected_batch = ba.collected_batch
+
+    #Assert 2nd item in triplet is False, indicating existing TAS
+    assert _collected_batch[0][:2] == [ 
+                                    "GarryKasparovGames.txt-1" 
+                                    ,False
+                                     ]
+    
+    #Make sure you loaded an existing TAS
+    _tas = _collected_batch[0][2].get_all()
+    assert type(_tas) == types.DictionaryType
+    assert _tas['log']['s_instructions'] == '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 \n'
+    assert _tas['log']['num_available'] == [20, 20, 22, 22, 26, 23, 26, 24, 31, 28, 31, 36, 40, 35, 46, 35, 44, 35, 40, 36, 40, 35, 47, 35, 45, 37, 44, 35, 42, 35, 42, 38, 43, 33, 47, 32, 32, 32, 31, 32, 30]
+    assert type(_tas['trials']) == types.ListType

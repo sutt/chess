@@ -161,6 +161,8 @@ class TasPerfDB(DBDriver):
             s = "SELECT * FROM games"
             self.c.execute(s)
             if len(self.c.fetchall()) > 1:
+                print str(self.conn)
+                print 'already populated'
                 return
             
             print 'Populating games table:'
@@ -195,7 +197,9 @@ class TasPerfDB(DBDriver):
                 print 'First 3 rows...'
                 print rows[:3]
 
+        print 'here', str(populate)
         if populate:
+            print 'starting populate'
             initPopulateGamesTable()
             
             
@@ -255,6 +259,27 @@ class TasPerfDB(DBDriver):
         s = "update basic_tas set tas=? where id=?"
         self.c.execute(s, tas_tuple)
         self.conn.commit()
+
+    @tryWrap
+    def check_for_basic_record(self, game_id):
+        ''' returns true if record exists in basic_tas tbl '''
+        self.c.execute("select id from basic_tas where id=?", (game_id,))
+        return len(self.c.fetchall()) == 1
+
+    @tryWrap
+    def get_tas_from_basic(self, game_id):
+        ''' returns true if record exists in basic_tas tbl '''
+        self.c.execute("select tas from basic_tas where id=?", (game_id,))
+        fetched = self.c.fetchall()
+        tas = TimeAnalysisSchema()
+        tas.from_json(path_fn=None, s_json=fetched[0][0])
+        return tas
+
+    @tryWrap
+    def get_instructions_from_games(self, game_id):
+        ''' return game_instructions from games tbl '''
+        self.c.execute("select game_instructions from games where game_id=?", (game_id,))
+        return self.c.fetchall()[0][0]  #first row, first elem of tuple
 
     @tryWrap
     def select_all_tas(self):
