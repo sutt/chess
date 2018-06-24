@@ -232,25 +232,51 @@ class GameLog:
         self.board_pre_turn_oppoenent = kwargs.get('b_log_show_opponent', False)
         self.manual_control = kwargs.get('manual_control', ())
         
-        self.b_check_schedule = kwargs.get('b_check_schedule', False)
+        
+        # Used to turn on all logs at once
+        self.b_full_log = kwargs.get('b_full_log', False)
+        _all = self.b_full_log 
+        
+        self.b_check_schedule = kwargs.get('b_check_schedule', False) or _all
         self.log_check_schedule = []
         
-        self.b_log_move = kwargs.get('b_log_move', False)
+        self.b_log_move = kwargs.get('b_log_move', False) or _all
         self.log_move = []
         
-        self.b_num_available = kwargs.get('b_num_available',False)
+        self.b_num_available = kwargs.get('b_num_available',False) or _all
         self.log_num_available = []
+
+        self.b_num_pieces = kwargs.get('b_num_pieces', False) or _all
+        self.log_num_pieces = []
+
+        self.b_num_player_pieces = kwargs.get('b_num_player_pieces', False) or _all
+        self.log_num_player_pieces = []
+
+        self.b_num_pieces = kwargs.get('b_num_player_pieces', False) or _all
+        self.log_num_player_pieces = []
+
+        self.b_num_irregular = kwargs.get('b_num_irregular', False) or _all
+        self.log_num_irregular = []
+
+        self.b_num_king_moves = kwargs.get('b_num_king_moves', False) or _all
+        self.log_num_king_moves = []
         
         self.b_turn_time = kwargs.get('b_turn_time',False)
         self.log_turn_time = []
         self.t0 = time.time()
+
         
 
+    def set_t0(self):
+        self.t0 = time.time()
+
     def add_turn_log(self
-                     ,move
-                     ,num_available = 0
-                     ,b_check = False
-                     ):
+                        ,move
+                        ,moves
+                        ,pieces
+                        ,player
+                        ,b_check = False
+                        ):
         
         '''each turn append a data element on to each of these logs'''
 
@@ -258,10 +284,26 @@ class GameLog:
             self.log_move.append(move)
         
         if self.b_num_available:
-            self.log_num_available.append(num_available)
+            self.log_num_available.append(len(moves))
 
         if self.b_check_schedule:
             self.log_check_schedule.append(b_check)
+
+        if self.b_num_pieces:
+            num_pieces = len(pieces)
+            self.log_num_pieces.append(num_pieces)
+
+        if self.b_num_player_pieces:
+            num_player_pieces = len(filter(lambda p: p.white==player, pieces))
+            self.log_num_player_pieces.append(num_player_pieces)
+
+        if self.b_num_irregular:
+            num_irregular = 0   #len(filter(lambda m: m.move_code != "REGULAR", moves))
+            self.log_num_irregular.append(num_irregular)
+
+        if self.b_num_king_moves:
+            num_king_moves = 0   
+            self.log_num_king_moves.append(num_king_moves)
         
         if self.b_turn_time:
             _time = time.time() - self.t0
@@ -280,6 +322,15 @@ class GameLog:
 
     def get_log_check_schedule(self):
         return copy.copy(self.log_check_schedule)
+
+    def get_log_num_pieces(self):
+        return copy.copy(self.log_num_pieces)
+
+    def get_log_num_player_pieces(self):
+        return copy.copy(self.log_num_player_pieces)
+
+    def get_log_num_irregular(self):
+        return copy.copy(self.log_num_irregular)
 
     
   

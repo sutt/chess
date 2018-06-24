@@ -287,7 +287,7 @@ if __name__ == "__main__":
         b_pgn_instruct = True
 
     if args["shortgame"]:
-        s_instruct = '1. e4 e5'
+        s_instruct = '1. e4 e5'  #TODO this A1 format is wrong!
         b_pgn_instruct = False
         
     if args["verboseparams"]:

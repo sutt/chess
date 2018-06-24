@@ -958,8 +958,372 @@ board should store edge cases:
                 [ ] adding a return_ncalls type printout
                 [ ] a way to look at other functions than just get_available_moves
               
-            [ ] cleanup directory of unused files
+            [x] cleanup directory of unused files
             [ ] write some notes of whats needed next
+
+
+        Review of the worksapce as of 5/25:
+
+            Little things:
+
+                [x] alter the vscode fileexplorer to hide:
+                    .cache (from pytest)
+                    .ipynb_checkpoints
+                    .code-workspace
+                [x] get your settings and keyboard_vs up into a git repo
+                [ ] TurnStage(513): b_bypass implemented in filter_check_naive()
+                    appears to be wrong
+                        fix this when implemnting final touches on profile_test
+                [ ] How to update params on batchverify; add this to cmds-list.txt
+                [ ] Can finally delete basic:print2() and remove its references
+
+            
+            Medium Things:
+            
+                [ ] Next step is rewriting(?)/running perf_test
+                    [ ] Need some kind of baseline saved in data/
+                    [ ] different game logging attributes
+                    [ ] we're headed towards switching b/w naive and opt
+                        at some low piece count on board. Think with that in mind.
+
+                [ ] Have a proof of concept of altering engine code and re-baselining
+
+                [ ] How to get sensible width terminal is vscode?
+
+                [ ] start implementing blog post of vscode customization
+
+            Major things:
+
+                There's half a dozen concepts like Enums and static-typing that I'd like to
+                implement into this.
+                        This will require going to py3
+                        Also it would be nice to get timing data baseline in py2 first
+                    [ ] Let's get a list of things that we want to implement
+
+                There's other libraries we want to use like stockfish:
+
+                There's the whole 'select_move' module to build out
+
+                There's the kivo/web-app etc build stuff to add
+                    and the MVC concept into Game.play()
+
+            5/27
+            
+            perf_test.py 
+
+            [x] bug - second test does not print
+
+                [ ] add a unit test after fix
+                [x] add appropriate s_instructions
+
+            Cleaup:
+            [x] add clarifying comments
+            [x] summary - all the styles run via commenting out
+            [x] are play() kwargs correct in select_function()? no, fix!
+            [x] ss (set line 20) needs a short move
+            [ ] remove header print in interpret_turn_time_data()
+            [x] opt_game_log (381) is mis-named
+            [ ] why does var3 take less  time than opt
+
+            Add Features:
+            [x] select_function takes s_insturction as arg
+            [x] game_init in separate function
+            [x] play 0th move init'd ?
+            [x] need a way to do pgn_instructions
+                [x] but pgn requires compute time to deduce, should have a 
+                    conversion called pgn->A1 pre-timing
+            [ ] interpert_xxx_data() saves number data as string?
+            [ ] print out meta-data header for reports
+                [ ] s_instructions
+                [ ] num of plies
+                [ ] comments from each s_test e.g. "this is naive, it run naive_filter"
+            [x] s_tests returned by named function
+            [x] Currently timing Game's init() not just play()
+                [x] change this with decorators?
+                [x] use indv turn time summing, and take the difference
+            [x] Currently perf_test times get_log_data() at end of play()
+            
+            Add Analysis:
+            [x] add a check_for_check analysis
+            [x] add a warm-up and cool-down analysis
+            [x] an init analysis, calling game constructor before
+                [x] also calling test_exit_moves=1 on play() before.
+            [x] a pgn vs s_instruction analysis
+            [ ] add num_irregluar to turntime logging and reporting
+            [ ] add num pieces
+            [ ] add b_bypass analysis ?
+            [ ] add num_king_moves
+            
+
+            Module Architecture:
+            [ ] add argparse to run these different styles
+                [ ] how to bring in a string of s_instructions
+            [ ] add an importable callable function that logs to data
+                    and has variables for s_instruction, s_test, etc..
+            [ ] function to write reports to files instead of console
+                [ ] build a data directory
+            
+            Advanced Concepts:
+            [ ] how to handle "zero" turn times?
+                [x] - demonstrate how to get them
+                        n=1, b_turn_time should do it
+
+            [ ] Ultimately, this data can be used to build a regression:
+                
+                TurnTime ~ A + B*num_moves
+                TurnTime ~ A + B1*Regular_num_moves + B2*Irregular_num_moves
+                TurnTime ~ B1*num_my_pieces*num_your_moves
+                ...etc...
+
+                [ ] Log a lot of the data
+                [ ] Find a way to aggregate the logged data into regression form
+                [ ] Run a regression in R
+                [ ] Compare SSE to a priori results discovered via profile_test
+
+
+        5/28
+
+            Add unit tests:
+            [ ] that basic demo works
+            [ ] that init_time > 0
+
+            Cleanup:
+            [x] add decorator to replace load_init
+                [x] remove load_ in select_function()
+
+        5/29
+
+            [x] pgn_conversion in utils
+            [x] pgn_conversion in perf_test
+            [ ] batch perf_test
+                [ ] log_schema for output
+            [ ] adding variables to gamelog
+            [ ] architecture: run first logging all the variables
+                then second time logging turn times
+                [ ] how to tie the two runs together?
+            [ ] add a current timing benchmark utility:
+                see if a change in engine has a statistically significant
+                change in perf
+                [ ] multiple game types
+                [ ] log in multiple computational situations for the variance
+                    in 
+                [ ] warm-up phase
+                [ ] git based comparison
+
+        5/30
+
+            [ ] Analysis on b_full_log: True vs. False
+                how much time does it take to log?
+
+            [ ] Idea for wram-up and baselining, do some non-custom known actions
+                like adding 1M items to a list, summing it, etc...
+                    -This will see the natural temporal variation on your 
+                     computing/python env
+
+
+        Other TODOs
+
+            [ ] a test runner to run all the tests
+            [ ] profile_test is using wrong A1 format on line 290
+            [ ] conversion functions:
+                [x] A1-movelog <-> PGN-movelog
+                [ ] Get board state at certain move nums
+                    [ ] output as a python / json format
+                    [ ] output as a console
+                    [ ] how to handle board_state
+                    [ ] output move_log as pgn
+            [ ] build random game play data
+                [ ] control the randomness to lean towards capture, etc...
+                [ ] build randomness from low-piece-initial-state
+            [ ] Get the whole app running in linux env
+                [ ] WSL, etc?
+                [ ] path utilities, etc...
+
+
+        6/12
+
+            There are ways to defeat the filter_check algo?
+                what if opponent piece could kill you but is pinned to his own king?
+                This counter-case doesn't work, you can't move into where an oppoent
+                piece can kill you next turn, even if that leaves him in check the next
+                turn.
+            Maybe something about putting him in check?
+
+        6/13
+
+            Need to build batch() in perf_test
+
+                [ ] Build a Schema for results
+                    [ ] output it to json
+                    [ ] give it an extension name
+                    [ ] load it from json
+                
+                [ ] Get an ipython notebook plotting the data
+                    [x] notebook plotting random data
+                    [ ] notebook reading a schema and 
+                    [ ] do a basic regression
+                    [ ] pandas
+                    [ ] aggregation if needed
+
+                [ ] Misc Cool Stuff
+                    [ ] assertions amidst code, with exceptions
+
+            There's something wrong with schema: different batch runs of N-trials need
+            separate 
+
+        6/15
+
+            [ ] add unittests of all flagged commands
+            [ ] separate utils.xpgn_to_pgn into separate file, along with its tests
+                [ ] and it references throughout repository
+            [ ] use sqlite and ORM to get TAS into
+            [ ] how to build warning messages into these utilites, e.g. pytest as example
+            [ ] how to handle double, decimals, etc.
+            [ ] build "weighted aggregate" for trials: account for different N.
+            [ ] build a zero turn time parser / warning
+
+        OK, the whole point of the TimeAnalysisSchema, and perf_test is to generate
+        data to run regressions on turn time, and create different conditions to reveal
+        how
+
+        It's also a model of how to build processing pipelines:
+            class based schema
+            scenarios / "forcings" - as input files
+            a blackbox with logging multi-dim output
+            need to align the inputs and output logs and find the relationships
+
+        6/18
+
+            [x] TAS is still different b/w json and class:
+                [x] There's no meta
+                [x] There's only one meta, instead one for each trial
+
+            [ ] Need to build-X
+                [x] first try a dummy pgn_to_xpgn()
+                [-] then try a "new info" pgn_to_xpgn()
+                [x] build a new game-schema:
+                [x] then incorporate that stuff into batch_analyze()
+                [ ] add the actual functions for this in GameLog:add_turn_log()
+
+
+            Notes:
+                GameLog:GameSchema is only about parsing pgn-instructions for extra info
+                                    like check and capture.
+                
+                it's GameLog:GameLog that has the info we need.
+
+        6/19
+
+            [x] First get all the hello world features of batch_analyze()
+            
+            [ ] Then, concentrate on getting "stateful" batch analyze
+                [ ] Load from saved tas, then add trials, then add trials
+                [x] R/W
+                [x] batch work
+            [ ] Finally end it with some unittests
+            
+            10am
+
+            [x] now get into sql, do a hello world demo
+            [x] then get a rudimentary tas example
+
+            12pm
+
+            [ ] get the ipython notebook setup
+            [ ] plot the data
+
+            2pm 
+
+            [ ] circle back and finish off with a current perf test
+                [ ] use git with subprocess and sql to benchmark
+                [ ] then compare to current perf
+                [ ] also need non-chess type perf-benchmark to deal
+                    with different cpu load regimes.
+
+            [ ] Program Flow for Stateful Batch Analysis
+                [ ] how to do an update as opposed to insert
+
+            [ ] Analysis Module
+                [ ] Perform weighted_avg
+                [ ] Function which returns ply_num
+                    [ ] Plot by ply_num
+                [ ] function which returns data.table of X and Y
+
+
+            Notes:
+
+                TAS doesn't save well db, needs to be split up
+
+                one_analysis() only needs to perform log once, add that option in
+
+                batch_analysis() needs to know if its first time or not
+
+        6/20
+
+            [ ] Do an update instead of insert
+                [x] hello update
+                
+            [ ] Refactor with Classes, etc
+                [ ] get rid of print-cruft
+                [ ] use a wrapper for try catch
+                [ ] rename functions camelcase
+                [ ] how to not instatiate tryWrap in module instead of the class?
+                [ ] add sqlite3.Row factory for fetchall
+
+            430-530 Get perf_test running
+
+
+            Notes:
+
+                https://docs.python.org/2.7/library/sqlite3.html
+                https://www.pythoncentral.io/introduction-to-sqlite-in-python/
+                https://www.sqlite.org/datatype3.html
+            
+                https://docs.python.org/2.7/tutorial/classes.html
+                https://medium.com/@vadimpushtaev/decorator-inside-python-class-1e74d23107f6
+
+        6/21
+
+            I think the abstraction that's needed is to have one object handle
+            writing the data to filesystem or db
+
+            For now, 9:00 - 9:45 get an update running
+            9:45 - 10:45 - refactor batch analysis
+            [x] Add the true error handling to ErrLog
+            [x] inheritance for specific db's
+            [ ] Use destructor in class to closeConn
+                https://stackoverflow.com/questions/865115/how-do-i-correctly-clean-up-a-python-object
+            [ ] do a if exists in sql create table
+
+        6/22
+
+            Get games table populated in perf.db
+            db_perf has a semi populated basic_tas table
+
+        6/24
+
+            x replace db_perf in tests with mock_db
+              x  do a delete statement in mock_db
+            x delete one db_perf / perf_db
+            x all tests passing
+            x then make the games table load in main db
+            x need to finish class based batch_analysis()
+            fix tas to/from json as mainly a string operation
+            x use cmdline args for gameRequest
+            x batchdemoclassupdate1
+            x mockdb
+            x start running BatchAnalysis on perf_db.db
+            x delete old batchanalysis funcs and cmds
+            x replace --singledemo
+
+            For the future:
+
+                Batch.interactiveWrite()
+                    add message
+                Batch.preveiwResults()
+                    .analyzeDiff
+
+                Ipython plotting
             
 
 
