@@ -4,7 +4,7 @@ import json
 from schema_module import TimeAnalysisSchema
 
 
-DATA_DIR = "../data/perf/db_perf.db"
+DATA_DIR = "../data/perf/perf_db.db"
 ERR_CODE = -1
 
 
