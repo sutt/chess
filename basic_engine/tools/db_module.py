@@ -244,9 +244,9 @@ class TasPerfDB(DBDriver):
         self.conn.commit()
 
     @tryWrap
-    def add_basic_record(self, s_tas, tas_id = "DUMMY"):
+    def add_basic_record(self, id, s_tas):
         
-        tas_tuple = (tas_id, s_tas)
+        tas_tuple = (id, s_tas)
         s = "INSERT INTO basic_tas VALUES (?,?)"
         self.c.execute(s, tas_tuple)
         self.conn.commit()
@@ -415,7 +415,7 @@ def test_errlog_msg_3():
     
     db = TasPerfDB()
     
-    db.add_basic_record(s_tas="s", tas_id=(1,1))    #Tas id not a tuple
+    db.add_basic_record(id=(1,1), s_tas="s")    #Tas id not a tuple, should break
 
     errLog = db.getErrLog()
 
@@ -429,7 +429,7 @@ def test_errlog_msg_3():
 
     assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
 
-    assert badOperationItem['method_kwargs'] == {'tas_id': (1, 1), 's_tas': 's'}
+    assert badOperationItem['method_kwargs'] == {'id': (1, 1), 's_tas': 's'}
 
 
 def test_execmany_1():

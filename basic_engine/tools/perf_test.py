@@ -714,8 +714,23 @@ class BatchAnalysis:
 
     
     def writeOut(self):
-        with self.db as db:
-            db.add_basic_record(self.results)
+        
+        d_collected = {}
+        for triplet in self.collected_batch:
+            d_collected[triplet[0]] = triplet[1]
+        
+        # with self.db as db:
+        for _gameId in self.results:
+            if d_collected[_gameId]:
+                self.db.add_basic_record(_gameId
+                                        ,self.results[_gameId].to_json(data_dir=None)
+                                        )
+            else:
+                self.db.update_basic_record(_gameId
+                                            ,self.results[_gameId].to_json(data_dir=None)
+                                            )
+
+        print self.db.getErrLog()
 
     def getResults(self):
         return copy.deepcopy(self.results)
@@ -1822,7 +1837,34 @@ def test_batch_analysis_run_1():
 
 def test_batch_analysis_run_write_1():
     ''' testing runBatch() by writing to db:  '''
-    pass
+    
+    gameId = "GarryKasparovGames.txt-1"
+    
+    #establish num of trials in TAS in basic_tas
+    db = TasPerfDB(data_dir = "../data/perf/mock_db.db")
+    tas0 = TimeAnalysisSchema()
+    db.c.execute("select * from basic_tas where id = ?",(gameId,))
+    s_tas0 = db.c.fetchall()[0][1]
+    db.closeConn()
+    tas0.from_json(s_json=s_tas0,path_fn=None)
+    tas0_num_trials = len(tas0.get_all()['trials'])
+    assert tas0_num_trials > 0
+
+    #Run batch analysis and write to db
+    ba = BatchAnalysis(path_db="../data/perf/mock_db.db")
+    ba.setGames([1])
+    ba.collect_batch()
+    ba.runBatch(b_write=True)
+    
+    #there should be one more trial added to tas
+    db = TasPerfDB(data_dir = "../data/perf/mock_db.db")
+    tas1 = TimeAnalysisSchema()
+    db.c.execute("select * from basic_tas where id = ?",(gameId,))
+    s_tas1 = db.c.fetchall()[0][1]
+    db.closeConn()
+    tas1.from_json(s_json=s_tas1, path_fn=None)
+    tas1_num_trials = len(tas1.get_all()['trials'])
+    assert tas1_num_trials == tas0_num_trials + 1
 
 def test_batch_analysis_run_parameters_1():
     ''' testing parameters passed thru and changed from default  '''
