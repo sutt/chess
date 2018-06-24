@@ -201,6 +201,8 @@ class TimeAnalysisSchema:
         if s_json is not None:
             try:
                 d_tas = json.loads(s_json)
+                
+                d_tas['log']['s_instructions'] = str(d_tas['log']['s_instructions'])
             except:
                 print 'could not load json from string.' 
                 print 'arg of type: ', str(type(s_json))

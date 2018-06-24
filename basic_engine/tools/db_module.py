@@ -197,7 +197,6 @@ class TasPerfDB(DBDriver):
                 print 'First 3 rows...'
                 print rows[:3]
 
-        print 'here', str(populate)
         if populate:
             print 'starting populate'
             initPopulateGamesTable()

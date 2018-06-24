@@ -671,7 +671,7 @@ class BatchAnalysis:
 
 
         tas.set_trial_meta(N = self.n)
-        tas.set_trial_data(results[algo_style])
+        tas.set_trial_data(results[self.algo_style])
         tas.add_trial()
         
         return tas
@@ -707,7 +707,7 @@ class BatchAnalysis:
                 loaded_tas = item[2]
                 tas_result = self.one_analysis(input_tas=loaded_tas)
 
-            results[game_id] = tas_result
+            self.results[game_id] = tas_result
         
         if b_write:
             self.writeOut()
@@ -718,7 +718,7 @@ class BatchAnalysis:
             db.add_basic_record(self.results)
 
     def getResults(self):
-        return self.results
+        return copy.deepcopy(self.results)
 
     def resetResults(self):
         self.results = {}
@@ -909,7 +909,6 @@ def batch_analyze(   input_fn="GarryKasparovGames.txt"
                     db.add_basic_record(s_tas = results[_k] ,tas_id = _k)
             
             if b_update:
-                print 'here!'
                 for _k in results.keys():
                     db.update_basic_record(id = _k, s_tas = results[_k])
 
@@ -1786,3 +1785,45 @@ def test_batch_class_collect_batch_2():
     assert _tas['log']['s_instructions'] == '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 \n'
     assert _tas['log']['num_available'] == [20, 20, 22, 22, 26, 23, 26, 24, 31, 28, 31, 36, 40, 35, 46, 35, 44, 35, 40, 36, 40, 35, 47, 35, 45, 37, 44, 35, 42, 35, 42, 38, 43, 33, 47, 32, 32, 32, 31, 32, 30]
     assert type(_tas['trials']) == types.ListType
+
+
+def test_batch_analysis_run_1():
+    ''' testing runBatch() without writing to db:  '''
+
+    gameId = "GarryKasparovGames.txt-1"
+    
+    #establish num of trials in TAS in basic_tas
+    db = TasPerfDB(data_dir = "../data/perf/mock_db.db")
+    tas0 = TimeAnalysisSchema()
+    db.c.execute("select * from basic_tas where id = ?",(gameId,))
+    
+    s_tas0 = db.c.fetchall()[0][1]
+    # print db.getErrLog()
+    # [0][1]
+    print s_tas0
+    db.closeConn()
+    tas0.from_json(s_json=s_tas0,path_fn=None)
+    tas0_num_trials = len(tas0.get_all()['trials'])
+    assert tas0_num_trials > 0
+
+    #Run batch analysis
+    ba = BatchAnalysis()
+    ba = BatchAnalysis(path_db="../data/perf/mock_db.db")
+    ba.setGames([1])
+    ba.collect_batch()
+    ba.runBatch(b_write=False)
+    results = ba.getResults()
+    tas1 = results[gameId].get_all()
+    tas1_num_trials = len(tas1['trials'])
+
+    #there should be one more trial added to tas
+    assert tas1_num_trials == tas0_num_trials + 1
+
+
+def test_batch_analysis_run_write_1():
+    ''' testing runBatch() by writing to db:  '''
+    pass
+
+def test_batch_analysis_run_parameters_1():
+    ''' testing parameters passed thru and changed from default  '''
+    pass

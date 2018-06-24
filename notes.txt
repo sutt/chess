@@ -1306,7 +1306,8 @@ board should store edge cases:
               x  do a delete statement in mock_db
             x delete one db_perf / perf_db
             x all tests passing
-            then make the games table load in main db
+            x then make the games table load in main db
+            need to finish class based batch_analysis()
             start running BatchAnalysis on perf_db.db
 
 
