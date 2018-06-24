@@ -628,8 +628,13 @@ class BatchAnalysis:
                 temp_collected.append( _itemList )
         
         self.collected_batch = temp_collected
-            
 
+    def setCollectedBatch(self, collected_batch):
+        ''' so you can input instructions into the algo. E.g:
+        [['dummy', True, "1. d4 e6 2. Nf3 Nf6"]]
+         '''
+        self.collected_batch = collected_batch
+            
 
     def one_analysis(self, input_tas=None, instructions=None):
         ''' 
@@ -744,205 +749,33 @@ class BatchAnalysis:
         input_return = input("'y' to save to db:" + str(self.db.conn) + ' >')
         if "y" in input_return:
             self.writeOut()
+        #TODO - add an attribute-msg to the data record: e.g. "with netflix running"
 
-
-# ba = BatchAnalysis()
-# ba.setGames()
-# ba.setDB()
-# ba.collect_batch()
-# ba.runBatch()
-# ba.writeOut()
-# ba.getResults()
-
-
-
-def one_analysis(   s_instructions
-                    ,b_pgn=True
-                    ,algo_style="opt_yk"
-                    ,n=2
-                    ,b_return_tas=False
-                    ,b_write_out=False
-                    ,b_build_x=True
-                    ,existing_tas=None
-                    ,b_noisy=False
-                    ):
-    
-    ''' run analysis2 to create Y-data, run create_data() to create X-data()'''
-
-    if existing_tas is not None:
-
-        analysis_schema = existing_tas
-        b_build_x = False
-
-    else:
-    
-        analysis_schema = TimeAnalysisSchema()
-
-        #Set Y-meta_analysis
-        analysis_schema.set_meta_analysis(   algo_style = algo_style
-                                            ,analysis_type = 'analysis2'
-                                            )
-
-    if b_build_x:
-        
-        #Build X
-        turn_attributes = TurnAttributeSchema()
-        turn_attributes.load_instructions(s_instructions, b_pgn=b_pgn)
-        turn_attributes.create_data()
-
-        #Set X
-        analysis_schema.set_log(turn_attributes.get_data())
-
-    #Set Y-(trial)-meta
-    analysis_schema.set_trial_meta(N = n)
-
-    #Build Y-data
-    results = analysis2([algo_style]
-                        ,s_instructions
-                        ,n=n
-                        ,b_return_results=True
-                        ,b_pgn_convert=True
-                        ,b_piece_init=True
-                        )
-    
-    #Set Y-data
-    analysis_schema.set_trial_data(results[algo_style])
-
-    #Append trial to trials
-    analysis_schema.add_trial()
-    
-    #FileSystem Save / Return data-structure
-    if b_write_out:
-        analysis_schema.to_json(data_dir='../data/perf/')
-
-    #Output to console
-    if b_noisy:
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(analysis_schema.get_all())
-
-    if b_return_tas:
-        return analysis_schema
-
-
-def batch_analyze(   input_fn="GarryKasparovGames.txt"
-                    ,output_fn="demo_batch.tas"
-                    ,max_lines=None
-                    ,n=2
-                    ,algo_style="opt_yk"
-                    ,b_noisy=False
-                    ,b_write_out=False
-                    ,b_update=False
-                    ,db_data_dir="../data/perf/perf_db.db"
-                    ):
-    
-    ''' analyze mulitple games and log them '''
-
-    
-    #PARAMS
-    b_input_filesystem = True
-    b_output_filesystem = False
-    b_input_db = False
-    b_output_db = True
-
-    INPUT_DATA_DIR = "../data/"
-    OUTPUT_DATA_DIR = "../data/perf/"
-    
-    db = None
-    if (output_fn is None) or (input_fn is None):
-        db = TasPerfDB(db_data_dir)
-
-    b_insert = not(b_update)
-
-    if input_fn is not None:
-        input_data = INPUT_DATA_DIR + input_fn
-    if output_fn is not None:
-        output_data = OUTPUT_DATA_DIR + output_fn
-    
-    #Read in Data
-    with open(input_data, "r") as f:
-        lines = f.readlines()
-    num_lines = len(lines) if max_lines is None else min(len(lines), max_lines)
-    games = lines[:num_lines]
-
-    if b_update:
-        list_existing_tas = db.select_all_basic()
-        
-    #Hold the data
-    results = {}
-    
-    #Loop
-    for i, s_instruct in enumerate(games):
-        
-        if b_update:
-            existingTas = TimeAnalysisSchema()
-            
-            source_key = input_fn + "-" + str(i+1)
-            s_tas_i = filter(lambda tup: tup[0] == source_key, list_existing_tas)[0]
-
-            existingTas.from_json(path_fn=None, s_json=s_tas_i[1])
-        else:
-            existingTas = None
-        
-        
-        #Pass in TAS to function, then pass it back out.
-        ret = one_analysis(  s_instructions = s_instruct
-                            ,b_pgn=True
-                            ,algo_style=algo_style
-                            ,n=n
-                            ,b_noisy=False
-                            ,b_return_tas=True
-                            ,b_write_out=False
-                            ,b_build_x=b_insert
-                            ,existing_tas=existingTas
-                            )
-
-        key_name = input_fn + "-" + str(i+1)
-        
-        if output_fn is not None:
-            results[key_name] = ret.get_all()
-        else:
-            results[key_name] = ret.to_json()
-
-    if b_write_out:
-        
-        if output_fn is not None:
-            with open(output_data, "w") as f:
-                json.dump(results, f)
-
-        if output_fn is None:
-            
-            if b_insert:
-                for _k in results.keys():
-                    db.add_basic_record(s_tas = results[_k] ,tas_id = _k)
-            
-            if b_update:
-                for _k in results.keys():
-                    db.update_basic_record(id = _k, s_tas = results[_k])
-
-            
-    if db is not None:
-        db.closeConn()
-            
-
-
-        
-    
     
     
 
 # Cmds -------------------------------------------------------------
 
+##### Show basic capabilities of this module
 # > python perf_test.py --demo
+# > python perf_test.py --singledemo
+# > python perf_test.py --batchdemo
+
+##### Show results around core concepts
 # > python perf_test.py --multialgosummary
 # > python perf_test.py --turntimenaivevsopt
-# > python perf_test.py --gameinitdemo
-# > python perf_test.py --batchdemo
-# > python perf_test.py --batchdemosave
-# > python perf_test.py --batchdemodb
-# > python perf_test.py --singledemo
 
-# > python perf_test.py --batchdemoclassupdate1 --gamesrequested 2,3,4 --mockrun --verbose
-# > python perf_test.py --batchdemoclassupdate1 --gamesrequested 2,3,4 --n 100
+##### Show contrived experiment printouts
+# > python perf_test.py --gameinitdemo
+# > python perf_test.py --pgndemo
+
+
+##### DB loading cmd, copy data/GarryKasparovGames.txt -> data/perf/perf_db.db, "games" table
+# > python perf_test.py --populategames
+
+#### Run batch with options
+# > python perf_test.py --batch --gamesrequested 2,3,4 --mockrun --verbose
+# > python perf_test.py --batch --gamesrequested 2,3,4 --n 100
 
 
 if __name__ == "__main__":
@@ -950,22 +783,16 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", action="store_true")
-    ap.add_argument("--longgame", action="store_true")
-    ap.add_argument("--shortgame", action="store_true")
     ap.add_argument("--multialgosummary", action="store_true")
     ap.add_argument("--turntimenaivevsopt", action="store_true")
     ap.add_argument("--gameinitdemo", action="store_true")
     ap.add_argument("--pgndemo", action="store_true")
     
-    ap.add_argument("--batchdemo", action="store_true")
-    ap.add_argument("--batchdemosave", action="store_true")
-    ap.add_argument("--batchdemodb", action="store_true")
-    ap.add_argument("--usemockdb", action="store_true")
-    ap.add_argument("--batchdemodbupdate", action="store_true")
     ap.add_argument("--populategames", action="store_true")
     ap.add_argument("--singledemo", action="store_true")
-    ap.add_argument("--batchdemoclass1", action="store_true")
-    ap.add_argument("--batchdemoclassupdate1", action="store_true")
+    
+    ap.add_argument("--batchdemo", action="store_true")
+    ap.add_argument("--batch", action="store_true")
     
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--gamesrequested", type=str)
@@ -975,13 +802,6 @@ if __name__ == "__main__":
     args = vars(ap.parse_args())
 
 
-    if args["longgame"]:
-        s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
-
-    if args["shortgame"]:
-        s_instructions = "1. b1 c3"
-
-    
     if args["demo"]:
         
         s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
@@ -1071,84 +891,30 @@ if __name__ == "__main__":
                         ,b_pgn_use=testUsePgn          # changing var
                         ,b_pgn_convert=testConvertPgn  # changing var
                         )
-
-    if args["batchdemo"]:
-        batch_analyze(max_lines=5, n=5, b_noisy=True, b_write_out=False)
-
-    if args["batchdemosave"]:
-        batch_analyze(max_lines=3, n=2, b_noisy=False, b_write_out=True)
-
     
-    if args["batchdemodb"]:
-        
-        #establish input_data_dir
-        if args["usemockdb"]:
-            input_data_dir = "../data/perf/mock_db.db"
-        else:
-            input_data_dir = "../data/perf/perf_db.db"
-        
-        #setup db stage
-        db = TasPerfDB(data_dir=input_data_dir)
-        db.drop_table_basic_tas()
-        db.closeConn()
-
-        #run batch with output to db
-        batch_analyze(max_lines=3
-                        ,n=2
-                        ,b_write_out=True
-                        ,output_fn=None
-                        ,db_data_dir=input_data_dir
-                        )
-        
-        #verify db results
-        db = TasPerfDB(data_dir=input_data_dir)
-        ret = db.select_all_basic()
-        print "\n\n".join(map(str,ret))
-
-    if args["batchdemodbupdate"]:
-        
-        #setup db stage
-        db = TasPerfDB()
-        db.drop_table_basic_tas()
-        db.closeConn()
-
-        #run batch with output to db
-        batch_analyze(max_lines=3, n=2, b_write_out=True
-                        ,output_fn=None)
-        
-        
-        #Verify game-1 has **1** trial in trials
-        db = TasPerfDB()
-        ret = db.select_all_basic()
-        tas = TimeAnalysisSchema()
-        tas.from_json(s_json = ret[0][1], path_fn=None)
-        d_tas = tas.get_all()
-        print 'LEN: ', len(d_tas['trials'])
-
-        #Tell it to update
-        batch_analyze(max_lines=3, n=3, b_noisy=False, b_write_out=True
-                        ,output_fn=None, b_update=True)
-
-        #Now verify game-1 has **2** trial(s) in trials
-        db = TasPerfDB()
-        ret = db.select_all_basic()
-        tas = TimeAnalysisSchema()
-        tas.from_json(s_json = ret[0][1], path_fn=None)
-        d_tas = tas.get_all()
-        print 'LEN: ', len(d_tas['trials'])
-        print d_tas['trials']
         
     if args["populategames"]:
         db = TasPerfDB(data_dir = "../data/perf/perf_db.db", populate=True)
         db.closeConn()
         print 'done with populate'
 
-    if args["singledemo"]:
-        s_instructions = "1. d4 e6 2. Nf3 Nf6"
-        ret = one_analysis(s_instructions)
-        print ret
 
-    if args["batchdemoclass1"]:
+    if args["singledemo"]:
+        
+        s_instructions = "1. d4 e6 2. Nf3 Nf6"
+        collected_batch = [['dummy', True, s_instructions]]
+
+        ba = BatchAnalysis(n=10)
+        ba.setCollectedBatch(collected_batch)
+        ba.runBatch(b_write=False)
+        
+        tas0 = ba.getResults()['dummy']
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(tas0.get_all())
+        
+
+
+    if args["batchdemo"]:
         
         ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
         ba.setGames([1,12])
@@ -1171,7 +937,9 @@ if __name__ == "__main__":
 
         print 'num_trials: ', str(len(tas0.get_all()['trials']))
 
-    if args["batchdemoclassupdate1"]:
+
+
+    if args["batch"]:
 
         if args["gamesrequested"]:
             s_cmd = args["gamesrequested"]
@@ -1210,16 +978,8 @@ if __name__ == "__main__":
         if args["verbose"]:
             print 'Total Time: ', str(time() - t0)
             print 'Num Results: ', str(len(results.keys()))
-
             for k in results.keys():
                 print str(k), " trials: ", str(len(results[k].get_all()['trials']))
-
-    
-    
-
-
-        
-
 
     print 'script done.'
         

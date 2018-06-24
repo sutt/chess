@@ -1313,7 +1313,17 @@ board should store edge cases:
             x batchdemoclassupdate1
             x mockdb
             x start running BatchAnalysis on perf_db.db
-            delete old batchanalysis funcs and cmds
+            x delete old batchanalysis funcs and cmds
+            x replace --singledemo
+
+            For the future:
+
+                Batch.interactiveWrite()
+                    add message
+                Batch.preveiwResults()
+                    .analyzeDiff
+
+                Ipython plotting
             
 
 
