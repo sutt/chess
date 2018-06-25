@@ -5,4 +5,6 @@ hack.py
 scrarch-batchverify.py
 *.code-workspace
 .ipynb_checkpoints
+basic_engine/data/*
+data/
 

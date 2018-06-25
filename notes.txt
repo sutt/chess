@@ -1264,10 +1264,10 @@ board should store edge cases:
                 [x] hello update
                 
             [ ] Refactor with Classes, etc
-                [ ] get rid of print-cruft
-                [ ] use a wrapper for try catch
-                [ ] rename functions camelcase
-                [ ] how to not instatiate tryWrap in module instead of the class?
+                [x] get rid of print-cruft
+                [x] use a wrapper for try catch
+                [x] rename functions camelcase
+                [x] how to not instatiate tryWrap in module instead of the class?
                 [ ] add sqlite3.Row factory for fetchall
 
             430-530 Get perf_test running
@@ -1322,9 +1322,34 @@ board should store edge cases:
                     add message
                 Batch.preveiwResults()
                     .analyzeDiff
+                    Deviation stats module
 
+                Better log results fro turn_attirbute_schema
+                
                 Ipython plotting
-            
+
+                Regression
+
+                Init game from some state, then run instructions
+                    (for late game)
+
+                Run random games
+                    Add Random Games to db
+
+                Build comparison utility
+                    has git commit attribute
+
+                    Build a historical record of game runs
+
+
+            Other stuff to shore up
+
+                PGN in out_log
+                PGN in cmd_move
+
+                End game and 3-fold repetition rule
+
+    
 
 
         HOWTOs
