@@ -1349,6 +1349,20 @@ board should store edge cases:
 
                 End game and 3-fold repetition rule
 
+        6/25
+
+            x Do some scatter plotting
+            Do some weighted avg
+            Problem: there aren't separate records for diff algo styles
+            maybe problem: it appears linear, not quadratic, time ~ num_available
+
+            [x] build tas_table
+                [x] drop old tas_table
+                [x] add analysis_type
+                [x] add algo_style
+            [ ] Get some data  ~3s/game on naive_yk , 0.5sgame on opt_yk
+            [ ] add analysis_utils module
+
     
 
 

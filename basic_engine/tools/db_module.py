@@ -131,7 +131,7 @@ class TasPerfDB(DBDriver):
         @tryWrap
         def initCreateTas():
             s = """CREATE TABLE tas_table
-                    (id text, log text, meta_analysis text, trials text)"""
+                    (id text, analysis_type text, algo_style text, tas text)"""
             self.c.execute(s)
             self.conn.commit()
         initCreateTas()
@@ -224,11 +224,6 @@ class TasPerfDB(DBDriver):
     def build_games_table(self, games_fn):
         ''' take a pgn file and create a table with an id and insturctions '''
         pass
-    
-    @tryWrap
-    def check_for_tas_record(self, tas_id):
-        ''' return True if record already exists, False otherwise '''
-        pass
 
     @tryWrap
     def update_tas_record(self, tas_id, trials_data):
@@ -244,31 +239,68 @@ class TasPerfDB(DBDriver):
         self.conn.commit()
 
     @tryWrap
-    def add_basic_record(self, id, s_tas):
+    def add_tas_record(self, id, tas, b_basic=False):
         
-        tas_tuple = (id, s_tas)
-        s = "INSERT INTO basic_tas VALUES (?,?)"
+        if b_basic:
+            tas_tuple = (id, tas.to_json(data_dir=None))
+            s = "INSERT INTO basic_tas VALUES (?,?)"
+        
+        else:
+            _analysis_type = tas.get_all()['meta_analysis']['analysis_type']    
+            _algo_style = tas.get_all()['meta_analysis']['algo_style']    
+            
+            tas_tuple = (id, _analysis_type, _algo_style, tas.to_json(data_dir=None))
+            s = "INSERT INTO tas_table VALUES (?,?,?,?)"
+
         self.c.execute(s, tas_tuple)
         self.conn.commit()
 
     @tryWrap
-    def update_basic_record(self, id, s_tas):
+    def update_tas_record(self, id, tas, b_basic=False):
         
-        tas_tuple = (s_tas, id)
-        s = "update basic_tas set tas=? where id=?"
+        if b_basic:
+            tas_tuple = (tas.to_json(data_dir=None), id)
+            s = "update basic_tas set tas=? where id=?"
+        
+        else:
+            _analysis_type = tas.get_all()['meta_analysis']['analysis_type']    
+            _algo_style = tas.get_all()['meta_analysis']['algo_style']    
+            
+            
+            tas_tuple = (tas.to_json(data_dir=None), id, _analysis_type, _algo_style)
+            s = """update tas_table set tas=? where id=? 
+                    and analysis_type=? and algo_style=?"""
+
         self.c.execute(s, tas_tuple)
         self.conn.commit()
 
     @tryWrap
-    def check_for_basic_record(self, game_id):
+    def check_for_tas_record(self, game_id, analysis_type=None, algo_style=None
+                            ,b_basic=False):
         ''' returns true if record exists in basic_tas tbl '''
-        self.c.execute("select id from basic_tas where id=?", (game_id,))
+        if b_basic:
+            self.c.execute("select id from basic_tas where id=?", (game_id,))
+        else:
+            self.c.execute("""select id from tas_table 
+                                where id=? and analysis_type=? and algo_style=?"""
+                            ,(game_id, analysis_type, algo_style)
+                            )
         return len(self.c.fetchall()) == 1
 
     @tryWrap
-    def get_tas_from_basic(self, game_id):
+    def get_tas_from_tbl(self, game_id, analysis_type=None, algo_style=None
+                        ,b_basic=False):
         ''' returns true if record exists in basic_tas tbl '''
-        self.c.execute("select tas from basic_tas where id=?", (game_id,))
+        
+        if b_basic:
+            self.c.execute("select tas from basic_tas where id=?", (game_id,))
+        
+        else:
+            tas_tuple = (game_id, analysis_type, algo_style,)
+            self.c.execute("""SELECT tas from tas_table where id=?
+                                and analysis_type=? and algo_style=? """
+                            ,tas_tuple)
+
         fetched = self.c.fetchall()
         tas = TimeAnalysisSchema()
         tas.from_json(path_fn=None, s_json=fetched[0][0])
@@ -414,22 +446,25 @@ def test_errlog_msg_3():
     ''' verify args and function name are present in in errLog.'''
     
     db = TasPerfDB()
+
+    _tas = TimeAnalysisSchema()
     
-    db.add_basic_record(id=(1,1), s_tas="s")    #Tas id not a tuple, should break
+    db.add_tas_record(id=(1,1), tas=_tas, b_basic=True)    #Tas id not a tuple, should break
 
     errLog = db.getErrLog()
 
     badOperationItem = None
     for errItem in errLog:
-        if errItem.get('method_name', None) == 'add_basic_record':
+        if errItem.get('method_name', None) == 'add_tas_record':
             badOperationItem = errItem
             break
     
     assert badOperationItem is not None
-
+    
     assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
 
-    assert badOperationItem['method_kwargs'] == {'id': (1, 1), 's_tas': 's'}
+    assert badOperationItem['method_kwargs']['id'] == (1, 1)
+    assert badOperationItem['method_kwargs']['b_basic'] == True
 
 
 def test_execmany_1():
@@ -459,7 +494,22 @@ def test_populate_games_table_1():
     fetched = db.execStr("select * from games", b_fetch=True)
     assert len(fetched) > 1
 
-
+def test_non_basic_tas_1():
+    ''' using b_basic=False'''
+    db = TasPerfDB(data_dir="../data/perf/mock_db.db")
+    db.c.execute('delete from tas_table where id = "dummy"')
+    db.conn.commit()
+    tas0 = TimeAnalysisSchema()
+    with open('../data/perf/demo.tas', 'r') as f:
+        lines = f.readlines()
+    tas_json = lines[0]
+    tas0.from_json(path_fn=None, s_json=tas_json)
+    db.add_tas_record("dummy", tas0, b_basic=False)
+    db.c.execute('select * from tas_table where id = "dummy"')
+    ret = db.c.fetchall()
+    db.closeConn()
+    assert len(ret) == 1
+    
 
 def test_err_execmany_1():
     ''' what happens when one of the many executemany() ops fails? 

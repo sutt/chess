@@ -577,15 +577,20 @@ class BatchAnalysis:
     def __init__(self
                     ,n=2
                     ,algo_style="opt_yk"
+                    ,analysis_type="analysis2"
+                    ,analysis_tbl="basic_tas"
                     ,games_requested=range(1,6)
                     ,path_db=None
                     ):
         
         #Params
-        self.n = n
         self.algo_style = algo_style
+        self.analysis_type=analysis_type
+        self.n = n
+        
+        self.analysis_tbl = analysis_tbl
+        self.b_basic = (self.analysis_tbl == "basic_tas")
         self.gamesList = []
-        self.analysis_tbl = "basic_tas"
         self.id_str = "GarryKasparovGames.txt-"
 
         #HoldingVars
@@ -613,10 +618,19 @@ class BatchAnalysis:
 
         for _gameId in self.gamesList:
             
-            _bExists = self.db.check_for_basic_record(_gameId)
+            _bExists = self.db.check_for_tas_record(_gameId
+                                                    ,self.analysis_type
+                                                    ,self.algo_style
+                                                    ,self.b_basic
+                                                    )
 
             if _bExists:
-                _item2 = self.db.get_tas_from_basic(_gameId)
+                _item2 = self.db.get_tas_from_tbl(_gameId
+                                                    ,self.analysis_type
+                                                    ,self.algo_style
+                                                    ,self.b_basic
+                                                    )
+
             else:
                 _item2 = self.db.get_instructions_from_games(_gameId)
 
@@ -651,7 +665,7 @@ class BatchAnalysis:
             
             tas.set_meta_analysis(  
                                     algo_style = self.algo_style
-                                    ,analysis_type = 'analysis2'
+                                    ,analysis_type = self.analysis_type
                                  )
             
             tas.set_log(
@@ -719,14 +733,16 @@ class BatchAnalysis:
         for triplet in self.collected_batch:
             d_collected[triplet[0]] = triplet[1]
         
-        for _gameId in self.results:
+        for _gameId in self.results.keys():
             if d_collected[_gameId]:
-                self.db.add_basic_record(_gameId
-                                        ,self.results[_gameId].to_json(data_dir=None)
+                self.db.add_tas_record(_gameId
+                                        ,self.results[_gameId]
+                                        ,self.b_basic
                                         )
             else:
-                self.db.update_basic_record(_gameId
-                                            ,self.results[_gameId].to_json(data_dir=None)
+                self.db.update_tas_record(_gameId
+                                            ,self.results[_gameId]
+                                            ,self.b_basic
                                             )
 
     def getResults(self):
@@ -777,6 +793,11 @@ class BatchAnalysis:
 # > python perf_test.py --batch --gamesrequested 2,3,4 --mockrun --verbose
 # > python perf_test.py --batch --gamesrequested 2,3,4 --n 100
 
+# > python perf_test.py --batch --gamesrequested 6,7,8 --n 50 --algo_style naive_yk --analysis_tbl tas_table
+
+# > python perf_test.py --batch --gamesrequested 11,12,13 --n 2 --algo_style naive_yk --analysis_tbl tas_table --mockrun --verbose
+# > python perf_test.py --batch --gamesrequested 11,12,13 --n 2 --algo_style opt_yk --analysis_tbl tas_table --mockrun --verbose
+
 
 if __name__ == "__main__":
     
@@ -797,6 +818,9 @@ if __name__ == "__main__":
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--gamesrequested", type=str)
     ap.add_argument("--n", type=int)
+    ap.add_argument("--analysis_type", type=str)
+    ap.add_argument("--algo_style", type=str)
+    ap.add_argument("--analysis_tbl", type=str)
     ap.add_argument("--mockrun", action="store_true")
 
     args = vars(ap.parse_args())
@@ -960,8 +984,19 @@ if __name__ == "__main__":
         else:
             cmd_pth_db = "../data/perf/perf_db.db"         #Production
             cmd_n = cmd_n
+
+        if args["algo_style"]:
+            cmd_algo_style = args["algo_style"]
+        else:
+            cmd_algo_style = "opt_yk"
+
+        if args["analysis_tbl"]:
+            cmd_analysis_tbl = args["analysis_tbl"]
+        else:
+            cmd_analysis_tbl = "basic_tas"  #"tas_table"
         
-        ba = BatchAnalysis(path_db=cmd_pth_db, n=cmd_n)
+        ba = BatchAnalysis(path_db=cmd_pth_db, n=cmd_n, algo_style=cmd_algo_style
+                            ,analysis_tbl=cmd_analysis_tbl)
         ba.setGames(cmd_games_requested)
         ba.collect_batch()
         
@@ -980,6 +1015,7 @@ if __name__ == "__main__":
             print 'Num Results: ', str(len(results.keys()))
             for k in results.keys():
                 print str(k), " trials: ", str(len(results[k].get_all()['trials']))
+            print ba.db.getErrLog()
 
     print 'script done.'
         
