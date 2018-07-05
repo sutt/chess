@@ -287,7 +287,7 @@ class TasPerfDB(DBDriver):
                             )
         return len(self.c.fetchall()) == 1
 
-    @tryWrap
+    # @tryWrap
     def get_tas_from_tbl(self, game_id, analysis_type=None, algo_style=None
                         ,b_basic=False):
         ''' returns true if record exists in basic_tas tbl '''
@@ -296,9 +296,8 @@ class TasPerfDB(DBDriver):
             self.c.execute("select tas from basic_tas where id=?", (game_id,))
         
         else:
-            tas_tuple = (game_id, analysis_type, algo_style,)
-            self.c.execute("""SELECT tas from tas_table where id=?
-                                and analysis_type=? and algo_style=? """
+            tas_tuple = (game_id, analysis_type, algo_style)
+            self.c.execute("""select tas from tas_table where id=? and analysis_type=? and algo_style=?"""
                             ,tas_tuple)
 
         fetched = self.c.fetchall()

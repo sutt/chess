@@ -1363,6 +1363,23 @@ board should store edge cases:
             [ ] Get some data  ~3s/game on naive_yk , 0.5sgame on opt_yk
             [ ] add analysis_utils module
 
+        6/26
+
+            [ ] need to import sklearn
+            
+                https://stackoverflow.com/questions/37267399/importerror-cannot-import-name-numpy-mkl
+                [ ] reinstall numpy with (intel) MKL
+                note: current np.__version__ == 1.12.1
+                    Python 2.7.13 (v2.7.13:a06454b1afa1, Dec 17 2016, 20:42:59) [MSC v.1500 32 bit (Intel)] on win32
+                getting: numpy‑1.14.5+mkl‑cp27‑cp27m‑win32.whl
+                    from: https://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+
+                
+        7/5
+
+            [ ] Organize Ipython notebooks and commit initial stuff
+            [ ] Cleanup ScratchExploratory
+            [ ] Run a demo update to perf_db
     
 
 

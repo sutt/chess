@@ -798,6 +798,9 @@ class BatchAnalysis:
 # > python perf_test.py --batch --gamesrequested 11,12,13 --n 2 --algo_style naive_yk --analysis_tbl tas_table --mockrun --verbose
 # > python perf_test.py --batch --gamesrequested 11,12,13 --n 2 --algo_style opt_yk --analysis_tbl tas_table --mockrun --verbose
 
+# > python perf_test.py --batch --gamesrequested 1,2,3,4 --n 50 --algo_style naive_yk --analysis_tbl tas_table --mockrun --verbose
+# > python perf_test.py --batch --gamesrequested 1,2,3,4 --n 50 --algo_style naive_yk --analysis_tbl tas_table --verbose
+
 
 if __name__ == "__main__":
     
