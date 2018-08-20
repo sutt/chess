@@ -1380,6 +1380,18 @@ board should store edge cases:
             [ ] Organize Ipython notebooks and commit initial stuff
             [ ] Cleanup ScratchExploratory
             [ ] Run a demo update to perf_db
+            [ ] Get a basic regression going
+            [ ] Put graphing functions into modules
+            [ ] Build more exploratory, and more concise
+            [ ] Build summary stats function in module
+            
+
+            Questions:
+                [ ] Is intercept the same for each?
+                [ ] Where is the quadratic for naive?
+                [ ] What's going on in check situations?
+                [ ] is nk vs yk relevant?
+
     
 
 
@@ -1652,5 +1664,56 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                 inter-turn reshuffling of the pieces of display of available moves
 
         
+
+8/20
+
+[x] get stockfish
+[x] compile stockfish
+[x] use stockfish from cli
+
+[ ] manually separate executable into separate bin
+[ ] compile for windows
+[ ] call stockfish as api
+[ ] call stockfish from basic_engine
+    [ ] as a linux program running in wsl with flask?
+    
+
+Notes:
+
+    Compiling stockfish
+    
+    BASICS:
+    in WSL: cd to src/
+            make build ARCH=x86-64   (32 has an error*)
+            it's implictily using gcc
+            do "make help" to get help
+            creates .o files
+            and a stockfish (no extension) file, which is run like ./stockfish  (inside src/)
+    
+    SAVOIR-FAIRE
+
+        in WSL the line ending can get messed up:
+        so in WSL with git checkout the files or directory like
+            >git checkout -- tests/
+        this will revert line endings on the .sh files contained in that file
+        then you run the tests like this:
+        >./tests/reprosearch.sh
+
+    
+    MORE THOUGHTS & QUESTIONS
+            
+            32bit compilation fails because usr/include/c++/5/iosfwd does not have some reference (?)
+                maybe by setting this to 5.4.0 (instead of 5) which is on this wsl-VM it would work ?
+
+                  -I DIRECTORY, --include-dir=DIRECTORY
+                  Search DIRECTORY for included makefiles.
+
+            how to put files into a bin; much cleaner!
+
+
+
+
+            
+
 
 
