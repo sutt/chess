@@ -1665,18 +1665,23 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         
 
-8/20
+8/20, 8/21
 
 [x] get stockfish
 [x] compile stockfish
 [x] use stockfish from cli
 
-[ ] manually separate executable into separate bin
+[x] manually separate executable into separate bin
 [ ] compile for windows
 [ ] call stockfish as api
 [ ] call stockfish from basic_engine
     [ ] as a linux program running in wsl with flask?
     
+    8/21 tasks
+    [x] get subprocA to popen, d-cmd, quit, 
+            then show next d-cmd fails
+    [x] get subprocA to parse output
+
 
 Notes:
 
@@ -1699,6 +1704,10 @@ Notes:
         then you run the tests like this:
         >./tests/reprosearch.sh
 
+        Keyboard shortcuts
+        https://docs.microsoft.com/en-us/previous-versions/orphan-topics/ws.11/mt427362(v=ws.11)
+        https://github.com/mintty/wsltty
+
     
     MORE THOUGHTS & QUESTIONS
             
@@ -1710,6 +1719,23 @@ Notes:
 
             how to put files into a bin; much cleaner!
 
+            using mingw
+            http://support.stockfishchess.org/kb/advanced-topics/compiling-stockfish-on-windows
+
+    Using stockfish:
+
+        http://support.stockfishchess.org/kb/advanced-topics/uci-protocol
+        
+        SEE: in stockfish/uci/engine-interface.txt
+
+        >quit
+        >d      [view board position]
+        >go     [think about moves]
+
+    Interfacing with stockfish
+
+        pip package for it
+        https://pypi.org/project/stockfish/
 
 
 
