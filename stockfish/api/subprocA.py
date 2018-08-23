@@ -3,6 +3,22 @@ import subprocess
 import time
 
 
+'''
+TODOs
+    add clean text function
+    make it a class to import it
+    flush title statement
+    add new game feature
+        with tests
+    add a set position function
+    add a go command
+    add a fen extractor
+
+QUESITONS
+    how to test if stockfish has all valid moves?
+
+'''
+
 def stock_popen():
     cmd = ["../stockfish/src/stockfish"]
     try:
@@ -12,19 +28,26 @@ def stock_popen():
                             ,stdout=subprocess.PIPE
                             ,universal_newlines=True
                             )
-        print 'stockfish popen complete'
     except Exception as e:
         print e
     return p
 
+def flush_process_stdout(p):
+    """ this doesnt appear to work """
+    p.stdout.flush()    #This fails to work
+    p.stdout.readline( )    #This works, but hangs if called incorrectly
+
 def send_cmd(p, cmd):
     p.stdin.write(cmd + "\n")
-    p.stdin.flush()
+    p.stdout.flush()
 
 def receive_text(p, exit_text = "Checkers:", max_lines = 100):
     lines = []
     for i in range(max_lines):
-        line = p.stdout.readline()
+        try:
+            line = p.stdout.readline()
+        except:
+            return lines
         lines.append(line)
         if line[:len(exit_text)] == exit_text:
             return lines
@@ -50,60 +73,34 @@ if __name__ =="__main__":
     print ''.join(text)
     time.sleep(1)
 
+
+def test_stock_on():
+    p = stock_popen()
+    txt = receive_text(p, exit_text = "Stockfish")
+    assert len(txt) == 1
+    clean_txt = ''.join(txt).strip()
+    assert clean_txt == "Stockfish 200818 64 by T. Romstad, M. Costalba, J. Kiiski, G. Linscott"
+
+def test_receive_text_no_match():
+    pass
+    # p = stock_popen()
+    # txt = receive_text(p, exit_text = "blah blah", max_lines=10)
+    # assert len(txt) == 10
+    # assert txt[1] is None
     
+    
+def test_stock_cmd_d():
+    p = stock_popen()
+    time.sleep(1)
+    # flush_process_stdout(p)
+    
+    send_cmd(p, "d")
+    txt = receive_text(p, exit_text = "Checkers:")
+    print '_________________________'
+    print ''.join(txt)
+    assert txt[2] ==' +---+---+---+---+---+---+---+---+\n'
+    assert txt[3] == ' | r | n | b | q | k | b | n | r |\n'
+    
+    clean_txt = ''.join(txt).strip()
 
-    # print 'poliing...'
-    # print p.poll()
-    # print 'going d'
-    # ret = p.communicate(input="d")
-    # print 'd cmd complete \n\n\n\n'
-    # print ret
-    # print 'poliing...'
-    # print p.poll()
-    # # time.sleep(3)
-    # # print 'going d'
-    # # p.communicate(input="d")
-    # time.sleep(1)
-    # print 'going quit'
-    # p.communicate(input="quit")
-    # time.sleep(1)
-    # print 'going d'
-    # p.communicate(input="d")
-
-    # while(True):
-    #     inp = raw_input("q on off dcmd \n")
-    #     if inp == "q":
-    #         sys.exit()
-    #     if inp == "on":
-    #         print 'calling stock_popen()'
-    #         stock_popen()
-    #     if inp == "off":
-    #         print 'calling quit cmd'
-    #         stock_off()
-    #     if inp == "demo":
-    #         demoA()
-    #     if inp == "dcmd":
-    #         stock_dcmd()
-        
-
-
-
-
-# def capture_image_pi(fn, b_verbose=False):
-# 	path_fn = PATH_IMG + fn
-# 	cmd = ["raspistill", "-o", path_fn]
-# 	if b_verbose:
-# 		cmd.exntend(["-v"])
-# 	out = subprocess.check_output(cmd)
-# 	return out
-
-# def run_opencfu(input_img_path_name, fn, b_windows=False, b_filesystem=True):
-# 	cmd = ["opencfu", "-i", input_img_path_name]
-# 	if b_windows:
-# 		wsl_path = "c:/windows/SysNative/wsl.exe"
-# 		cmd = [wsl_path, "opencfu", "-i", input_img_path_name]
-# 	if b_filesystem:
-# 		path_to_colony_data = PATH_COLONY_DATA + fn + ".csv"
-# 		cmd.extend([">", path_to_colony_data])	#pipe to data/colony-data/
-# 	output_text = subprocess.check_output(cmd, shell=False)
-# 	return output_text
+    

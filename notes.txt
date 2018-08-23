@@ -1665,7 +1665,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         
 
-8/20, 8/21
+8/20, 8/21, 8/23
 
 [x] get stockfish
 [x] compile stockfish
@@ -1681,6 +1681,15 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [x] get subprocA to popen, d-cmd, quit, 
             then show next d-cmd fails
     [x] get subprocA to parse output
+
+[ ] build functions into serverA:
+    [x] get position
+    [x] set position
+    [ ] get bestmoves
+        [ ] demo game
+        [ ] demo multigame, so start_new_game
+        [ ] unittests
+[ ] interface select turn with server
 
 
 Notes:
