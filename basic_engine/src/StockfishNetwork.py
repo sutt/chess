@@ -15,6 +15,8 @@ class StockfishNetworking():
             best_move/defaults
     '''
     def __init__(self):
+        self.url_root = "http://127.0.0.1:5000/"
+        # self.port = "5000"
         #TODO - add launch
         #TODO - add url/port dynamic
         #TODO - add error handling/logging
@@ -32,9 +34,14 @@ class StockfishNetworking():
         str_log = self._movecodelist_to_movestr(list_log_moves)
 
         if str_log != "":                   #disregard for first ply
-            self._set_position(str_log)
+            if not(self._set_position(str_log)):
+                print 'set_position http call failed'
+                return None
 
         str_best_move = self._get_best_move()
+        if str_best_move == "":
+            print 'best_position http call failed'
+            return None
             
         movetuple_best_move = self._movestr_to_movecode(str_best_move)
         
@@ -44,14 +51,27 @@ class StockfishNetworking():
 
         return None     #Error - movetuple is not in available_moves
 
-    def _set_position(self):
-        pass
+    def _set_position(self, str_log):
+        url = self.url_root
+        url += "set_position/"
+        url += str_log
+        r = requests.get(url)
+        if r.status_code == 200:
+            return True
+        else:
+            return False
 
     def _get_position(self):
         pass
 
     def _get_best_move(self):
-        pass
+        url = self.url_root
+        url += "best_move/default"
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.content
+        else:
+            return ""
 
     @staticmethod
     def _movecodelist_to_movestr(list_log_moves):
@@ -84,8 +104,8 @@ class StockfishNetworking():
     
 
 
-if __name__ == "__main__":
-    demo_request()
+# if __name__ == "__main__":
+#     demo_request()
 
 
 
@@ -122,10 +142,7 @@ def test_sn_movestr_to_movecode():
 
     sn = StockfishNetworking()
     assert sn._movestr_to_movecode("e2e4") == ((6,4), (4,4))
-    assert sn._movestr_to_movecode("a2e4") == ((6,0), (4,4))
-
-    
-
+    assert sn._movestr_to_movecode("a2e8") == ((6,0), (0,4))
 
 def test_sn_get_best_move_1():
     ''' basic example    '''
@@ -141,4 +158,9 @@ def test_sn_get_best_move_1():
     available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 3), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 3), pos1=(5, 5), code=0), MoveHolder(pos0=(7, 3), pos1=(4, 6), code=0), MoveHolder(pos0=(7, 3), pos1=(3, 7), code=0), MoveHolder(pos0=(7, 4), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(5, 3), code=0), MoveHolder(pos0=(7, 5), pos1=(4, 2), code=0), MoveHolder(pos0=(7, 5), pos1=(3, 1), code=0), MoveHolder(pos0=(7, 5), pos1=(2, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6, 2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3), pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
 
     sn = StockfishNetworking()
-    # sn.get_move()
+    best_move = sn.get_move(list_log_moves, available_moves )
+    print best_move
+    assert best_move == Move(pos0 = (6,3), pos1 = (4,3), code = 0)
+
+if __name__ == "__main__":
+    test_sn_get_best_move_1()
