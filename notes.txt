@@ -1685,14 +1685,48 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 [ ] build functions into serverA:
     [x] get position
     [x] set position
-    [ ] get bestmoves
-        [ ] demo game
+    [x] get bestmoves
+        [x] demo game
         [ ] demo multigame, so start_new_game
-        [ ] unittests
+        [ ] unittests - py-pkg unittest for flask?
+
+[x] Learn to ammend a commit
+
 [ ] interface select turn with server
+
+    Other ideas
+        [ ] need to set parameters
+        [ ] need to register multiple games as one player could
+            be at different skill-level
+        
+
 
 
 Notes:
+
+    Commands:
+
+        "flask" serverA.py as of 10am 8/23
+        In WSL, in api/ directry:
+            >export FLASK_APP=flask-server.py
+            >flask run
+        In cmd, from any directory:
+            >curl 127.0.0.1:5000/get_position_ascii/
+                (should display a printout of board)
+            >curl 127.0.0.1:5000/set_position/e2e4-e7e6
+                (should print "position set.")
+            >curl 127.0.0.1:5000/best_move/default
+                (should return "d2d4")
+        Or, in browser, simply enter those curl url into address bar.
+        use /get_position/ not get_position_ascii for HTML formatting:
+            http://127.0.0.1:5000/get_position/
+
+    Git
+
+        Amend (Previous) Commit:
+            >git add lib_stockfish.py
+            >git commit --amend --no-edit
+            >git push -f origin master
 
     Compiling stockfish
     

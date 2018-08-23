@@ -32,13 +32,21 @@ def get_position(b_html = B_HTML):
         return html_txt
     return plain_txt
 
+@app.route('/get_position_ascii/')
+def get_position_ascii():
+    return get_position(b_html=False)
+
 @app.route('/set_position/<moves>')
 def set_position(moves):
-    list_moves = moves.split('|')   
+    list_moves = moves.split('-')   
+    print list_moves
     interface.set_position(list_moves)
     return 'position set.'
 
-#TODO - add go cmd
+@app.route('/best_move/<params>')
+def get_best_move(params):
+    best_move = interface.get_best_move()
+    return best_move
 
 # export FLASK_APP=flask-server.py
 # flask run [--host=0.0.0.0 (this enables outside access)]

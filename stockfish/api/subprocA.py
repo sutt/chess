@@ -34,7 +34,7 @@ def stock_popen():
 
 def flush_process_stdout(p):
     """ this doesnt appear to work """
-    p.stdout.flush()    #This fails to work
+    p.stdout.flush()        #This fails to work
     p.stdout.readline( )    #This works, but hangs if called incorrectly
 
 def send_cmd(p, cmd):
@@ -72,6 +72,9 @@ if __name__ =="__main__":
     print 'received text: \n'
     print ''.join(text)
     time.sleep(1)
+
+
+
 
 
 def test_stock_on():
