@@ -1693,13 +1693,21 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 [x] Learn to ammend a commit
 
 [ ] interface select turn with server
+    [x] option on Game()
+    [ ] use out_log to get setposition
+    [x] bring log into select_move()
+    [x] demo py-requests
+    [x] build an interface in utils
+
+[ ] get a setup script from main to launch wsl-flask in stockfish/api/
 
     Other ideas
-        [ ] need to set parameters
+        [ ] need to set parameters of stockfish-app
         [ ] need to register multiple games as one player could
             be at different skill-level
+        [ ] how to debug a linux app in vscode?
+        [ ] how to debug flask?
         
-
 
 
 Notes:
