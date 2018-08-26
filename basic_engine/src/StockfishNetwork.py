@@ -1,5 +1,6 @@
 import requests
 import subprocess
+import time
 from utils import alphamove_to_posmove
 from utils import pos_to_alphanum
 
@@ -14,14 +15,49 @@ class StockfishNetworking():
             set_position/move1-move2-move3...-moveN
             best_move/defaults
     '''
-    def __init__(self):
+    def __init__(self, b_launch_server = False, b_read_server_stdout = False):
+        
         self.url_root = "http://127.0.0.1:5000/"
-        # self.port = "5000"
-        #TODO - add launch
-        #TODO - add url/port dynamic
-        #TODO - add error handling/logging
-        #TODO - add validation and auto re-launch of server
-        pass
+        
+        self.serverProcess = None
+        
+        if b_launch_server:
+
+            self.serverProcess = subprocess.Popen(
+                            [
+                            'c:/windows/sysnative/bash.exe'
+                            ,'-c'
+                            ,"printenv"
+                            ,"&&"
+                            ,"source"
+                            , "~/.customprofile"
+                            ,"&&"
+                            ,"flask"
+                            ,"run"
+                            ]
+                    # ,stdin=subprocess.PIPE
+                    # ,stdout=subprocess.PIPE
+                    )
+
+            if b_read_server_stdout:
+                
+                #TODO - do a tmp file thing with threading/readline
+                # This is going to be tough b/c stdout PIPE
+                # doesnt work from wsl->win. Can do > tmp.txt
+
+                print 'Setting up Stockfish Server...'
+                b_idle = True
+                while(b_idle):
+                    line = self.serverProcess.stdout.readline()
+                    if line.find("Running on http") > -1:
+                        b_idle = False
+                        #TODO - parse this line for ip/port
+                        print 'Server setup!'
+                        
+            else:
+                print 'Sleeping 4 seconds to launch stockfish server...'
+                time.sleep(4)
+                print 'Server initialized'
 
     def get_move(self, list_log_moves, available_moves):
         ''' Args:
@@ -51,6 +87,7 @@ class StockfishNetworking():
 
         return None     #Error - movetuple is not in available_moves
 
+    
     def _set_position(self, str_log):
         url = self.url_root
         url += "set_position/"
@@ -61,8 +98,10 @@ class StockfishNetworking():
         else:
             return False
 
+
     def _get_position(self):
         pass
+
 
     def _get_best_move(self):
         url = self.url_root
@@ -101,11 +140,23 @@ class StockfishNetworking():
         '''
         space_sep_move = str_move[:2] + " " + str_move[2:]
         return alphamove_to_posmove(space_sep_move)
+
+    def __del__(self):
+        if self.serverProcess is not None:
+            print 'tearing down StockfishNetwork server'
+            self.serverProcess.kill()
     
 
 
-# if __name__ == "__main__":
-#     demo_request()
+if __name__ == "__main__":
+    pass    
+    # sn = StockfishNetworking(b_launch_server=True)
+    # print 'awaiting...'
+    # time.sleep(5)
+    # print 'done'
+
+    
+    #TODO - play stockfish right here
 
 
 
@@ -116,7 +167,7 @@ MoveA = moveAHolder()
 
 def test_sn_movecodelist_to_movestr():
     
-    sn = StockfishNetworking()
+    sn = StockfishNetworking    #note: no need to instantiate
 
     list_move_1 = [
          Move(pos0 = (6,4), pos1 = (4,4), code = 0)
@@ -140,10 +191,24 @@ def test_sn_movecodelist_to_movestr():
 
 def test_sn_movestr_to_movecode():
 
-    sn = StockfishNetworking()
+    sn = StockfishNetworking
     assert sn._movestr_to_movecode("e2e4") == ((6,4), (4,4))
     assert sn._movestr_to_movecode("a2e8") == ((6,0), (0,4))
 
+def test_sn_launch_server_1():
+    ''' test that the module can launch the flask server inside WSL '''
+    
+    sn = StockfishNetworking(b_launch_server=True)
+
+    r = requests.get("http://127.0.0.1:5000/")
+
+    assert r.content == "Hello, Flask! <br> New Line?"
+
+#TODO - test that it's in linux
+#TODO - test that it's 
+
+
+    
 def test_sn_get_best_move_1():
     ''' basic example    '''
     
@@ -157,10 +222,14 @@ def test_sn_get_best_move_1():
     MoveHolder = moveHolder()
     available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 3), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 3), pos1=(5, 5), code=0), MoveHolder(pos0=(7, 3), pos1=(4, 6), code=0), MoveHolder(pos0=(7, 3), pos1=(3, 7), code=0), MoveHolder(pos0=(7, 4), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(5, 3), code=0), MoveHolder(pos0=(7, 5), pos1=(4, 2), code=0), MoveHolder(pos0=(7, 5), pos1=(3, 1), code=0), MoveHolder(pos0=(7, 5), pos1=(2, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6, 2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3), pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
 
-    sn = StockfishNetworking()
+    sn = StockfishNetworking(b_launch_server=True)
     best_move = sn.get_move(list_log_moves, available_moves )
-    print best_move
+
     assert best_move == Move(pos0 = (6,3), pos1 = (4,3), code = 0)
 
-if __name__ == "__main__":
-    test_sn_get_best_move_1()
+# def test_demo_fail():
+#     assert False
+
+#TODO - a ply=1 game
+
+#TODO - a get position example

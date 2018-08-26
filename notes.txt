@@ -1673,9 +1673,9 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
 [x] manually separate executable into separate bin
 [ ] compile for windows
-[ ] call stockfish as api
-[ ] call stockfish from basic_engine
-    [ ] as a linux program running in wsl with flask?
+[x] call stockfish as api
+[x] call stockfish from basic_engine
+    [x] as a linux program running in wsl with flask?
     
     8/21 tasks
     [x] get subprocA to popen, d-cmd, quit, 
@@ -1698,9 +1698,14 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [x] bring log into select_move()
     [x] demo py-requests
     [x] build an interface in utils
-    [ ] connect StockfishNetwork to main.py
+    [x] connect StockfishNetwork to main.py
 
-[ ] get a setup script from main to launch wsl-flask in stockfish/api/
+[x] get a setup script from main to launch wsl-flask in stockfish/api/
+    [ ] check the teardown method __del__, dont strand running servers
+        [x] how to view processes running in ubuntu?
+            (>top / >kill [pid])
+
+[x] use stockfish display to print to console
 
     Other ideas
         [ ] need to set parameters of stockfish-app
@@ -1708,7 +1713,27 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             be at different skill-level
         [ ] how to debug a linux app in vscode?
         [ ] how to debug flask?
-        
+
+
+8/26
+
+    [ ] test that __del__ fires in different scenarios:
+        [ ] failed test in pytest
+        [ ] ctrl c
+        [ ] make sure both flask and stockfish
+
+    [ ] run unittest instead of pytest
+        [ ] use setup/teardown
+
+    [ ] formalize bat to run pytest
+        [ ] a way to use arg to control 
+        [ ] @ECHO OFF ?
+
+    [ ] use sys.path.relative or something to determine 
+        STOCKFISH_PATH in serverA.py (line 20)
+
+
+    
 
 
 Notes:
@@ -1736,6 +1761,69 @@ Notes:
             >git add lib_stockfish.py
             >git commit --amend --no-edit
             >git push -f origin master
+
+    WSL CLI:
+
+        From Windows
+
+        >wsl        [open ubuntu vm at that directory]
+        >ubuntu     [opens ubuntu vm at home/user/]
+
+        In linux
+
+        >whoami         ["user"]
+        >printenv       [environ variables, thus FLASK_APP if it is set]
+        >which flask    [/home/user/.local/bin/flask]
+
+    Linux:
+
+        >top            [view running processes, and their pid]
+            >q          [to exit the screen]
+        >kill XXX       [XXX=pid]
+
+    Windows commands:
+
+        >type           [same as cat]
+        >del            [same as rm]
+        >move           [same as mv]
+
+    
+    WSL - calling from python.subprocess:
+
+        Need to use full-path + 'invisible' SysNative:
+
+            NOT: subprocess.call(['wsl', 'ls'])
+            YES: subprocess.call(['c:/windows/sysnative/bash.exe','ls'])
+
+        Need to separate all args/cmds that have spaces, inclduing '&&':
+
+            NOT: [..., "source ~/.profile && flask run"]
+            YES: [..., "source", "~/.profile", "&&", "flask", "run"]
+
+        Use "bin/bash -c" along with sysnative to get &&-lines to run:
+
+            subprocess.Popen(['c:/windows/sysnative/bash.exe'
+                    ,'-c' ,"source", "~/.customprofile", "&&"
+                          ,"flask", "run"])
+
+        Main weird thing: need to prepend a dummy command, here,
+        'printenv' before the other commands to get them to work:
+
+            subprocess.Popen(['c:/windows/sysnative/bash.exe'
+                                ,'-c'
+                                ,"printenv"
+                                ,"&&"
+                                ,"source"
+                                , "~/.customprofile"
+                                ,"&&"
+                                ,"flask"
+                                ,"run"
+                                ])
+    
+    Python path/import
+
+        https://stackoverflow.com/questions/11536764/how-to-fix-attempted-relative-import-in-non-package-even-with-init-py
+
 
     Compiling stockfish
     
@@ -1790,8 +1878,89 @@ Notes:
         https://pypi.org/project/stockfish/
 
 
+8/27:
 
+Problems with pytest:
+
+After running pytest, on StockfishNetwork.py once in cmd, 
+the second time the console throws a deep python/windows error.
+ 
+ - This does not occur for other pytests
+ - This occurs primarily in Docker, so its likely a WSL issue
+
+
+pip install win-unicode-console  (but it's already installled)
+https://github.com/docker/compose/issues/2775
+
+Solution:
+    build a .bat that runs pytest that > to a tmp file
+    then echo those contents to console:
+
+    ECHO 'here we go...'
+    pytest -vv StockfishNetwork.py > tmp.txt
+    type tmp.txt
+
+    TODO:
+        get this to run in other directories
+        get this to run for any file
+        turn off each command
             
-
+Traceback (most recent call last):
+  File "c:\python27\lib\runpy.py", line 174, in _run_module_as_main
+    "__main__", fname, loader, pkg_name)
+  File "c:\python27\lib\runpy.py", line 72, in _run_code
+    exec code in run_globals
+  File "C:\Python27\Scripts\pytest.exe\__main__.py", line 9, in <module>
+  File "c:\python27\lib\site-packages\_pytest\config.py", line 59, in main
+    return config.hook.pytest_cmdline_main(config=config)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 617, in __call__
+    return self._hookexec(self, self._nonwrappers + self._wrappers, kwargs)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 222, in _hookexec
+    return self._inner_hookexec(hook, methods, kwargs)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 216, in <lambda>
+    firstresult=hook.spec_opts.get('firstresult'),
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 201, in _multicall
+    return outcome.get_result()
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 77, in get_result
+    _reraise(*ex)  # noqa
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 180, in _multicall
+    res = hook_impl.function(*args)
+  File "c:\python27\lib\site-packages\_pytest\main.py", line 136, in pytest_cmdline_main
+    return wrap_session(config, _main)
+  File "c:\python27\lib\site-packages\_pytest\main.py", line 119, in wrap_session
+    config.notify_exception(excinfo, config.option)
+  File "c:\python27\lib\site-packages\_pytest\config.py", line 956, in notify_exception
+    excinfo=excinfo)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 617, in __call__
+    return self._hookexec(self, self._nonwrappers + self._wrappers, kwargs)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 222, in _hookexec
+    return self._inner_hookexec(hook, methods, kwargs)
+  File "c:\python27\lib\site-packages\pluggy\__init__.py", line 216, in <lambda>
+    firstresult=hook.spec_opts.get('firstresult'),
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 201, in _multicall
+    return outcome.get_result()
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 77, in get_result
+    _reraise(*ex)  # noqa
+  File "c:\python27\lib\site-packages\pluggy\callers.py", line 180, in _multicall
+    res = hook_impl.function(*args)
+  File "c:\python27\lib\site-packages\_pytest\terminal.py", line 227, in pytest_internalerror
+    self.write_line("INTERNALERROR> " + line)
+  File "c:\python27\lib\site-packages\_pytest\terminal.py", line 195, in write_line
+    self._tw.line(line, **markup)
+  File "c:\python27\lib\site-packages\py\_io\terminalwriter.py", line 234, in line
+    self.write(s, **kw)
+  File "c:\python27\lib\site-packages\py\_io\terminalwriter.py", line 224, in write
+    write_out(self._file, markupmsg)
+  File "c:\python27\lib\site-packages\py\_io\terminalwriter.py", line 369, in write_out
+    fil.write(msg)
+  File "c:\python27\lib\site-packages\colorama\ansitowin32.py", line 40, in write
+    self.__convertor.write(text)
+  File "c:\python27\lib\site-packages\colorama\ansitowin32.py", line 141, in write
+    self.write_and_convert(text)
+  File "c:\python27\lib\site-packages\colorama\ansitowin32.py", line 169, in write_and_convert
+    self.write_plain_text(text, cursor, len(text))
+  File "c:\python27\lib\site-packages\colorama\ansitowin32.py", line 174, in write_plain_text
+    self.wrapped.write(text[start:end])
+LookupError: unknown encoding: cp65001
 
 
