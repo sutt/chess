@@ -1762,7 +1762,16 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] have cmd accept PGN format
         [ ] create message for checkmate
 
+8/27
 
+    [x] Clean out git
+    [ ] squash some commits together?
+    [x] build some branches
+    [ ] sys.path learn
+    [ ] sys.path apply
+        [ ] StockfishNetwork:41
+        [ ] running pytest on main.py inside src/
+        [ ] ?
     
 
 
@@ -1791,6 +1800,21 @@ Notes:
             >git add lib_stockfish.py
             >git commit --amend --no-edit
             >git push -f origin master
+
+        View Diff in Staged files
+            >git diff --staged
+
+        Get rid of untracked files on git status
+            >git ls-files --others --exclude-standard >> .gitignore
+                - or -
+            >git status -uno
+
+        Stashing:
+            >git stash list         [view things in stash]
+            >git stash save         [put changes in the stash]
+            >git stash apply        [takes things out of stash]
+            >git stash drop         [removes an entry from stash]
+
 
     WSL CLI:
 

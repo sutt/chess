@@ -7,4 +7,16 @@ scrarch-batchverify.py
 .ipynb_checkpoints
 basic_engine/data/*
 data/
-
+.pytest_cache
+stockfish/Stockfish/
+basic_engine/src/tmp.txt
+basic_engine/tests/run_pytest_script.bat
+basic_engine/tests/tmp.txt
+ignoretmp.txt
+stockfish/api/demo.sh
+stockfish/api/launch_serverA.py
+stockfish/api/py_stockfish/__init__.py
+stockfish/api/py_stockfish/stockfish/
+stockfish/api/tmp.app.py
+stockfish/api/tmp.txt
+stockfish/uci.zip
