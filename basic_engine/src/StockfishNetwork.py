@@ -1,6 +1,8 @@
+import os
 import requests
 import subprocess
 import time
+from utils import find_app_path_root
 from utils import alphamove_to_posmove
 from utils import pos_to_alphanum
 
@@ -35,10 +37,16 @@ class StockfishNetworking():
                             ,"flask"
                             ,"run"
                             ]
+                    
                     ,stdin=subprocess.PIPE
                     ,stdout=subprocess.PIPE
                     ,stderr=subprocess.PIPE
-                    ,cwd = "../../stockfish/api/"
+                    
+                    ,cwd = os.path.join(
+                                         find_app_path_root(__file__)
+                                        ,'stockfish'
+                                        ,'api'
+                                        )
                     )
 
             if b_read_server_stdout:

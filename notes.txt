@@ -1761,17 +1761,21 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] have 'hint' command printout alphanum, not movecode
         [ ] have cmd accept PGN format
         [ ] create message for checkmate
+        [ ] have a quit cmd for cli
+
 
 8/27
 
     [x] Clean out git
     [ ] squash some commits together?
     [x] build some branches
-    [ ] sys.path learn
-    [ ] sys.path apply
-        [ ] StockfishNetwork:41
-        [ ] running pytest on main.py inside src/
+    [x] sys.path learn
+    [x] sys.path apply
+        [x] StockfishNetwork:41
+        [x] running pytest on main.py inside src/
         [ ] ?
+
+    [ ] the reason pytest main.py runs many tests is * imports
     
 
 

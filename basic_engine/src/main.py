@@ -274,6 +274,8 @@ class Game():
         return ret_data
 
 
+PATH_TO_DATA = os.path.join(find_app_path_root(__file__), 'basic_engine', 'data')
+
 def test_castling_allowed_misc():
     
     ss = "1. g1 h3 2. a7 a6 3. e2 e4 4. b7 b6 5. f1 d3 6. c7 c6 7. e1 g1"
@@ -1287,7 +1289,7 @@ def test_multi_pgn_games_1():
 
     num_games = 5
 
-    f = open('data/GarryKasparovGames.txt', 'r')
+    f = open(os.path.join(PATH_TO_DATA ,'GarryKasparovGames.txt'), 'r')
     lines = f.readlines()
     f.close()
 
@@ -1325,7 +1327,7 @@ def test_kasparov_game_10_pgn_err():
     
     problem_game_ind = 9
     
-    f = open('data/GarryKasparovGames.txt', 'r')
+    f = open(os.path.join(PATH_TO_DATA ,'GarryKasparovGames.txt'), 'r')
     lines = f.readlines()
     f.close()
 
@@ -1343,7 +1345,7 @@ def batchtest_multi_pgn_games_1(**kwargs):
 
     max_games = kwargs.get('max_games', None)
     modulo_print = kwargs.get('modulo_print', 100)
-    data_path = 'data/GarryKasparovGames.txt'
+    data_path = os.path.join(PATH_TO_DATA ,'GarryKasparovGames.txt')
 
     f = open(data_path, 'r')
     lines = f.readlines()

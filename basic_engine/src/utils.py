@@ -13,6 +13,25 @@ Move = moveHolder()
 # 1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 
 
 
+def find_app_path_root(input_file, find_dir = "chess"):
+    ''' input:  input_file - pass in __file__
+        return: a relative-path to folder or None '''
+    
+    _path = os.path.abspath(os.path.dirname(input_file))
+    
+    while(True):
+    
+        _head, _tail = os.path.split(_path)
+        
+        if _head == _path:
+            return None
+        
+        if str.lower(_tail) == str.lower(find_dir):
+            return os.path.relpath(_path, start = os.getcwd())
+        
+        _path = _head
+
+
 #TODO - better please
 def parse_instructions(s):
     """ input: s, a string 
@@ -604,6 +623,9 @@ def pgn_to_xpgn(pgn_fn
     return None
 
 
+PATH_TO_DATA = os.path.join(find_app_path_root(__file__), 'basic_engine', 'data')
+
+
 def test_pgn_to_xpgn_1():
     
     '''verify the output xpgn creation tool'''
@@ -612,8 +634,8 @@ def test_pgn_to_xpgn_1():
     
     s_json = pgn_to_xpgn(pgn_fn = 'GarryKasparov.pgn'
                             ,xpgn_fn = 'output1.xpgn'
-                            ,pgn_path = 'data/'     
-                            ,xpgn_path = 'data/'
+                            ,pgn_path = os.path.join(PATH_TO_DATA, '')
+                            ,xpgn_path = os.path.join(PATH_TO_DATA, '')
                             ,max_lines = 100
                             ,b_silent = True)
 
@@ -629,7 +651,7 @@ def test_pgn_to_xpgn_2():
     '''Verify file-system transaction here '''
 
     # test_dir = '../data/tests/' #if run from src/
-    test_dir = 'data/tests/'
+    test_dir = os.path.join(PATH_TO_DATA, 'tests', '')
 
     target_fn = 'test_dummy_1.xpgn'
     
