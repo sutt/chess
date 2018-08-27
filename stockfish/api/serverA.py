@@ -1,3 +1,4 @@
+import os
 import flask
 
 from flask import Flask
@@ -7,15 +8,30 @@ app = Flask(__name__)
 
 from lib_stockfish import Stockfish
 
+print os.name
+print 'path:'
+print os.getcwd()   #Why is this the same as where subprocess.Popen is happening?
+
 B_HTML = True
 
-STOCKFISH_PATH = "../Stockfish/src/stockfish"
+#TODO - use python relative path for determining these?
+STOCKFISH_PATH = "../Stockfish/src/stockfish" #When calling from chess/stockfish/api/
+# STOCKFISH_PATH = "../../stockfish/Stockfish/src/stockfish"  #When calling from chess/basic_engine/src/
+
 interface = Stockfish(path = STOCKFISH_PATH)
 
 
 @app.route('/')
 def hello_flask():
     return 'Hello, Flask! <br> New Line?'
+
+@app.route('/check_server_params/')
+def check_server_params():
+    ret = os.name
+    ret += '|'
+    ret += os.getcwd()
+    return ret
+
 
 @app.route('/new_game/')
 def new_game():
@@ -48,5 +64,7 @@ def get_best_move(params):
     best_move = interface.get_best_move()
     return best_move
 
+# if __name__ == "__main__":
+#     app.run()
 # export FLASK_APP=flask-server.py
 # flask run [--host=0.0.0.0 (this enables outside access)]

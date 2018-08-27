@@ -54,6 +54,7 @@ class StockfishNetworking():
                     if line.find("Running on http") > -1:
                         b_idle = False
                         #TODO - parse this line for ip/port
+                        #TODO - run a test request to verify
                         print 'Server setup!'
                         
             else:
@@ -157,10 +158,6 @@ if __name__ == "__main__":
     # time.sleep(5)
     # print 'done'
 
-    
-    #TODO - play stockfish right here
-
-
 
 
 from datatypes import moveHolder, moveAHolder
@@ -197,6 +194,7 @@ def test_sn_movestr_to_movecode():
     assert sn._movestr_to_movecode("e2e4") == ((6,4), (4,4))
     assert sn._movestr_to_movecode("a2e8") == ((6,0), (0,4))
 
+
 def test_sn_launch_server_1():
     ''' test that the module can launch the flask server inside WSL '''
     
@@ -206,13 +204,19 @@ def test_sn_launch_server_1():
 
     assert r.content == "Hello, Flask! <br> New Line?"
 
-#TODO - test that it's in linux
-#TODO - test that it's 
 
+def test_sn_launch_server_2():
+    ''' test that the module launches the server inside WSL '''
+    
+    sn = StockfishNetworking(b_launch_server=True)
 
+    r = requests.get("http://127.0.0.1:5000/check_server_params/")
+
+    assert r.content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
+    
     
 def test_sn_get_best_move_1():
-    ''' basic example    '''
+    ''' basic example of bestmove on ply 3 '''
     
     #e4 e5 game
     list_log_moves = [
@@ -225,13 +229,25 @@ def test_sn_get_best_move_1():
     available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 3), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 3), pos1=(5, 5), code=0), MoveHolder(pos0=(7, 3), pos1=(4, 6), code=0), MoveHolder(pos0=(7, 3), pos1=(3, 7), code=0), MoveHolder(pos0=(7, 4), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(5, 3), code=0), MoveHolder(pos0=(7, 5), pos1=(4, 2), code=0), MoveHolder(pos0=(7, 5), pos1=(3, 1), code=0), MoveHolder(pos0=(7, 5), pos1=(2, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6, 2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3), pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
 
     sn = StockfishNetworking(b_launch_server=True)
-    best_move = sn.get_move(list_log_moves, available_moves )
+    best_move = sn.get_move(list_log_moves, available_moves)
 
     assert best_move == Move(pos0 = (6,3), pos1 = (4,3), code = 0)
 
-# def test_demo_fail():
-#     assert False
 
-#TODO - a ply=1 game
+def test_sn_best_move_2():
+    ''' basic example of bestmove on ply 1 '''
+    
+    #start-position game
+    list_log_moves = []
+
+    #available moves for white; ply=1
+    MoveHolder = moveHolder()
+    available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6,2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3),pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 4), pos1=(5, 4), code=0), MoveHolder(pos0=(6, 4), pos1=(4, 4), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
+
+    sn = StockfishNetworking(b_launch_server=True)
+    best_move = sn.get_move(list_log_moves, available_moves)
+
+    assert best_move == Move(pos0 = (6,4), pos1 = (4,4), code = 0)  # e4
+
 
 #TODO - a get position example

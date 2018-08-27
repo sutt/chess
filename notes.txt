@@ -1744,10 +1744,23 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [ ] parse flask output from StockfishNetwork b_read_server_stdout
         note: it's actually stderr that contains useful on ip/port and requests
 
+        [ ] build a test that checks the setup time for the server
+
     [ ] fix the tests that fail for src/main.py when running 
         pytest inside src/
 
     [ ] Explain why the dummy cmd is neccessary in WSL Popen
+
+    [ ] Build a batchverify test that plays random moves against stockfish
+        [ ] need a way only set the server up once
+        [ ] run two different skill-level stockfishes against each other
+
+    
+    MainProgram Features + Bugs:
+
+        [ ] have 'hint' command printout alphanum, not movecode
+        [ ] have cmd accept PGN format
+        [ ] create message for checkmate
 
 
     
@@ -1833,6 +1846,16 @@ Notes:
             NOT: [..., "source ~/.profile && flask run"]
             YES: [..., "source", "~/.profile", "&&", "flask", "run"]
 
+        
+        When calling a "wsl-1-liner", meaning putting the full command as one cmd
+        (possibly concatenated by '&&') instead of signing in to WSL with >wsl,
+        then doing stuff, you don't end up "signed-in" in linux terminology.
+        What this means is that .profile and .bashrc are not initialized in bash,
+        so some commands, like where flask is, are not possible straight-away.
+        You get around this by first fdoing ">source ~/.profile" or creating a custom
+        file and sourcing it like ">source ~/.custom_profile"
+
+        
         Use "bin/bash -c" along with sysnative to get &&-lines to run:
 
             subprocess.Popen(['c:/windows/sysnative/bash.exe'
@@ -1938,6 +1961,9 @@ the second time the console throws a deep python/windows error.
  - This does not occur for other pytests
  - This occurs primarily in Docker, so its likely a WSL issue
 
+
+https://stackoverflow.com/questions/35176270/python-2-7-lookuperror-unknown-encoding-cp65001
+lso try to run set PYTHONIOENCODING=UTF-8 after execute pip --version without reloading terminal if everything going well add PYTHONIOENCODING as env variable with value UTF-8. See How to set the path and environment variables in Windows article to get info how to add Windows variable.
 
 pip install win-unicode-console  (but it's already installled)
 https://github.com/docker/compose/issues/2775
