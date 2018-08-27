@@ -35,8 +35,10 @@ class StockfishNetworking():
                             ,"flask"
                             ,"run"
                             ]
-                    # ,stdin=subprocess.PIPE
-                    # ,stdout=subprocess.PIPE
+                    ,stdin=subprocess.PIPE
+                    ,stdout=subprocess.PIPE
+                    ,stderr=subprocess.PIPE
+                    ,cwd = "../../stockfish/api/"
                     )
 
             if b_read_server_stdout:

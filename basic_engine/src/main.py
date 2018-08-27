@@ -53,7 +53,7 @@ class Game():
 
         self.stockfish_control = stockfish_control
         if len(self.stockfish_control) > 0:
-            self.stockfish_interface = StockfishNetworking(b_launch_server=False)
+            self.stockfish_interface = StockfishNetworking(b_launch_server=True)
 
         self.instructions = parse_instructions(s_instructions)
         self.instruction_control = instruction_control 

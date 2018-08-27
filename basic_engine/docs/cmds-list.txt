@@ -39,3 +39,11 @@ Run batchverify tests:
 
     (?) Also, aren't there way to alter the params for these tests?
 
+Run pytest on StockfishNetwork so it doesnt throw error second time:
+
+    In basic_engine/src/
+
+        >run_pytest_script.bat
+
+    (subject to change)
+

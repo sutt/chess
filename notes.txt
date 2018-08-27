@@ -1712,6 +1712,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] need to register multiple games as one player could
             be at different skill-level
         [ ] how to debug a linux app in vscode?
+            (think you have to run X11 server in linux?)
         [ ] how to debug flask?
 
 
@@ -1729,8 +1730,24 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] a way to use arg to control 
         [ ] @ECHO OFF ?
 
-    [ ] use sys.path.relative or something to determine 
+    [x] use sys.path.relative or something to determine 
         STOCKFISH_PATH in serverA.py (line 20)
+
+        Pass a cwd arg to Popen()
+        https://stackoverflow.com/questions/1685157/specify-working-directory-for-popen
+
+    [x] check the launch_server works in main:Game
+        [ ] only works when called in src/ not from basic_engine/
+    
+    [x] check stdin/stdout params in Popen for launch_server
+       
+    [ ] parse flask output from StockfishNetwork b_read_server_stdout
+        note: it's actually stderr that contains useful on ip/port and requests
+
+    [ ] fix the tests that fail for src/main.py when running 
+        pytest inside src/
+
+    [ ] Explain why the dummy cmd is neccessary in WSL Popen
 
 
     
@@ -1774,6 +1791,22 @@ Notes:
         >whoami         ["user"]
         >printenv       [environ variables, thus FLASK_APP if it is set]
         >which flask    [/home/user/.local/bin/flask]
+        >top            [view running processes]
+        >kill [pid]     [end process of pid]
+
+    
+    WSL Console:
+
+        Keyboard shortcuts lacking in wsl-mode: 
+                
+                simply toggle wsl OFF with 'exit', 
+                then use ALT+SPACE,E,K to Mark
+                then get back in with 'wsl'
+
+        After exiting something like flask in wsl (maybe from "wsl-1-liner")
+        you'll temporarily lose your cmd history. Simply >wsl then >exit and it's
+        back.
+
 
     Linux:
 
@@ -1819,6 +1852,21 @@ Notes:
                                 ,"flask"
                                 ,"run"
                                 ])
+
+                (maybe try double backslash path?)
+
+        Set cwd arg in Popen, otherwise the cwd is inherited from
+        the calling module:
+
+            e.g. chess/basic_engine/src/StockfishNetwork.py calls
+                 Popen for a flask app at chess/stockfish/api/serverA.py,
+                 within serverA.py, the cwd will be src/ not api/
+
+            but 
+
+                subprocess.Popen([...], cwd = "../../stockfish/api/")
+
+            will restore cwd to serverA.py's actual directory
     
     Python path/import
 
@@ -1856,6 +1904,8 @@ Notes:
 
                   -I DIRECTORY, --include-dir=DIRECTORY
                   Search DIRECTORY for included makefiles.
+
+            32bit might fail b/c WSL is distributed as 64bit app
 
             how to put files into a bin; much cleaner!
 
