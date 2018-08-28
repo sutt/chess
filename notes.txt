@@ -1811,7 +1811,10 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         [x] fix the remove(TMP) in wrong dir bug
         [x] fix the stderr in wrong directory bug
-        [ ] squash commits together
+        [x] squash commits together
+            [x] read_stderr commits
+            [x] verify on server
+            [x] older commits
 
 
 Notes:
@@ -1853,6 +1856,36 @@ Notes:
             >git stash save         [put changes in the stash]
             >git stash apply        [takes things out of stash]
             >git stash drop         [removes an entry from stash]
+
+        Diffing Commits:
+            >git log                       
+            >git diff 6char-old 6char-new  [each commit is 6chars]
+            
+        
+        Squashing:
+            >git rebase -i HEAD~4
+
+                [in vi put 'squash' next to the commits you want]
+
+                >ESC : wq  to save and exit vi
+
+            If the commits have already been pushed to master:
+                
+                >git push origin branch-name --force
+
+            Fixing Squash - say an error of the following occurs:
+
+                error: The following untracked working tree files would be overwritten by merge:
+                Please move or remove them before you merge.
+                Aborting
+
+                You'll be dropped into a diff head point, not master but: (master|REBASE-i 3/6)
+
+                [be very careful with the following as it's a file DELETER!]
+                    >git clean -f [bad-file.ext]
+
+                finally
+                    >git rebase --continue
 
 
     WSL CLI:
