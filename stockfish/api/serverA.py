@@ -32,6 +32,10 @@ def check_server_params():
     ret += os.getcwd()
     return ret
 
+@app.route('/check_server_is_up/')
+def check_server_is_up():
+    return 'ok'
+
 
 @app.route('/new_game/')
 def new_game():

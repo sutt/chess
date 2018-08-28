@@ -1776,7 +1776,42 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] ?
 
     [ ] the reason pytest main.py runs many tests is * imports
+
+    [x] build a read_stderr module
+        [x] setup a scratch file
     
+
+8/28
+
+    Updates and VScode shit:
+
+        1.26.1
+
+        Fix slow completion: 
+        ,"python.jediEnabled": false
+
+        goto extension is ms-python.python:
+
+            go to 'contributions' tab:
+
+                view the commands and settings
+
+        describes issue and workaround: open the file that's not being imported
+        https://github.com/Microsoft/vscode-python/issues/2201
+
+        PTVS? PythonTools for Visual Studio
+        or DonJaymanne?
+
+        Check out pre-load modules for numpy, etc maybe opencv as well
+
+        Ctrl+Space: triggers intellisense
+
+    
+    Tasks:
+
+        [x] fix the remove(TMP) in wrong dir bug
+        [x] fix the stderr in wrong directory bug
+        [ ] squash commits together
 
 
 Notes:

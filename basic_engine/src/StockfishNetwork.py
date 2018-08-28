@@ -17,13 +17,25 @@ class StockfishNetworking():
             set_position/move1-move2-move3...-moveN
             best_move/defaults
     '''
-    def __init__(self, b_launch_server = False, b_read_server_stdout = False):
+    def __init__(self, b_launch_server = False, b_read_stderr = True):
         
         self.url_root = "http://127.0.0.1:5000/"
         
+        self.TMP = "stderr.txt"
+        
         self.serverProcess = None
+
         
         if b_launch_server:
+
+            if b_read_stderr:
+                if self._del_tmp_file():
+                    _stderr = open(os.path.join(os.path.dirname(__file__), self.TMP), 'w')
+                else:
+                    b_read_stderr = False
+                    _stderr = subprocess.PIPE
+            else:
+                _stderr = subprocess.PIPE
 
             self.serverProcess = subprocess.Popen(
                             [
@@ -40,7 +52,7 @@ class StockfishNetworking():
                     
                     ,stdin=subprocess.PIPE
                     ,stdout=subprocess.PIPE
-                    ,stderr=subprocess.PIPE
+                    ,stderr=_stderr
                     
                     ,cwd = os.path.join(
                                          find_app_path_root(__file__)
@@ -49,22 +61,36 @@ class StockfishNetworking():
                                         )
                     )
 
-            if b_read_server_stdout:
-                
-                #TODO - do a tmp file thing with threading/readline
-                # This is going to be tough b/c stdout PIPE
-                # doesnt work from wsl->win. Can do > tmp.txt
+            if b_read_stderr:
 
-                print 'Setting up Stockfish Server...'
-                b_idle = True
-                while(b_idle):
-                    line = self.serverProcess.stdout.readline()
-                    if line.find("Running on http") > -1:
-                        b_idle = False
-                        #TODO - parse this line for ip/port
-                        #TODO - run a test request to verify
-                        print 'Server setup!'
+                _stderr.close()
+                
+                t0 = time.time()
+
+                while(True):
+                    
+                    with open(os.path.join(os.path.dirname(__file__)
+                                            ,self.TMP)
+                                ,'r') as f_stderr:
                         
+                        try:    
+                            if time.time() - t0 > 5:
+                                break
+                            
+                            line = f_stderr.readline()
+                            if line.find("Running on http") > -1:
+                                self.url_root = self.parse_stderr_url(line)
+                                break
+
+                        except:
+                            break
+                
+                if not(self._check_server_is_up()):
+                    print 'failed to validate the stockfish server is up.'
+                else:
+                    self._del_tmp_file()
+                    print 'server setup in secs: %s' % str(time.time() - t0)[:4]
+
             else:
                 print 'Sleeping 4 seconds to launch stockfish server...'
                 time.sleep(4)
@@ -124,6 +150,21 @@ class StockfishNetworking():
             return ""
 
     @staticmethod
+    def _parse_stderr_url(line):
+        ''' take the stderr output by flask and find the relevant parts in the string'''
+        ip_start =  line.find("//")
+        ip_end =    line[ip_start:].find(":") + ip_start
+        ip = line[ip_start+2:ip_end]
+
+        port_start = ip_end + 1
+        port_end =   port_start + line[port_start:].find("/")
+        port = line[port_start:port_end]
+        
+        url_root = "http://" + ip + ":" + port + "/"
+        return url_root
+
+
+    @staticmethod
     def _movecodelist_to_movestr(list_log_moves):
         ''' input:  list_log_moves: list of MoveCode's
             output: string of alphanum's (or "" for empty list)
@@ -151,6 +192,28 @@ class StockfishNetworking():
         '''
         space_sep_move = str_move[:2] + " " + str_move[2:]
         return alphamove_to_posmove(space_sep_move)
+
+    def _check_server_is_up(self):
+        ''' do a simple check if server is takign requests. Return True if it does '''
+        try:
+            r = requests.get(self.url_root + 'check_server_is_up/')
+            if r.content == 'ok':
+                return True
+        except:
+            pass
+        return False
+
+    
+    def _del_tmp_file(self):
+        ''' remove the stderr.txt tmp file return true is succesful '''
+        if self.TMP in os.listdir(os.path.dirname(__file__)):
+            try:
+                os.remove(os.path.join(os.path.dirname(__file__), self.TMP))
+                return True
+            except:
+                return False
+        else:
+            return True
 
     def __del__(self):
         if self.serverProcess is not None:
@@ -201,6 +264,13 @@ def test_sn_movestr_to_movecode():
     sn = StockfishNetworking
     assert sn._movestr_to_movecode("e2e4") == ((6,4), (4,4))
     assert sn._movestr_to_movecode("a2e8") == ((6,0), (0,4))
+
+
+def test_parse_flask_stderr():
+
+    line = """ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)"""
+    assert StockfishNetworking._parse_stderr_url(line) == "http://127.0.0.1:5000/"
+     
 
 
 def test_sn_launch_server_1():

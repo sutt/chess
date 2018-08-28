@@ -6,6 +6,7 @@ scrarch-batchverify.py
 *.code-workspace
 .ipynb_checkpoints
 basic_engine/data/*
+basic_engine/src/stderr.txt
 data/
 .pytest_cache
 stockfish/Stockfish/
