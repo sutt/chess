@@ -1999,6 +1999,17 @@ Notes:
 
         https://stackoverflow.com/questions/11536764/how-to-fix-attempted-relative-import-in-non-package-even-with-init-py
 
+        https://www.python.org/dev/peps/pep-0366/
+
+        from basic_engine/tests/:
+
+        if __name__ == '__main__' and __package__ is None:
+            sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+            from src.StockfishNetwork import StockfishNetworking
+        else:
+            #for intellisense
+            from ..src.StockfishNetwork import StockfishNetworking
+
 
     VScode - Extensions and Updates:
 
