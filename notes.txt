@@ -1737,16 +1737,16 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         https://stackoverflow.com/questions/1685157/specify-working-directory-for-popen
 
     [x] check the launch_server works in main:Game
-        [ ] only works when called in src/ not from basic_engine/
+        [x] only works when called in src/ not from basic_engine/
     
     [x] check stdin/stdout params in Popen for launch_server
        
-    [ ] parse flask output from StockfishNetwork b_read_server_stdout
+    [x] parse flask output from StockfishNetwork b_read_server_stdout
         note: it's actually stderr that contains useful on ip/port and requests
 
         [ ] build a test that checks the setup time for the server
 
-    [ ] fix the tests that fail for src/main.py when running 
+    [x] fix the tests that fail for src/main.py when running 
         pytest inside src/
 
     [ ] Explain why the dummy cmd is neccessary in WSL Popen
@@ -1767,13 +1767,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 8/27
 
     [x] Clean out git
-    [ ] squash some commits together?
+    [x] squash some commits together?
     [x] build some branches
     [x] sys.path learn
     [x] sys.path apply
         [x] StockfishNetwork:41
         [x] running pytest on main.py inside src/
-        [ ] ?
 
     [ ] the reason pytest main.py runs many tests is * imports
 
@@ -1782,30 +1781,6 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     
 
 8/28
-
-    Updates and VScode shit:
-
-        1.26.1
-
-        Fix slow completion: 
-        ,"python.jediEnabled": false
-
-        goto extension is ms-python.python:
-
-            go to 'contributions' tab:
-
-                view the commands and settings
-
-        describes issue and workaround: open the file that's not being imported
-        https://github.com/Microsoft/vscode-python/issues/2201
-
-        PTVS? PythonTools for Visual Studio
-        or DonJaymanne?
-
-        Check out pre-load modules for numpy, etc maybe opencv as well
-
-        Ctrl+Space: triggers intellisense
-
     
     Tasks:
 
@@ -1815,6 +1790,39 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [x] read_stderr commits
             [x] verify on server
             [x] older commits
+
+        [ ] Mop up previous tasks
+            [ ] arg on .bat
+            [ ] test setup time for StockfishNetwork
+            [ ] test for teardown
+        
+        [ ] Develop a branch pattern for dev in separate areas of the app
+
+    
+    Major Things Dev-Features
+
+        [ ] One run unit-tests
+        [ ] Ship an app
+        [ ] The tools/ features of profile test
+            [ ] A cmd suite for these cmds
+            [ ] notebooks with graphs, tables, etc.
+            [ ] the writeups
+            [ ] the db-module for perf_time
+                [ ] ORM for logging
+        
+
+    
+    Larger Learning Projects
+
+        [ ] compile with mingw for windows
+        [ ] Python3
+            [ ] 2 to 3
+            [ ] bring in
+        [ ] virtualenv
+            [ ] requirements.txt
+        [ ] docker
+        [ ] kivo
+
 
 
 Notes:
@@ -1990,6 +1998,34 @@ Notes:
     Python path/import
 
         https://stackoverflow.com/questions/11536764/how-to-fix-attempted-relative-import-in-non-package-even-with-init-py
+
+
+    VScode - Extensions and Updates:
+
+        1.26.1
+
+        Fix slow completion: 
+        ,"python.jediEnabled": false
+
+        goto extension is ms-python.python:
+
+            go to 'contributions' tab:
+
+                view the commands and settings
+
+        describes issue and workaround: open the file that's not being imported
+        https://github.com/Microsoft/vscode-python/issues/2201
+
+            either click thru all the files
+            or
+            python.autoComplete.extraPaths add your own folders
+
+        PTVS? PythonTools for Visual Studio
+        or DonJaymanne?
+
+        Check out pre-load modules for numpy, etc maybe opencv as well
+
+        Ctrl+Space: triggers intellisense
 
 
     Compiling stockfish
