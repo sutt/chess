@@ -1,0 +1,71 @@
+This is to keep track of "scratch" work in the docs/ folder:
+
+These are to investigate different modules / new code
+
+==============================================================
+
+8/30
+
+adding:
+    
+    path_examples/
+
+    wsl_thread/
+
+    wrappers/
+
+decriptions:
+
+    path_examples/
+
+    > Run p1.py from any directory in the worksapce:
+
+        e.g. in path_examples/, from chess/, from basic_engine/src/
+    
+    ->  These should show how to get same relative paths regardless
+        of calling examples. And how these are processed in imported
+        modules.
+
+    
+    wsl_thread/
+
+    > demo_wsl.py  contains notes about running WSL and flask within
+                   from subprocess.
+
+        - there is a problem about using a dummy cmd in 1 wsl-1-liner
+        - there is notes about "signed on" bash having additional "powers"
+        - there is flask specific notes
+        - there is subproc specific notes
+
+    > a.py          since wsl can't pipe to windows console, we can 
+                    pipe to a file and read it. In this example, flask
+                    outputs data to sterr that we are interested in,
+                    and can use this output to know when the server 
+                    is setup and ready to receive commands.
+
+    
+    wrappers/
+
+        (this is older scratch work)
+
+    > demo_wrap.py      a very simply wrapper example
+        
+    > demo_wrap2.py     a more complicated wrapper that allows
+                        error handling with 1-line wrapper 
+                        at the method. The rationale for this
+                        is removing all the error handling to keep
+                        methods terse.
+
+    
+
+    >demo_wrap.py
+
+
+
+
+
+
+
+
+
+
