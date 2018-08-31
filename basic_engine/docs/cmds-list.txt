@@ -41,9 +41,15 @@ Run batchverify tests:
 
 Run pytest on StockfishNetwork so it doesnt throw error second time:
 
-    In basic_engine/src/
+    In basic_engine/tests/
 
-        >run_pytest_script.bat
+        >run_pytest_file.bat ../src/StockfishNetwork.py
 
     (subject to change)
+
+Run unittests:
+
+    in basic_engine/tests/
+
+        >python stockfish_test.py
 

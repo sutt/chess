@@ -1798,6 +1798,19 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         
         [ ] Develop a branch pattern for dev in separate areas of the app
 
+8/30
+
+    Tasks:
+
+        [x] unittest module learn
+        [ ] unittest module apply
+            [ ] use a temp file for wsl_ps
+        [ ] test teardown in stockfish_test
+        [ ] tempfile module
+            [ ] tempfile for stockfishnetwork stderr
+        [ ] use pytest to discover all tests?
+            [ ] don't import tests into main.py
+
     
     Major Things Dev-Features
 
@@ -1910,6 +1923,11 @@ Notes:
         >which flask    [/home/user/.local/bin/flask]
         >top            [view running processes]
         >kill [pid]     [end process of pid]
+        >ps -A          [simple view of running processes]
+
+        
+        "kd" alias program for quick cd-navigation
+        https://gitlab.com/lloeki/dotfiles/blob/master/shell/kd
 
     
     WSL Console:

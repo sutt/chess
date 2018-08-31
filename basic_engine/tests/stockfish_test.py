@@ -60,7 +60,7 @@ class TestSetup(unittest.TestCase):
 
     
     def _check_wsl_ps(self):
-        self.assertFalse(True)
+        self.assertFalse(True)  #underscore func name means its not collected by test discover
 
 if __name__ == '__main__':
     unittest.main()
