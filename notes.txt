@@ -1803,13 +1803,37 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     Tasks:
 
         [x] unittest module learn
-        [ ] unittest module apply
+        [x] unittest module apply
             [ ] use a temp file for wsl_ps
         [ ] test teardown in stockfish_test
         [ ] tempfile module
             [ ] tempfile for stockfishnetwork stderr
         [ ] use pytest to discover all tests?
             [ ] don't import tests into main.py
+        [ ] setup pytest to run in wsl, then clear the cache
+
+        [ ] eliminate circular reference in 
+            utils:parse_pgn_instructions <-> GameLog:GameSchema
+        [ ] eliminate parse_pgn_instructions overlapped function 
+            name utils and GameLog
+        [ ] eliminate duplicated (by import) unit tests
+        [ ] add tools/ the test-discovery directories
+            [ ] fix paths from wrong dir in tools/-tests
+        [ ] put the pytest cache only in 1 place
+        
+        [ ] fix bad test: test_opening_move_ncalls_get_available
+
+            something about pytest is changing it from a normal run
+                k in return_ncalls becomes ambiguous with 2 entries:
+                (90, [('C:\\Users\\wsutt\\Desktop\\files\\chess\\basic_engine\\src\\TurnStage.py', 12, 'get_available_moves'), ('C:\\Users\\wsutt\\Desktop\\files\\chess\\basic_engine\\src\\basic.py', 406, 'get_available_moves')])
+
+                with pytest
+                   List reduced from 95 to 62 due to restriction <'basic'>
+                   List reduced from 62 to 2 due to restriction <'get_available_moves'>
+
+                run normally from cmdline
+                       List reduced from 95 to 32 due to restriction <'basic'>
+                       List reduced from 32 to 1 due to restriction <'get_available_moves'>
 
     
     Major Things Dev-Features
@@ -1907,6 +1931,19 @@ Notes:
 
                 finally
                     >git rebase --continue
+
+    Pytest
+
+        >pytest --collect-only      [only collect tests; don't run 'em]
+        
+        >pytest --collect-only --ignore=src/GameLog.py      [ignore particular file]
+        
+        build 'pytest.ini' and put in a directory:
+        
+        [pytest]
+        python_files = src/*.py
+        addopts = --ignore=src/GameLog.py
+
 
 
     WSL CLI:
