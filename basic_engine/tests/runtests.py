@@ -1,7 +1,7 @@
 '''
     This runs some or all the tests in the workspace
 
-    >start python runtests.py 
+    >[start] python runtests.py [--hang]
 
         --all
         --src           - only src/ ; exlcudes StockfishNetwork.py
@@ -15,12 +15,14 @@
 
         --clear-cache   - clears pytest caches to run b/w win/wsl
 
-        --disregard-err - dont use .bat to eliminate pytest cp encoding err
+        --hang          -use time.sleep to keep cmd window open
 '''
 
 import os
 import subprocess
 import argparse
+import time
+from pytest_utils import reset_pytest
 
 import argparse
 ap = argparse.ArgumentParser()
@@ -33,6 +35,7 @@ ap.add_argument("--tools", action="store_true")
 ap.add_argument("--batchverify", action="store_true")
 ap.add_argument("--stockfish", action="store_true")
 ap.add_argument("--clearcache", action="store_true")
+ap.add_argument("--hang", action="store_true")
 args = vars(ap.parse_args())
 
 
@@ -59,9 +62,12 @@ if args["batchverify"]:
 if args["stockfish"]:
     b_stockfish     = True
 if args["clearcache"]:
-    raise Exception("Not Implemented Yet")
-    #TODO - add clear cache
-    #TODO - add clear .pyc
+    print 'clearing pytest caches: deleting __pycache__ folder and all .pyc in'
+    print 'src/ tools/ and tests/ ...'
+    reset_pytest()
+
+if os.name != "nt":
+    b_stockfish     = False
 
 verbose_arg     = ""
 if args["v"]:
@@ -98,4 +104,8 @@ if b_stockfish:
 
 
 print 'done with runtests.'
+
+if args["hang"]:
+    print '..hanging for a long time...'
+    time.sleep(999999)
 

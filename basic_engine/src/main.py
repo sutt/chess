@@ -1,4 +1,4 @@
-import sys, random, time
+import os, sys, random, time
 
 from basic import *
 from utils import *
@@ -12,13 +12,15 @@ from TurnStage import check_endgame
 from TurnStage import is_king_in_check
 from TurnStage import filter_check_naive
 from TurnStage import filter_check_opt   
-from StockfishNetwork import StockfishNetworking
 
 from TurnStage import filter_check_test_copy   
 from TurnStage import filter_check_test_copy_apply   
 from TurnStage import filter_check_test_copy_apply_2
 from TurnStage import filter_check_test_copy_apply_3
 from TurnStage import filter_check_test_copy_opt
+
+if os.name == 'nt':
+    from StockfishNetwork import StockfishNetworking
 
 
 

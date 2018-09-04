@@ -1837,16 +1837,23 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         9/5
 
-        [ ] Finish runtests.py
-            [ ] Add bathcverify
+        [x] Finish runtests.py
+            [x] Add bathcverify
         [ ] Fix the two problem tests
         [ ] batchverify - are the kickouts still wrong?
 
-        [ ] runtests.py is STILL bad can't be run twice!
-            [ ] can .bat be run twice?
-                [ ] check by removing tmp b/w runs
-            [ ] why can't it be run from subproc?
-                [ ] try with shell=T
+        [x] runtests.py is STILL bad can't be run twice!
+            just run with 'start' cmd from cli
+            ^this doesn't work, the cmd window closes
+
+        [x] Need to conditional import stockfishnetwork for wsl tests
+        [ ] Need to add os.name conditionals for win v linux in runtests
+
+        [ ] add a linux stockfish library
+
+        [ ] build a requirements.txt
+
+        [ ] need common sense checks on rmtree befroe running it
 
     
     Major Things Dev-Features
