@@ -6,11 +6,11 @@
 
 ::Examples: 
 ::[terse+specific run]
-::  tests/ >run_pytest_file.bat ../src/StockfishNetwork.py -
+::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
 ::[verbose+specific run]
-::  tests/ >run_pytest_file.bat ../src/StockfishNetwork.py -vv
+::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
 ::[verbose+directory run]
-::  tests/ >run_pytest_file.bat - -vv
+::  src/ >"../tests/run_pytest_file.bat" "-" "-vv"
 echo off
 
 IF "%~1"=="-" (

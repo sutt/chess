@@ -1835,6 +1835,19 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                        List reduced from 95 to 32 due to restriction <'basic'>
                        List reduced from 32 to 1 due to restriction <'get_available_moves'>
 
+        9/5
+
+        [ ] Finish runtests.py
+            [ ] Add bathcverify
+        [ ] Fix the two problem tests
+        [ ] batchverify - are the kickouts still wrong?
+
+        [ ] runtests.py is STILL bad can't be run twice!
+            [ ] can .bat be run twice?
+                [ ] check by removing tmp b/w runs
+            [ ] why can't it be run from subproc?
+                [ ] try with shell=T
+
     
     Major Things Dev-Features
 
@@ -1859,6 +1872,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [ ] requirements.txt
         [ ] docker
         [ ] kivo
+        [ ] client-side app: python->js via pypi(?)
 
 
 
