@@ -1824,12 +1824,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [x] fix bad test: test_opening_move_ncalls_get_available
 
 
-9/5
+9/4
 
         [x] Finish runtests.py
             [x] Add bathcverify
         [x] Fix the two problem tests
-        [ ] batchverify - are the kickouts still wrong?
+        [x] batchverify - are the kickouts still wrong?
 
         [x] runtests.py is STILL bad can't be run twice!
             just run with 'start' cmd from cli
@@ -1843,6 +1843,15 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] build a requirements.txt
 
         [ ] need common sense checks on rmtree befroe running it
+
+9/5
+
+        [x] Linux Stockfish library
+            [x] put an interface library in src
+            [ ] add tests
+        
+        [ ] Get Stockfish for Windows
+            [ ] download MinGW
 
     
     Major Things Dev-Features
