@@ -21,3 +21,6 @@ stockfish/api/py_stockfish/stockfish/
 stockfish/api/tmp.app.py
 stockfish/api/tmp.txt
 stockfish/uci.zip
+basic_engine/docs/temp/
+*tmp.txt
+tmp*.txt
