@@ -1723,12 +1723,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] ctrl c
         [ ] make sure both flask and stockfish
 
-    [ ] run unittest instead of pytest
-        [ ] use setup/teardown
+    [x] run unittest instead of pytest
+        [x] use setup/teardown
 
-    [ ] formalize bat to run pytest
-        [ ] a way to use arg to control 
-        [ ] @ECHO OFF ?
+    [x] formalize bat to run pytest
+        [x] a way to use arg to control 
+        [x] @ECHO OFF ?
 
     [x] use sys.path.relative or something to determine 
         STOCKFISH_PATH in serverA.py (line 20)
@@ -1744,7 +1744,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [x] parse flask output from StockfishNetwork b_read_server_stdout
         note: it's actually stderr that contains useful on ip/port and requests
 
-        [ ] build a test that checks the setup time for the server
+        [x] build a test that checks the setup time for the server
 
     [x] fix the tests that fail for src/main.py when running 
         pytest inside src/
@@ -1791,12 +1791,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [x] verify on server
             [x] older commits
 
-        [ ] Mop up previous tasks
-            [ ] arg on .bat
-            [ ] test setup time for StockfishNetwork
+        [x] Mop up previous tasks
+            [x] arg on .bat
+            [x] test setup time for StockfishNetwork
             [ ] test for teardown
         
-        [ ] Develop a branch pattern for dev in separate areas of the app
+        [x] Develop a branch pattern for dev in separate areas of the app
 
 8/30
 
@@ -1808,34 +1808,23 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] test teardown in stockfish_test
         [ ] tempfile module
             [ ] tempfile for stockfishnetwork stderr
-        [ ] use pytest to discover all tests?
+        [x] use pytest to discover all tests?
             [ ] don't import tests into main.py
-        [ ] setup pytest to run in wsl, then clear the cache
+        [x] setup pytest to run in wsl, then clear the cache
 
         [ ] eliminate circular reference in 
             utils:parse_pgn_instructions <-> GameLog:GameSchema
-        [ ] eliminate parse_pgn_instructions overlapped function 
+        [~] eliminate parse_pgn_instructions overlapped function 
             name utils and GameLog
         [ ] eliminate duplicated (by import) unit tests
-        [ ] add tools/ the test-discovery directories
+        [x] add tools/ the test-discovery directories
             [ ] fix paths from wrong dir in tools/-tests
-        [ ] put the pytest cache only in 1 place
+        [?] put the pytest cache only in 1 place
         
-        [ ] fix bad test: test_opening_move_ncalls_get_available
+        [x] fix bad test: test_opening_move_ncalls_get_available
 
-            something about pytest is changing it from a normal run
-                k in return_ncalls becomes ambiguous with 2 entries:
-                (90, [('C:\\Users\\wsutt\\Desktop\\files\\chess\\basic_engine\\src\\TurnStage.py', 12, 'get_available_moves'), ('C:\\Users\\wsutt\\Desktop\\files\\chess\\basic_engine\\src\\basic.py', 406, 'get_available_moves')])
 
-                with pytest
-                   List reduced from 95 to 62 due to restriction <'basic'>
-                   List reduced from 62 to 2 due to restriction <'get_available_moves'>
-
-                run normally from cmdline
-                       List reduced from 95 to 32 due to restriction <'basic'>
-                       List reduced from 32 to 1 due to restriction <'get_available_moves'>
-
-        9/5
+9/5
 
         [x] Finish runtests.py
             [x] Add bathcverify
