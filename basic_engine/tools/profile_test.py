@@ -108,7 +108,7 @@ def display_profiles(fn, amt=10, b_full=False):
 
 
 def return_ncalls( fn
-                   ,sel_list = ('basic', 'get_available_moves')
+                   ,sel_list = ('basic.py', 'get_available_moves')
                  ):
     ''' get a machine readable value of n calls '''
     p = pstats.Stats(fn)
