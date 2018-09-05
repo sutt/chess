@@ -43,6 +43,7 @@ b_src               = False
 b_tools             = False
 b_batchverify       = False
 b_stockfish         = False
+b_linux             = False
 
 if args["all"]:
     b_src           = True
@@ -69,6 +70,9 @@ if args["clearcache"]:
 if os.name != "nt":
     b_stockfish     = False
 
+if os.name == "posix":
+    b_linux         = True
+
 verbose_arg     = ""
 if args["v"]:
     verbose_arg = "-v"
@@ -78,6 +82,11 @@ if args["vv"]:
 
 if b_src:
     p = subprocess.Popen(["pytest", verbose_arg], cwd="../src/")
+    p.wait()
+
+if b_linux and b_src:
+    p = subprocess.Popen(["pytest", verbose_arg, "StockfishCLApi.py"]
+                            ,cwd = "../src/")
     p.wait()
 
 if b_tools:

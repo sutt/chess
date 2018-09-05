@@ -1848,7 +1848,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         [x] Linux Stockfish library
             [x] put an interface library in src
-            [ ] add tests
+            [x] add tests
         
         [ ] Get Stockfish for Windows
             [ ] download MinGW

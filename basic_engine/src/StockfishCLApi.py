@@ -92,12 +92,76 @@ class StockfishCLApi():
         return alphamove_to_posmove(space_sep_move)
 
 
-if __name__ == "__main__":
-    import time
-    s = StockfishCLApi()
-    print s._get_best_move()
-    time.sleep(5)
 
 
 
+from datatypes import moveHolder, moveAHolder
+Move = moveHolder()
+MoveA = moveAHolder()
 
+
+def test_sn_movecodelist_to_movestr():
+    
+    sn = StockfishCLApi    #note: no need to instantiate
+
+    list_move_1 = [
+         Move(pos0 = (6,4), pos1 = (4,4), code = 0)
+        ,Move(pos0 = (1,4), pos1 = (3,4), code = 0)
+    ]
+
+    str_alpha_1 = sn._movecodelist_to_movelist(list_move_1)
+
+    assert str_alpha_1 == ["e2e4","e7e5"]
+
+    list_move_blank = []
+
+    str_alpha_blank = sn._movecodelist_to_movelist(list_move_blank)
+
+    assert str_alpha_blank == []
+
+    #TODO - convert alphanum moves to movecode
+    #TODO - castling
+    #TODO - enpassant
+
+
+def test_sn_movestr_to_movecode():
+
+    sn = StockfishCLApi
+    assert sn._movestr_to_movecode("e2e4") == ((6,4), (4,4))
+    assert sn._movestr_to_movecode("a2e8") == ((6,0), (0,4))
+
+    
+    
+def test_sn_get_best_move_1():
+    ''' basic example of bestmove on ply 3 '''
+    
+    #e4 e5 game
+    list_log_moves = [
+         Move(pos0 = (6,4), pos1 = (4,4), code = 0)
+        ,Move(pos0 = (1,4), pos1 = (3,4), code = 0)
+    ]
+
+    #available moves for white; ply=3
+    MoveHolder = moveHolder()
+    available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 3), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 3), pos1=(5, 5), code=0), MoveHolder(pos0=(7, 3), pos1=(4, 6), code=0), MoveHolder(pos0=(7, 3), pos1=(3, 7), code=0), MoveHolder(pos0=(7, 4), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 5), pos1=(5, 3), code=0), MoveHolder(pos0=(7, 5), pos1=(4, 2), code=0), MoveHolder(pos0=(7, 5), pos1=(3, 1), code=0), MoveHolder(pos0=(7, 5), pos1=(2, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(6, 4), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6, 2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3), pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
+
+    sn = StockfishCLApi()
+    best_move = sn.get_move(list_log_moves, available_moves)
+
+    assert best_move == Move(pos0 = (6,3), pos1 = (4,3), code = 0)
+
+
+def test_sn_best_move_2():
+    ''' basic example of bestmove on ply 1 '''
+    
+    #start-position game
+    list_log_moves = []
+
+    #available moves for white; ply=1
+    MoveHolder = moveHolder()
+    available_moves = [MoveHolder(pos0=(7, 1), pos1=(5, 2), code=0), MoveHolder(pos0=(7, 1), pos1=(5, 0), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 7), code=0), MoveHolder(pos0=(7, 6), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 0), pos1=(5, 0), code=0), MoveHolder(pos0=(6, 0), pos1=(4, 0), code=0), MoveHolder(pos0=(6, 1), pos1=(5, 1), code=0), MoveHolder(pos0=(6, 1), pos1=(4, 1), code=0), MoveHolder(pos0=(6,2), pos1=(5, 2), code=0), MoveHolder(pos0=(6, 2), pos1=(4, 2), code=0), MoveHolder(pos0=(6, 3),pos1=(5, 3), code=0), MoveHolder(pos0=(6, 3), pos1=(4, 3), code=0), MoveHolder(pos0=(6, 4), pos1=(5, 4), code=0), MoveHolder(pos0=(6, 4), pos1=(4, 4), code=0), MoveHolder(pos0=(6, 5), pos1=(5, 5), code=0), MoveHolder(pos0=(6, 5), pos1=(4, 5), code=0), MoveHolder(pos0=(6, 6), pos1=(5, 6), code=0), MoveHolder(pos0=(6, 6), pos1=(4, 6), code=0), MoveHolder(pos0=(6, 7), pos1=(5, 7), code=0), MoveHolder(pos0=(6, 7), pos1=(4, 7), code=0)]
+
+    sn = StockfishCLApi()
+    best_move = sn.get_move(list_log_moves, available_moves)
+
+    assert best_move == Move(pos0 = (6,4), pos1 = (4,4), code = 0)  # e4
