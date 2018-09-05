@@ -85,12 +85,16 @@ if b_tools:
     p.wait()
 
 if b_batchverify:
+    
     p = subprocess.Popen(["pytest", verbose_arg, "batchverify.py"])
     p.wait()
 
 if b_stockfish:
     
     verbose_arg_flag = "-" if verbose_arg == "" else verbose_arg
+
+    if "test_tmp.txt" in os.listdir(os.getcwd()):
+        os.remove("test_tmp.txt")
 
     p = subprocess.Popen( [  'run_pytest_file.bat'
                             ,'../src/StockfishNetwork.py'
