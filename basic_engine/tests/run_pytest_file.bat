@@ -20,7 +20,7 @@ IF "%~1"=="-" (
 )
 
 IF "%~2"=="-" (
-    set arg2=""
+    set arg2="-v"
 ) ELSE (
     set arg2=%2
 )

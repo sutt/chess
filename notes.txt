@@ -1812,9 +1812,9 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [ ] don't import tests into main.py
         [x] setup pytest to run in wsl, then clear the cache
 
-        [ ] eliminate circular reference in 
+        [x] eliminate circular reference in 
             utils:parse_pgn_instructions <-> GameLog:GameSchema
-        [~] eliminate parse_pgn_instructions overlapped function 
+        [x] eliminate parse_pgn_instructions overlapped function 
             name utils and GameLog
         [ ] eliminate duplicated (by import) unit tests
         [x] add tools/ the test-discovery directories
@@ -1828,12 +1828,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         [x] Finish runtests.py
             [x] Add bathcverify
-        [ ] Fix the two problem tests
+        [x] Fix the two problem tests
         [ ] batchverify - are the kickouts still wrong?
 
         [x] runtests.py is STILL bad can't be run twice!
             just run with 'start' cmd from cli
-            ^this doesn't work, the cmd window closes
+            ^this doesn't work, the cmd window closes (now this works with hang)
 
         [x] Need to conditional import stockfishnetwork for wsl tests
         [ ] Need to add os.name conditionals for win v linux in runtests

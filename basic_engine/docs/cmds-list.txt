@@ -1,5 +1,26 @@
 List commands for this workspace here:
 
+1-click Tests:
+
+    In tests/
+
+        >start python runtests.py --all --hang
+
+        [open a new window to prevent encoding bug]
+
+    or:
+        >python runtests.py --src
+        >python runtests.py --src --vv
+        >python runtests.py --srcall --vv
+        >python runtests.py --tools
+
+    or going back and forth between win/wsl:
+
+        >python runtests.py --src --clearcache
+
+        [erases files that get confused b/w the two os's]
+
+
 Display profiling stats:
     
     Run all in: ~/tools/
@@ -52,4 +73,3 @@ Run unittests:
     in basic_engine/tests/
 
         >python stockfish_test.py
-
