@@ -19,9 +19,10 @@ from TurnStage import filter_check_test_copy_apply_2
 from TurnStage import filter_check_test_copy_apply_3
 from TurnStage import filter_check_test_copy_opt
 
-if os.name == 'nt':
+b_use_clapi = True
+if os.name == 'nt' and not(b_use_clapi):
     from StockfishNetwork import StockfishNetworking
-if os.name == 'posix':
+if os.name == 'posix' or b_use_clapi:
     from StockfishCLApi import StockfishCLApi
 
 
@@ -57,9 +58,9 @@ class Game():
 
         self.stockfish_control = stockfish_control
         if len(self.stockfish_control) > 0:
-            if os.name == 'nt':
+            if os.name == 'nt' and not(b_use_clapi):
                 self.stockfish_interface = StockfishNetworking(b_launch_server=True)
-            if os.name == 'posix':
+            if os.name == 'posix' or b_use_clapi:
                 self.stockfish_interface =StockfishCLApi()
             
 

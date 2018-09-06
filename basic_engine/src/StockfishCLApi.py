@@ -8,12 +8,14 @@ class StockfishCLApi():
 
     def __init__(self):
     
+        exec_name = "stockfish-32.exe" if os.name == "nt" else "stockfish"
+        
         self.interface = Stockfish(path=os.path.join(
                                         find_app_path_root(__file__)
                                         ,"stockfish"
                                         ,"Stockfish"
                                         ,"bin"
-                                        ,"stockfish"
+                                        ,exec_name
                                         )
                                     )
 

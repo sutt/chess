@@ -1855,9 +1855,19 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [x] compile with mingw
             [x] change paths to stockfish executables
 
-        [ ] Add a command-line api on windows
+        [x] Add a command-line api on windows
 
         [ ] Need Tests for stockfish play
+
+        
+9/6
+        [x] Why can't I search in stockfish folder?
+            it was combo of:
+                case_sensitive search turned ON
+                search ignores files in .gitignore
+            can be controlled with:
+                "search.useIgnoreFiles": true
+
 
     
     Major Things Dev-Features
@@ -2093,6 +2103,13 @@ Notes:
 
     VScode - Extensions and Updates:
 
+        1.27.0
+        
+        Search ignores files in .gitignore:
+            
+            controlled with:
+                "search.useIgnoreFiles": true
+        
         1.26.1
 
         Fix slow completion: 
