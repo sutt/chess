@@ -12,7 +12,7 @@ class StockfishCLApi():
                                         find_app_path_root(__file__)
                                         ,"stockfish"
                                         ,"Stockfish"
-                                        ,"src"
+                                        ,"bin"
                                         ,"stockfish"
                                         )
                                     )

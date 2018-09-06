@@ -15,7 +15,7 @@ print os.getcwd()   #Why is this the same as where subprocess.Popen is happening
 B_HTML = True
 
 #TODO - use python relative path for determining these?
-STOCKFISH_PATH = "../Stockfish/src/stockfish" #When calling from chess/stockfish/api/
+STOCKFISH_PATH = "../Stockfish/bin/stockfish" #When calling from chess/stockfish/api/
 # STOCKFISH_PATH = "../../stockfish/Stockfish/src/stockfish"  #When calling from chess/basic_engine/src/
 
 interface = Stockfish(path = STOCKFISH_PATH)

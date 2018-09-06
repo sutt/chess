@@ -1836,9 +1836,9 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             ^this doesn't work, the cmd window closes (now this works with hang)
 
         [x] Need to conditional import stockfishnetwork for wsl tests
-        [ ] Need to add os.name conditionals for win v linux in runtests
+        [x] Need to add os.name conditionals for win v linux in runtests
 
-        [ ] add a linux stockfish library
+        [x] add a linux stockfish library
 
         [ ] build a requirements.txt
 
@@ -1850,8 +1850,14 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [x] put an interface library in src
             [x] add tests
         
-        [ ] Get Stockfish for Windows
-            [ ] download MinGW
+        [x] Get Stockfish for Windows
+            [x] download MinGW
+            [x] compile with mingw
+            [x] change paths to stockfish executables
+
+        [ ] Add a command-line api on windows
+
+        [ ] Need Tests for stockfish play
 
     
     Major Things Dev-Features
@@ -2152,6 +2158,101 @@ Notes:
             using mingw
             http://support.stockfishchess.org/kb/advanced-topics/compiling-stockfish-on-windows
 
+    MINGW:
+
+        got mingw32
+
+        Error occurs with mingw32 (not 64):
+
+        Troubleshooting:
+
+            C:\MinGW\bin>gcc --version
+            gcc (MinGW.org GCC-6.3.0-1) 6.3.0
+        
+
+        The key to resolving thread error is to install mingw64:
+        
+            from: https://sourceforge.net/projects/mingw-w64/
+
+                in downloads: x86_64-4.9.2-release-posix-seh-rt_v3-rev1.7z
+            
+            this is put in:     c/mingw/mingw64
+
+            changing path:      C:\mingw\mingw\bin    [from c\mingw\bin]
+            and keeping path:   C:\MinGW\msys\1.0\bin\m
+
+            Run:    (and it works, creating stockfish.exe)
+            >make build ARCH=x86-32 COMP=mingw
+
+            >make clean     [to remove .o files but also removes executable if not moved/renamed]
+
+        alternate (alleged) solution:
+            https://stackoverflow.com/questions/37358856/does-mingw-w64-support-stdthread-out-of-the-box-when-using-the-win32-threading
+            https://github.com/meganz/mingw-std-threads
+
+        
+        full error message:
+
+            C:\Users\wsutt\Desktop\files\chess\stockfish\Stockfish\src>make profile-build ARCH=x86-64-modern
+            COMP=mingw
+
+            Config:
+            debug: 'no'
+            sanitize: 'no'
+            optimize: 'yes'
+            arch: 'x86_64'
+            bits: '64'
+            kernel: 'MINGW32_NT-6.2'
+            os: 'Windows_NT'
+            prefetch: 'yes'
+            popcnt: 'yes'
+            sse: 'yes'
+            pext: 'no'
+
+            Flags:
+            CXX: g++
+            CXXFLAGS: -Wall -Wcast-qual -fno-exceptions -std=c++11  -Wextra -Wshadow -DNDEBUG -O3 -DIS_64BIT
+            -msse -msse3 -mpopcnt -DUSE_POPCNT
+            LDFLAGS:  -static
+
+            Testing config sanity. If this fails, try 'make help' ...
+
+
+            Step 1/4. Building instrumented executable ...
+            make ARCH=x86-64-modern COMP=mingw gcc-profile-make
+            make[1]: Entering directory `/c/Users/wsutt/Desktop/files/chess/stockfish/Stockfish/src'
+            make ARCH=x86-64-modern COMP=mingw \
+                    EXTRACXXFLAGS='-fprofile-generate' \
+                    EXTRALDFLAGS='-lgcov' \
+                    all
+            make[2]: Entering directory `/c/Users/wsutt/Desktop/files/chess/stockfish/Stockfish/src'
+            g++ -Wall -Wcast-qual -fno-exceptions -std=c++11 -fprofile-generate -Wextra -Wshadow -DNDEBUG -O3
+            -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT   -c -o benchmark.o benchmark.cpp
+            g++ -Wall -Wcast-qual -fno-exceptions -std=c++11 -fprofile-generate -Wextra -Wshadow -DNDEBUG -O3
+            -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT   -c -o bitbase.o bitbase.cpp
+            g++ -Wall -Wcast-qual -fno-exceptions -std=c++11 -fprofile-generate -Wextra -Wshadow -DNDEBUG -O3
+            -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT   -c -o bitboard.o bitboard.cpp
+            g++ -Wall -Wcast-qual -fno-exceptions -std=c++11 -fprofile-generate -Wextra -Wshadow -DNDEBUG -O3
+            -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT   -c -o endgame.o endgame.cpp
+            g++ -Wall -Wcast-qual -fno-exceptions -std=c++11 -fprofile-generate -Wextra -Wshadow -DNDEBUG -O3
+            -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT   -c -o evaluate.o evaluate.cpp
+            In file included from thread.h:35:0,
+                            from evaluate.cpp:31:
+            thread_win32.h:61:14: error: 'condition_variable_any' in namespace 'std' does not name a type
+            typedef std::condition_variable_any ConditionVariable;
+                        ^~~~~~~~~~~~~~~~~~~~~~
+            In file included from evaluate.cpp:31:0:
+            thread.h:46:3: error: 'ConditionVariable' does not name a type
+            ConditionVariable cv;
+            ^~~~~~~~~~~~~~~~~
+            thread.h:49:8: error: 'thread' in namespace 'std' does not name a type
+            std::thread stdThread;
+                    ^~~~~~
+            make[2]: *** [evaluate.o] Error 1
+            make[2]: Leaving directory `/c/Users/wsutt/Desktop/files/chess/stockfish/Stockfish/src'
+
+        
+
     Using stockfish:
 
         http://support.stockfishchess.org/kb/advanced-topics/uci-protocol
@@ -2162,10 +2263,30 @@ Notes:
         >d      [view board position]
         >go     [think about moves]
 
+        >uci    [view parameters]
+        >bench  [run some tests to see perf/timing]
+
     Interfacing with stockfish
 
         pip package for it
         https://pypi.org/project/stockfish/
+
+    
+    Comparing Benchmarks 
+
+        linux64
+        ===========================
+        Total time (ms) : 6599
+        Nodes searched  : 4592766
+        Nodes/second    : 695979
+
+        win32
+        ===========================
+        Total time (ms) : 6566
+        Nodes searched  : 4592766
+        Nodes/second    : 699477
+
+        -> win32 is ~ 0.5% faster
 
 
 8/27:
