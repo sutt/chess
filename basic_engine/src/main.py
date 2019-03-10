@@ -1321,7 +1321,7 @@ def test_multi_pgn_games_1():
             
             b_whites_move = ((ret % 2) == 1)
 
-            pgn_turn = (ret + int(b_whites_move)) / 2
+            pgn_turn = (ret + int(b_whites_move)) // 2
             s_player = 'White' if b_whites_move else 'Black'
 
             print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
@@ -1403,7 +1403,7 @@ def batchtest_multi_pgn_games_1(**kwargs):
             print('Move Incompatibility | line_i: ', str(i + 1))
             print('game.i_turn: ', str(ret))    
             b_whites_move = ((ret % 2) == 1)
-            pgn_turn = (ret + int(b_whites_move)) / 2
+            pgn_turn = (ret + int(b_whites_move)) // 2
             s_player = 'White' if b_whites_move else 'Black'
             print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
             err_cntr += 1

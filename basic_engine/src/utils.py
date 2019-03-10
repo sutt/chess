@@ -143,7 +143,7 @@ def parse_pgn_instructions( s
             
 
             #first digit backwards
-            i_first_digit = map(lambda s: str.isdigit(s), _s[::-1] ).index(True)
+            i_first_digit = list(map(lambda s: str.isdigit(s), _s[::-1] )).index(True)
             i_first_digit =  len(_s) - i_first_digit
 
             destination_a1 = _s[i_first_digit - 2: i_first_digit ]
@@ -303,7 +303,7 @@ class PGN:
     @staticmethod
     def piece_class_from_pos(pieces, pos0):
         '''return first letter (Captialized) of piece name'''
-        p = filter(lambda p: p.pos == pos0, pieces)[0]
+        p = list(filter(lambda p: p.pos == pos0, pieces))[0]
         p_name = p.__class__.__name__
         p_symbol = p_name[0] if p_name != 'Knight' else "N"
         return p_symbol
@@ -526,8 +526,8 @@ H  ~ ~ ~ ~ ~ ~ ~ ~
     
     board, pieces = printout_to_data(s_test)
 
-    white_king = filter(lambda p: p.white == True and 
-                        p.__class__.__name__ == "King", pieces)[0]
+    white_king = list(filter(lambda p: p.white == True and 
+                        p.__class__.__name__ == "King", pieces))[0]
     assert white_king.pos == (4,3)
     
     display = Display()
@@ -550,8 +550,8 @@ def test_printout_to_data_2():
     
     board, pieces = printout_to_data(s_test)
 
-    white_king = filter(lambda p: p.white == True and 
-                        p.__class__.__name__ == "King", pieces)[0]
+    white_king = list(filter(lambda p: p.white == True and 
+                        p.__class__.__name__ == "King", pieces))[0]
     assert white_king.pos == (4,3)
     
     display = Display()

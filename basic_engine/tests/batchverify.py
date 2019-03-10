@@ -55,7 +55,7 @@ def build_modulo_print_data(data, modulo_print):
         assert type(modulo_print) == int
         try:
             data_modulo = []
-            for i in range(len(data) / modulo_print):        
+            for i in range(len(data) // modulo_print):        
                 data_modulo.append(data[i*modulo_print:(i+1)*modulo_print])
             
             data_modulo.append(data[(i+1)*modulo_print:])    #the fractional leftover

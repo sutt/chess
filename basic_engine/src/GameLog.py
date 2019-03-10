@@ -137,7 +137,7 @@ class GameSchema:
                                     player: 0=white,1=black
         '''
         player_int = int(not(i_turn % 2))
-        pgn_turn = ((i_turn - 1) / 2) + 1
+        pgn_turn = ((i_turn - 1) // 2) + 1
         return (pgn_turn, player_int)
 
     @staticmethod

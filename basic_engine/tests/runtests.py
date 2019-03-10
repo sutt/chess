@@ -3,6 +3,9 @@
 
     >[start] python runtests.py [--hang]
 
+        --2             - run with python2, pytest2 (default right now)
+        --3             - run with python3, pytest3
+
         --all
         --src           - only src/ ; exlcudes StockfishNetwork.py
         --src-all       - includes StockfishNetwork.py and unittests
@@ -13,7 +16,7 @@
         --vv            - verbosity vv
         --v             - verbosity v
 
-        --clear-cache   - clears pytest caches to run b/w win/wsl
+        --clearcache   - clears pytest caches to run b/w win/wsl
 
         --hang          -use time.sleep to keep cmd window open
 '''
@@ -22,10 +25,13 @@ import os
 import subprocess
 import argparse
 import time
-from .pytest_utils import reset_pytest
+import copy
+from pytest_utils import reset_pytest
 
 import argparse
 ap = argparse.ArgumentParser()
+ap.add_argument("--2", action="store_true")
+ap.add_argument("--3", action="store_true")
 ap.add_argument("--v", action="store_true")
 ap.add_argument("--vv", action="store_true")
 ap.add_argument("--all", action="store_true")
@@ -80,11 +86,21 @@ if args["vv"]:
     verbose_arg = "-vv"
 
 
+pytest_cmd = ["python", "-m" , "pytest"]
+if args["3"]:
+    pytest_cmd = ["python3", "-m" , "pytest"]
+
+
 if b_src:
-    p = subprocess.Popen(["pytest", verbose_arg], cwd="../src/")
+    cmd =  copy.copy(pytest_cmd)
+    cmd.extend([verbose_arg])
+    print(cmd)
+    p = subprocess.Popen(cmd, cwd="../src/")
     p.wait()
 
 if b_linux and b_src:
+    cmd =  copy.copy(pytest_cmd)
+    cmd.extend(verbose_arg)
     p = subprocess.Popen(["pytest", verbose_arg, "StockfishCLApi.py"]
                             ,cwd = "../src/")
     p.wait()

@@ -112,7 +112,8 @@ def apply_move(move, board, pieces, _player):
     pos0, pos1 = move[0], move[1]
 
     #TODO - add helper func: piece_from_pos( index_=True)
-    piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
+    #TODO - py3 : make this a list comprehension
+    piece_i = list(filter(lambda _p: _p[1].pos == pos0, enumerate(pieces)))[0][0]
     #TODO - piece = pieces[piece_i]
 
     kill_flag = False   # before the move, check if opp's piece is there
@@ -144,7 +145,7 @@ def apply_move(move, board, pieces, _player):
                                     ,left_side = castle_absolute_left)
         
         #TODO - helper func
-        rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
+        rook_i = list(filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces)))[0][0]
 
         pieces[rook_i].pos = r_pos1   
         pieces[piece_i].pos = k_pos1   #piece_i already king
@@ -181,7 +182,7 @@ def apply_move(move, board, pieces, _player):
     #TODO - any promotions here    
     if b_promotion:
         
-        pro_piece_i = filter(lambda _p: _p[1].pos == pos1, enumerate(pieces))[0][0]
+        pro_piece_i = list(filter(lambda _p: _p[1].pos == pos1, enumerate(pieces)))[0][0]
         pro_piece = pieces.pop(pro_piece_i)
 
         #new piece
@@ -235,7 +236,7 @@ class Mirror():
 
     @staticmethod
     def get_piece_class(pieces, pos):
-        piece = filter(lambda piece: piece.pos == pos, pieces)[0]
+        piece = list(filter(lambda piece: piece.pos == pos, pieces))[0]
         return piece.__class__.__name__
 
     def infer_move_type(self, move):
@@ -471,7 +472,8 @@ class Mutator():
         moving_piece_enum = self.old_mutation[1]
         if (moving_piece_enum) == 3:
             
-            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
+            #TODO - py3
+            player_king = list(filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces))[0]
             old_pos = player_king.pos
             new_pos = self.new_mutation[0]
 
@@ -492,7 +494,7 @@ class Mutator():
             return pieces
         else:
             #TODO - helper func
-            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
+            player_king = list(filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces))[0]
             old_pos = self.mutation_king_piece[0]
             player_king.pos = old_pos
             return pieces

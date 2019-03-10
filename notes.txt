@@ -1872,12 +1872,17 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 3/10
 
     [ ] Experiment with py2to3
-        [ ] branch: py3
+        [x] branch: py3
+
+        Adding #TODO - py3 : <msg>
+        tags for refactoring to py3
+        
+        [ ] do a diff of diffs! - diff1=2to3, diff2=manual-correction
 
     Notes on previous
         in basic_engine/tests/ >python runtests.py -vv --all 
         use --clearcache when switching between wsl and win32
-        all tests pass in win32 and wsl
+        all tests pass in win32 and wsl (on py2)
 
         >python C:/Python27/Tools/scripts/2to3.py src/main.py
 
@@ -1891,7 +1896,97 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 -        black_pieces = filter(lambda p: not(p.white),  pieces)
 +        black_pieces = [p for p in pieces if not(p.white)]
 
+    corrections:
+
+        doesn't recognize pytest_utils as a relative import
+        -from .pytest_utils import reset_pytest
+        +from .pytest_utils import reset_pytest
+
+        first: the program no longer runs!
+        (basic_engine/src/) >python3 main.py
+
+            File "main.py", line 3, in <module>
+                from .basic import *
+            ModuleNotFoundError: No module named '__main__.basic'; '__main__' is not a package
+
+        second: does intellisense still work?
+            yes - very well
+
+        third: is runtests.py defaulting to python2? with pytest
+            yes - >where pytest ...points to python27/
+            can also see in output:
+                ============================= test session starts =============================
+                platform win32 -- Python 2.7.13, pytest-3.3.2, py-1.5.2, pluggy-0.6.0 -- c:\python27\python.exe
+            got pytest with pip3
+
+    manual corrections:
+
+        on src/ after initial 2to3
+        === 52 failed, 69 passed in 13.44 seconds ======
+
+        correction:
+
+        -piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
+        +piece_i = list(filter(lambda _p: _p[1].pos == pos0, enumerate(pieces)))[0][0]
+
+
+        === 52 failed, 69 passed in 13.44 seconds ======
+        >       assert gs.iturn_to_pgnturn(2) == (1,1)
+        E       assert (1.5, 1) == (1, 1)
+        E         At index 0 diff: 1.5 != 1
+        E         Full diff:
+        E         - (1.5, 1)
+        E         ?   --
+        E         + (1, 1)
+
+        clearly dividing operator is the problem
+
+        correction:
+        -pgn_turn = ((i_turn - 1) / 2) + 1
+        +pgn_turn = ((i_turn - 1) // 2) + 1
+
+        + other corrections for divisor...
+
+            un-needed b/c it's already doing floats
+                avg_elems = float(sum_elems) / float(n)
+
+        === 50 failed, 69 passed in 13.44 seconds ======
+
+        correction:
+        -i_first_digit = map(lambda s: str.isdigit(s), _s[::-1] ).index(True)
+        +i_first_digit = list(map(lambda s: str.isdigit(s), _s[::-1] )).index(True)
+
+        
+        === 36 failed, 85 passed in 3.94 seconds ==
+
+        corrections:
+        white_king = list(filter(lambda p: p.white == True and 
+                        p.__class__.__name__ == "King", pieces))[0]
+
+        === 30 failed, 91 passed in 3.69 seconds ===
+
+        weird, all failures together now in order
+
+        correction:
+        player_king = list(filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces))[0]
+
+            +others similiar
+        
+        === 22 failed, 99 passed in 2.80 seconds =====
+
+        corrections: go trhu TunStage.py looking for all filter() -> list(filter())
+
+        === 7 failed, 114 passed in 1.79 seconds ==
+
+        another filter->list(filter)
+
+        === 121 passed in 2.96 seconds ===
     
+    [ ] Maybe a good search is for ")[0]" b/c this seems to be 
+        how I did maps/filter patterns to get one elem
+
+
+
     Major Things Dev-Features
 
         [ ] One run unit-tests
