@@ -104,21 +104,21 @@ class TimeAnalysisSchema:
         try:
             assert len(data) > 1
             len0  = len(data[0])
-            assert all([len(data_i) == len0 for data_i in data])
+            assert all(map(lambda data_i: len(data_i) == len0, data))
         except AssertionError:
-            print('data fed to aggregate_y is of different length; cant aggregate that.')
+            print 'data fed to aggregate_y is of different length; cant aggregate that.'
             return None
         try:
             temp = []
             n = len(data)
             j = len(data[0])
             for _j in range(j):
-                sum_elems = sum([d[_j] for d in data])
+                sum_elems = sum(map(lambda d: d[_j], data))
                 avg_elems = float(sum_elems) / float(n)
                 temp.append(avg_elems)
             return temp
         except:
-            print('failed to aggregate, but did not catch in exception')
+            print 'failed to aggregate, but did not catch in exception'
             return None
 
     @staticmethod
@@ -131,7 +131,7 @@ class TimeAnalysisSchema:
         cum_sum_y = [0 for j in range(num_turns)]
         
         for i in range(num_elems):
-            weighted_y = [elem * float(list_n[i]) for elem in list_list_y[i]]
+            weighted_y = map(lambda elem: elem * float(list_n[i]), list_list_y[i])
             cum_sum_y = [cum_sum_y[j] + weighted_y[j] for j in range(num_turns)]
 
         avg_y = [float(cum_sum_y[j]) / float(total_n) for j in range(num_turns)]
@@ -182,9 +182,9 @@ class TimeAnalysisSchema:
             with open(data_dir + data_fn, 'w') as f:
                 json.dump(tas, f)
         except:
-            print('failed to write file output')
+            print 'failed to write file output'
             return None
-        print('wrote output to: ', data_dir, data_fn)
+        print 'wrote output to: ', data_dir, data_fn
 
     
     def from_json(self, path_fn="../data/perf/demo.tas", s_json=None):
@@ -195,7 +195,7 @@ class TimeAnalysisSchema:
                 with open(path_fn, "r") as f:
                     d_tas = json.load(f)
             except:
-                print('could not load json from: ', str(path_fn))
+                print 'could not load json from: ', str(path_fn)
                 return None
 
         if s_json is not None:
@@ -204,8 +204,8 @@ class TimeAnalysisSchema:
                 
                 d_tas['log']['s_instructions'] = str(d_tas['log']['s_instructions'])
             except:
-                print('could not load json from string.') 
-                print('arg of type: ', str(type(s_json)))
+                print 'could not load json from string.' 
+                print 'arg of type: ', str(type(s_json))
                 return None
 
         try:
@@ -214,7 +214,7 @@ class TimeAnalysisSchema:
             self.trials = d_tas['trials']
 
         except:
-            print('could not convert json to TAS')
+            print 'could not convert json to TAS'
             return None
 
         return 0
@@ -251,7 +251,7 @@ class TurnAttributeSchema:
             game = Game(s_pgn_instructions=self.s_pgn_instructions
                         ,b_log_full=True)
         else:
-            print('could not find instructions to run create_data()')
+            print 'could not find instructions to run create_data()'
             return None
 
         game.play()

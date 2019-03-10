@@ -1,7 +1,7 @@
 import sys, time, json, os
-from .basic import *
-from .datatypes import moveHolder
-from .Display import Display
+from basic import *
+from datatypes import moveHolder
+from Display import Display
 
 Move = moveHolder()
 
@@ -150,7 +150,7 @@ def parse_pgn_instructions( s
 
             #Verify destination
             if (len(destination_a1) != 2 ):
-                print('Not 2!')
+                print 'Not 2!'
 
             #Piece 
             piece_letter = _s[0] if str.isupper(_s[0]) else "P"
@@ -212,13 +212,13 @@ def alphamove_to_posmove(inp):
     try:
         inputs = inp.split(" ")
         if len(inputs) != 2:
-            print('could not parse alphanumeric move')
+            print 'could not parse alphanumeric move'
         else:
             pos0 = alphanum_to_pos(inputs[0])
             pos1 = alphanum_to_pos(inputs[1])
             return (pos0,pos1)
     except:
-        print('exception while parsing input.')
+        print 'exception while parsing input.'
         return -1
         
 
@@ -240,7 +240,7 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
             data = out
     except:
         data = []
-        print('failure in routine to parse user input.')
+        print 'failure in routine to parse user input.'
     return ret, data
 
 class PGN:
@@ -413,7 +413,7 @@ def player_control_input(board, moves_player, log, **kwargs):
     msg = "Type your move. Or type 'hint' or 'out_log'..."
     msg += "\n"
     while(True):
-        raw = input(msg)    #example: >1,1 | 2,2
+        raw = raw_input(msg)    #example: >1,1 | 2,2
         ret, the_move = parse_player_input(raw, board, 'alphanum')
         if ret == 0:
             #TODO - call common return function
@@ -421,13 +421,13 @@ def player_control_input(board, moves_player, log, **kwargs):
                 if the_move == (_m.pos0, _m.pos1):
                     return Move(_m.pos0, _m.pos1, _m.code)
             else:
-                print('this move is not legal according to the game engine.')
+                print 'this move is not legal according to the game engine.'
         if ret == 1: 
-            print(moves_player)
+            print moves_player
         if ret == 2:
-            print(format_move_log(log.get_log_move()))
+            print format_move_log(log.get_log_move())
         if ret == -1:
-            print('could not recognize move ', str(raw), ". Try again:")
+            print 'could not recognize move ', str(raw), ". Try again:"
 
 
 def _find_blank(list_str, find_str):
@@ -450,9 +450,9 @@ def printout_to_data(s_printout, b_king_can_castle = False):
     #or if there are stray blank marks within the string/graphic
 
     blank_ind = [_find_blank(x, s_blank) for x in lines]
-    first_blank = [ind for ind in enumerate(blank_ind) if ind[1] >= 0]
+    first_blank = filter(lambda ind: ind[1] >= 0, enumerate(blank_ind))
     top_line = first_blank[0][0]
-    left_side = min([ind for ind in blank_ind if ind >= 0])
+    left_side = min(filter(lambda ind: ind >= 0, blank_ind))
     
     board_lines = lines[top_line:top_line + 8]
     
@@ -495,7 +495,7 @@ def printout_to_data(s_printout, b_king_can_castle = False):
                                     )
                     _piece_val = 3
                 else:
-                    print('could not determine piece in board.')
+                    print 'could not determine piece in board.'
                     continue
                 
                 pieces.append(_piece)
@@ -576,7 +576,7 @@ def test_pgn_parse_2():
     
     out = parse_pgn_instructions(s)
 
-    print(out)
+    print out
 
     assert out == [('f3', 'N', None), ('e6', 'P', None), ('c4', 'P', None), ('b6', 'P', None), ('g3', 'P', None), ('b7', 'B', None), ('g2', 'B', None), ('c5', 'P', None), ('g1', 'K', None), ('f6', 'N', None), ('c3', 'N', None), ('e7', 'B', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'Q', None), ('c6', 'N', None), ('f4', 'Q', None), ('g8', 'K', None), ('d1', 'R', None), ('b8', 'Q', None), ('e4', 'P', None), ('d6', 'P', None), ('b3', 'P', None), ('a6', 'P', None), ('b2', 'B', None), ('d8', 'R', None), ('e3', 'Q', None), ('a7', 'Q', None), ('a3', 'B', None), ('f8', 'B', None), ('h3', 'P', None), ('b5', 'P', None), ('a7', 'Q', None), ('a7', 'N', None), ('e5', 'P', None), ('e5', 'P', 'd'), ('f8', 'B', None), ('f8', 'K', None), ('e5', 'N', None), ('g2', 'B', None), ('g2', 'K', None), ('c4', 'P', 'b'), ('c4', 'P', 'b'), ('e8', 'K', None), ('b1', 'R', 'a'), ('d1', 'R', None), ('d1', 'N', None), ('e4', 'N', None), ('b7', 'R', None), ('d6', 'N', None), ('c7', 'R', None), ('c8', 'N', 'a'), ('c5', 'P', None), ('e4', 'N', None), ('f7', 'R', None), ('a7', 'R', None), ('f4', 'R', None), ('f6', 'N', None), ('e3', 'N', None), ('c7', 'R', None), ('c4', 'R', None), ('e7', 'N', None), ('f4', 'P', None), ('c6', 'N', None), ('g4', 'N', '3'), ('d5', 'N', None), ('c6', 'N', None), ('c6', 'R', None), ('f3', 'K', None), ('c7', 'R', None), ('e5', 'N', None), ('d8', 'K', None), ('c6', 'P', None), ('e7', 'K', None), ('a4', 'R', None), ('a7', 'R', None), ('f2', 'K', None), ('d6', 'K', None), ('h4', 'P', None), ('a5', 'P', None), ('f3', 'K', None), ('c3', 'N', None), ('d4', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('g6', 'P', None), ('g4', 'P', None), ('c7', 'K', None), ('d2', 'R', None), ('a4', 'P', None), ('f5', 'P', None), ('f6', 'N', None), ('f4', 'K', None), ('f5', 'P', 'e'), ('f5', 'P', 'g'), ('a5', 'R', None), ('g6', 'P', 'f'), ('g6', 'P', 'h'), ('b2', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('b6', 'N', None), ('f2', 'R', None), ('a3', 'P', None), ('f7', 'R', None), ('c8', 'K', None), ('g6', 'N', None), ('a4', 'R', None), ('e5', 'K', None), ('b4', 'R', None), ('e7', 'N', None), ('d8', 'K', None), ('c7', 'P', None), ('e8', 'K', None), ('h7', 'R', None), ('c4', 'R', None), ('d5', 'N', None), ('c5', 'R', None), ('h8', 'R', None), ('d7', 'K', None), ('d8', 'R', None)]
 

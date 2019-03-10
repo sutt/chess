@@ -1,8 +1,8 @@
 import os
-from .utils import alphamove_to_posmove
-from .utils import pos_to_alphanum
-from .utils import find_app_path_root
-from .StockfishLib import Stockfish
+from utils import alphamove_to_posmove
+from utils import pos_to_alphanum
+from utils import find_app_path_root
+from StockfishLib import Stockfish
 
 class StockfishCLApi():
 
@@ -97,7 +97,7 @@ class StockfishCLApi():
 
 
 
-from .datatypes import moveHolder, moveAHolder
+from datatypes import moveHolder, moveAHolder
 Move = moveHolder()
 MoveA = moveAHolder()
 

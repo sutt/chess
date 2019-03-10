@@ -51,7 +51,7 @@ class Stockfish:
         self.__put('setoption name %s value %s' % (optionname, str(value)))
         stdout = self.__isready()
         if stdout.find('No such') >= 0:
-            print(('stockfish was unable to set option %s' % optionname))
+            print('stockfish was unable to set option %s' % optionname)
 
     def __isready(self):
         self.__put('isready')

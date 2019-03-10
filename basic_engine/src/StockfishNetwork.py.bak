@@ -2,13 +2,13 @@ import os
 import requests
 import subprocess
 import time
-from .utils import find_app_path_root
-from .utils import alphamove_to_posmove
-from .utils import pos_to_alphanum
+from utils import find_app_path_root
+from utils import alphamove_to_posmove
+from utils import pos_to_alphanum
 
 def demo_request():
     r = requests.get("http://127.0.0.1:5000/")
-    print(r.text)
+    print r.text
 
 
 class StockfishNetworking():
@@ -86,15 +86,15 @@ class StockfishNetworking():
                             break
                 
                 if not(self._check_server_is_up()):
-                    print('failed to validate the stockfish server is up.')
+                    print 'failed to validate the stockfish server is up.'
                 else:
                     self._del_tmp_file()
-                    print('server setup in secs: %s' % str(time.time() - t0)[:4])
+                    print 'server setup in secs: %s' % str(time.time() - t0)[:4]
 
             else:
-                print('Sleeping 4 seconds to launch stockfish server...')
+                print 'Sleeping 4 seconds to launch stockfish server...'
                 time.sleep(4)
-                print('Server initialized')
+                print 'Server initialized'
 
     def get_move(self, list_log_moves, available_moves):
         ''' Args:
@@ -108,12 +108,12 @@ class StockfishNetworking():
 
         if str_log != "":                   #disregard for first ply
             if not(self._set_position(str_log)):
-                print('set_position http call failed')
+                print 'set_position http call failed'
                 return None
 
         str_best_move = self._get_best_move()
         if str_best_move == "":
-            print('best_position http call failed')
+            print 'best_position http call failed'
             return None
             
         movetuple_best_move = self._movestr_to_movecode(str_best_move)
@@ -217,7 +217,7 @@ class StockfishNetworking():
 
     def __del__(self):
         if self.serverProcess is not None:
-            print('tearing down StockfishNetwork server')
+            print 'tearing down StockfishNetwork server'
             self.serverProcess.kill()
     
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
 
 
-from .datatypes import moveHolder, moveAHolder
+from datatypes import moveHolder, moveAHolder
 Move = moveHolder()
 MoveA = moveAHolder()
 

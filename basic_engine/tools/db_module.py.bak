@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import json
-from .schema_module import TimeAnalysisSchema
+from schema_module import TimeAnalysisSchema
 
 
 DATA_DIR = "../data/perf/perf_db.db"
@@ -60,7 +60,7 @@ class DBErrLog:
                             )
                 
                 if self.verbose:
-                    print('failure: ', str(method_name))
+                    print 'failure: ', str(method_name)
                 
             return result
         return call
@@ -161,11 +161,11 @@ class TasPerfDB(DBDriver):
             s = "SELECT * FROM games"
             self.c.execute(s)
             if len(self.c.fetchall()) > 1:
-                print(str(self.conn))
-                print('already populated')
+                print str(self.conn)
+                print 'already populated'
                 return
             
-            print('Populating games table:')
+            print 'Populating games table:'
             fn = POPULATE_GAMES_DATA_DIR + POPULATE_GAMES_DATA_FN
             with open(fn,'r') as f:
                 instructions = f.readlines()
@@ -187,18 +187,18 @@ class TasPerfDB(DBDriver):
             rows = self.c.fetchall()
             numRows = len(rows)
             if numRows < 1:
-                print('failed to load!')
+                print 'failed to load!'
                 errLog = self.getErrLog()
-                print('ErrLog length: ', str(len(errLog)))
+                print 'ErrLog length: ', str(len(errLog))
                 # print 'first seven errors: '
                 # print errLog[:min(len(errLog), 7)]
             else:
-                print('Num Rows in game table: ', str(numRows))
-                print('First 3 rows...')
-                print(rows[:3])
+                print 'Num Rows in game table: ', str(numRows)
+                print 'First 3 rows...'
+                print rows[:3]
 
         if populate:
-            print('starting populate')
+            print 'starting populate'
             initPopulateGamesTable()
             
             
@@ -365,10 +365,10 @@ def test_class_wrapper_1():
     def decorate(func):
         def call(*args, **kwargs):
             try:
-                print('starting calc')
+                print 'starting calc'
                 result = func(*args, **kwargs)
             except:
-                print('failure! ', str( func.__name__ ))
+                print 'failure! ', str( func.__name__ )
                 return -1
             return result
         return call
@@ -380,7 +380,7 @@ def test_class_wrapper_1():
 
         @decorate
         def calc(self,x, y):
-            print('executing function')
+            print 'executing function'
             return (x / y)  + self.z
 
     mc = MyClass()

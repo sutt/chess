@@ -1,5 +1,5 @@
 import sys, copy, time
-from .datatypes import moveAHolder
+from datatypes import moveAHolder
 
 #Params and Enums ---------------------------
 
@@ -34,7 +34,7 @@ def print2(data, arg1="", arg2="", arg3="",arg4=""):
     '''for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630'''
     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
     try:
-        print(data)
+        print data
     except:
         pass
 
@@ -176,7 +176,7 @@ class Board:
 
     #Atomic Move Types
 
-    def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = list(range(4))):
+    def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
         """ input: pos, [spaces (int > 0)] [only_direction (tuple)]
             returns: list of list of pos's, ordered closest from piece
                      starting pos to furthest"""
@@ -198,7 +198,7 @@ class Board:
         return [ret[i] for i in range(len(ret)) if i in i_dir]
 
     
-    def get_upacross(self, pos, spaces = BOARD_WIDTH - 1, i_dir = list(range(4))):
+    def get_upacross(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
         """ input: pos, [spaces (int > 0)]
             returns: list of list of pos's, ordered closest from piece
                      starting pos to furthest"""
@@ -288,8 +288,8 @@ class Piece:
         mine_mult = 1 if self.white else -1
         yours_mult = -1 if self.white else 1
         
-        mine = [v * mine_mult for v in piece_enums]
-        yours = [v * yours_mult for v in piece_enums]
+        mine = map(lambda v: v * mine_mult, piece_enums)
+        yours = map(lambda v: v * yours_mult, piece_enums)
         
         yours_king = -3 if self.white else 3
         yours_enpassant_pawn = -2 if self.white else 2
@@ -358,7 +358,7 @@ class Piece:
         
         # Handling king castling here, check for clear back row, all other conditions satisfied
         if b_king:
-            castling_moves = [move_set for move_set in moves if len(move_set) > 1]
+            castling_moves = filter(lambda move_set: len(move_set) > 1, moves)
             if len(castling_moves) > 0:
                 [moves.pop(moves.index(_x)) for _x in castling_moves]  #dont process them below
                 
@@ -867,7 +867,7 @@ def test_castling_disallowed1():
     white_king.king_can_castle = False
 
     moves = white_king.get_available_moves(board,move_type_flag = True)
-    print(moves)
+    print moves
     assert moves == [((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
 
 def test_castling_disallowed2():
@@ -877,7 +877,7 @@ def test_castling_disallowed2():
     
     board.rooks_can_castle[0][1] = False
     moves = white_king.get_available_moves(board,move_type_flag = True)
-    print(moves)
+    print moves
     assert moves == [((7, 2), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
 
     board.rooks_can_castle[0][0] = False

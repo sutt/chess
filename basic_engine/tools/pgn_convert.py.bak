@@ -38,14 +38,14 @@ if False:
     data = f.readlines()
     f.close()
 
-    print('lines: ', str(len(data)))
+    print 'lines: ', str(len(data))
 
     valid = []
     for line in data:
         if line[:3] == '1. ':
             valid.append(line)
 
-    print('valids: ', str(len(valid)))
+    print 'valids: ', str(len(valid))
 
     path_fn = 'data/GarryKasparovGames.txt'
     f = open(path_fn, 'w')
@@ -72,9 +72,9 @@ if True:
             min_moves = len(moves)
             min_moves_ind = cntr
 
-    print('max_moves: ', max_moves)
-    print('min_moves: ', min_moves)
-    print('min_moves_ind: ', min_moves_ind)
+    print 'max_moves: ', max_moves
+    print 'min_moves: ', min_moves
+    print 'min_moves_ind: ', min_moves_ind
 
 if True:
 

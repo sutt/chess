@@ -22,7 +22,7 @@ def convert_pgn_to_a1(s_pgn):
 if __name__ == "__main__":
     
     s_input = "1. c4"
-    print(convert_pgn_to_a1(s_input))
+    print convert_pgn_to_a1(s_input)
 
 
 def test_convert_pgn_to_a1_1():

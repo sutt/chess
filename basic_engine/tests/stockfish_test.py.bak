@@ -48,7 +48,7 @@ class TestSetup(unittest.TestCase):
         self.assertTrue(self.stockConn._check_server_is_up())
         response_t1 = time.time()
 
-        print('response time: %s' % str(response_t1 - response_t0)[:7])
+        print 'response time: %s' % str(response_t1 - response_t0)[:7]
         self.assertTrue(response_t1 - response_t0 > 0.001)
         self.assertTrue(response_t1 - response_t0 < 0.1)
 

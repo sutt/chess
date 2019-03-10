@@ -1,5 +1,5 @@
 import time, copy, json
-from .utils import parse_pgn_instructions
+from utils import parse_pgn_instructions
 
 
 class GameSchema:
@@ -39,27 +39,27 @@ class GameSchema:
     def from_json(self,json_data):
         
         k = 'pgn_instructions'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_instructions = json_data[k]
 
         k = 'pgn_check_schedule'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_check_schedule = json_data[k]
 
         k = 'pgn_capture_schedule'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_capture_schedule = json_data[k]
 
         k = 'pgn_mate_turn'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_mate_turn = json_data[k]
 
         k = 'pgn_player_last_move'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_player_last_move = json_data[k]
 
         k = 'pgn_s_outcome'
-        if k in json_data:
+        if json_data.has_key(k):
             self.pgn_s_outcome = json_data[k]
         
     
@@ -294,7 +294,7 @@ class GameLog:
             self.log_num_pieces.append(num_pieces)
 
         if self.b_num_player_pieces:
-            num_player_pieces = len([p for p in pieces if p.white==player])
+            num_player_pieces = len(filter(lambda p: p.white==player, pieces))
             self.log_num_player_pieces.append(num_player_pieces)
 
         if self.b_num_irregular:

@@ -1,29 +1,29 @@
 import os, sys, random, time
 
-from .basic import *
-from .utils import *
-from .GameLog import *
-from .datatypes import moveHolder
-from .GameLog import GameLog
-from .GameLog import GameSchema
-from .Display import Display
-from .TurnStage import increment_turn, get_available_moves, apply_move
-from .TurnStage import check_endgame
-from .TurnStage import is_king_in_check
-from .TurnStage import filter_check_naive
-from .TurnStage import filter_check_opt   
+from basic import *
+from utils import *
+from GameLog import *
+from datatypes import moveHolder
+from GameLog import GameLog
+from GameLog import GameSchema
+from Display import Display
+from TurnStage import increment_turn, get_available_moves, apply_move
+from TurnStage import check_endgame
+from TurnStage import is_king_in_check
+from TurnStage import filter_check_naive
+from TurnStage import filter_check_opt   
 
-from .TurnStage import filter_check_test_copy   
-from .TurnStage import filter_check_test_copy_apply   
-from .TurnStage import filter_check_test_copy_apply_2
-from .TurnStage import filter_check_test_copy_apply_3
-from .TurnStage import filter_check_test_copy_opt
+from TurnStage import filter_check_test_copy   
+from TurnStage import filter_check_test_copy_apply   
+from TurnStage import filter_check_test_copy_apply_2
+from TurnStage import filter_check_test_copy_apply_3
+from TurnStage import filter_check_test_copy_opt
 
 b_use_clapi = True
 if os.name == 'nt' and not(b_use_clapi):
-    from .StockfishNetwork import StockfishNetworking
+    from StockfishNetwork import StockfishNetworking
 if os.name == 'posix' or b_use_clapi:
-    from .StockfishCLApi import StockfishCLApi
+    from StockfishCLApi import StockfishCLApi
 
 
 
@@ -143,7 +143,7 @@ class Game():
         elif int(player) in self.stockfish_control:
             move = self.stockfish_interface.get_move(self.log.get_log_move(), moves)
         else:
-            move_i = random.sample(list(range(0,len(moves))),1)[0]
+            move_i = random.sample(range(0,len(moves)),1)[0]
             move = moves[move_i]
         return move
 
@@ -389,7 +389,7 @@ def test_king_in_check2():
     
     moves = game.play()
     moves = moves['moves']
-    print(moves)
+    print moves
     assert moves == [ ( (7,0),(7,1),0) ]
 
 def test_king_in_check3():
@@ -426,7 +426,7 @@ def test_king_in_check3():
     
     moves = game.play()
     moves = moves['moves']
-    print(moves)
+    print moves
     assert moves == [ ( (7,0),(6,0),0) ]
 
 def test_post_castling_move_rook():
@@ -516,19 +516,19 @@ def test_promotion_on_advance():
     assert board.data_by_player[0][2] == 1
     
     #Test there is no pawn at that pos
-    back_row_pawns = [p for p in pieces if p.white and p.__class__.__name__ == "Pawn"
-                              and p.pos == (0,2)]
+    back_row_pawns = filter(lambda p: p.white and p.__class__.__name__ == "Pawn"
+                              and p.pos == (0,2) ,pieces)
     assert len(back_row_pawns) == 0
 
     #Test there is a queen there
-    queen_at_pos = [p for p in pieces if p.__class__.__name__ == "Queen" 
-                            and p.pos == (0,2)]
+    queen_at_pos = filter(lambda p: p.__class__.__name__ == "Queen" 
+                            and p.pos == (0,2) ,pieces)
 
     assert len(queen_at_pos) == 1
     
     #Test there are two queens total
-    white_queens = [p for p in pieces if p.__class__.__name__ == "Queen" 
-                            and p.white]
+    white_queens = filter(lambda p: p.__class__.__name__ == "Queen" 
+                            and p.white,pieces)
 
     assert len(white_queens) == 2
 
@@ -567,7 +567,7 @@ def test_init_midgame_1():
     ret_data = game.play()
     
     moves = ret_data['moves']
-    print(moves)
+    print moves
     
     my_board = ret_data['board']
     my_pieces = ret_data['pieces']    
@@ -586,7 +586,7 @@ def test_init_midgame_1():
     display.print_board_letters(my_pieces2)
     
     moves2 = ret_data2['moves']
-    print(moves2)
+    print moves2
 
     my_board2 = ret_data2['board']
 
@@ -634,8 +634,8 @@ def test_filter_check_pawn_1():
     opt_check_moves = ret_data2b['moves']
 
     #Assess the difference
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     #Heres the key move that Opt doesnt allow
     assert  Move(pos0=(3, 6), pos1=(4, 5), code=0) in generic_check_moves
@@ -734,8 +734,8 @@ def test_filter_forward_diagonal_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -772,8 +772,8 @@ def test_filter_forward_diagonal_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -819,8 +819,8 @@ def test_filter_forward_diagonal_2():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -857,8 +857,8 @@ def test_filter_forward_diagonal_2():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -900,8 +900,8 @@ def test_pawn_check_true_positive_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print("\n".join([str(s) for s in generic_check_moves]))
-    print(opt_check_moves)
+    print "\n".join(map(lambda s: str(s), generic_check_moves))
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -943,8 +943,8 @@ def test_pawn_check_true_positive_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -990,8 +990,8 @@ def test_pawn_check_negative_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -1032,8 +1032,8 @@ def test_pawn_check_negative_1():
                                 )
     opt_check_moves = ret_data_opt['moves']
 
-    print(generic_check_moves)
-    print(opt_check_moves)
+    print generic_check_moves
+    print opt_check_moves
 
     assert opt_check_moves == generic_check_moves
 
@@ -1071,7 +1071,7 @@ def test_cant_castle_into_check_1():
 
     moves = ret['moves']
 
-    print("\n".join([str(s) for s in moves]))
+    print "\n".join(map(lambda s:str(s), moves))
 
     assert Move(pos0=(0, 4), pos1=(0, 5), code=0) in moves
     assert Move(pos0=(0, 4), pos1=(0, 6), code=2) in moves
@@ -1310,23 +1310,23 @@ def test_multi_pgn_games_1():
         ret = game.play()
         
         #Printout
-        print('Line Num: ', str(i + 1))
+        print 'Line Num: ', str(i + 1)
 
         if isinstance(ret, dict):
             s_last_player = str(ret.get('last_player', 'N/A: no last_player'))
-            print('last player to move: ', s_last_player)
+            print 'last player to move: ', s_last_player
         if isinstance(ret, int):
-            print('exited from move incompatiability')            
-            print('game.i_turn: ', str(ret))
+            print 'exited from move incompatiability'            
+            print 'game.i_turn: ', str(ret)
             
             b_whites_move = ((ret % 2) == 1)
 
             pgn_turn = (ret + int(b_whites_move)) / 2
             s_player = 'White' if b_whites_move else 'Black'
 
-            print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
-            print('\n')
-            print(s_game)
+            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
+            print '\n'
+            print s_game
 
 
 def test_kasparov_game_10_pgn_err():
@@ -1369,7 +1369,7 @@ def batchtest_multi_pgn_games_1(**kwargs):
     err_cntr = 0
 
     b_naive_check = kwargs.get('naive_check', False)
-    print(b_naive_check)
+    print b_naive_check
 
     for i, s_game in enumerate(s_games):
         
@@ -1381,36 +1381,36 @@ def batchtest_multi_pgn_games_1(**kwargs):
             else:
                 ret = game.play()
         except Exception as e:
-            print('Error in play() | line_i: ', str(i + 1))
-            print(str(e))
+            print 'Error in play() | line_i: ', str(i + 1)
+            print str(e)
             err_cntr += 1
             continue
             
         if i % modulo_print == 0:
             s_secs = str(time.time() - t).split(".")[0]
             t = time.time()
-            print('line_i: ', str(i + 1), '  secs: ', s_secs)
+            print 'line_i: ', str(i + 1), '  secs: ', s_secs
         
         
         if isinstance(ret, dict):
             s_last_player = str(ret.get('last_player', None))
             if s_last_player is None:
-                print('No Last Player | line_i: ', str(i + 1))
-                print(ret)
+                print 'No Last Player | line_i: ', str(i + 1)
+                print ret
                 err_cntr += 1
             
         if isinstance(ret, int):
-            print('Move Incompatibility | line_i: ', str(i + 1))
-            print('game.i_turn: ', str(ret))    
+            print 'Move Incompatibility | line_i: ', str(i + 1)
+            print 'game.i_turn: ', str(ret)    
             b_whites_move = ((ret % 2) == 1)
             pgn_turn = (ret + int(b_whites_move)) / 2
             s_player = 'White' if b_whites_move else 'Black'
-            print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
+            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
             err_cntr += 1
             # print '\n'
             # print s_game
 
-    print('err_cntr: ', str(err_cntr))
+    print 'err_cntr: ', str(err_cntr)
 
 def test_filter_check_pinned_piece_1():
     

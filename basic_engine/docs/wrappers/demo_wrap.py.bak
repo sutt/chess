@@ -9,14 +9,14 @@ def wrap(pre, post):
     return decorate
 
 def trace_in(func, *args, **kwargs):
-    print("Entering function",  func.__name__)
+    print "Entering function",  func.__name__
  
 def trace_out(func, *args, **kwargs):
-    print("Leaving function", func.__name__)
+    print "Leaving function", func.__name__
  
 @wrap(trace_in, trace_out)
 def calc(x, y):
-    print('executing function')
+    print 'executing function'
     return x + y
 
 calc(1,2)

@@ -1,7 +1,7 @@
 import sys
 from main import Game
 from Display import Display
-from .utils import format_move_log
+from utils import format_move_log
 
 display = Display()
 
@@ -9,7 +9,7 @@ display = Display()
 run_type = "interactive"
 if len(sys.argv) > 1:
     run_type = str(sys.argv[1])
-print('\nRunning: ', run_type, '\n')
+print '\nRunning: ', run_type, '\n'
 
 # run_type = 'randomplay2'    #for debugging
 # run_type = 'replay'    #for debugging
@@ -37,20 +37,20 @@ elif run_type == "randomplay":
     ret = game.play()
     
     if game.i_turn == 1000:
-        print('1000 turn game')
+        print '1000 turn game'
     else:
         
         outcome, board, pieces = ret
 
-        print('Outcome: ', str(outcome))
+        print 'Outcome: ', str(outcome)
         
         display.print_board_letters(pieces)
 
         log = game.get_gamelog()
         move_log = log.get_log_move()
 
-        print('Game Turn on exit: ', str(game.i_turn))
-        print('Len of Log Moves:  ', str(len(move_log)))
+        print 'Game Turn on exit: ', str(game.i_turn)
+        print 'Len of Log Moves:  ', str(len(move_log))
 
 if run_type == '20random':
     
@@ -64,20 +64,20 @@ if run_type == '20random':
         ret = game.play()
         
         if game.i_turn == 1000:
-            print('1000 turn game')
+            print '1000 turn game'
         else:
             
             outcome, board, pieces = ret
 
-            print('Outcome: ', str(outcome))
+            print 'Outcome: ', str(outcome)
             
             display.print_board_letters(pieces)
 
             log = game.get_gamelog()
             move_log = log.get_log_move()
 
-            print('Game Turn on exit: ', str(game.i_turn))
-            print('Len of Log Moves:  ', str(len(move_log)))
+            print 'Game Turn on exit: ', str(game.i_turn)
+            print 'Len of Log Moves:  ', str(len(move_log))
 
 if run_type == 'manyrandom':
     
@@ -91,20 +91,20 @@ if run_type == 'manyrandom':
         ret = game.play()
         
         if game.i_turn == 1000:
-            print('1000 turn game')
+            print '1000 turn game'
         else:
             
             outcome, board, pieces = ret
 
-            print('Outcome: ', str(outcome))
+            print 'Outcome: ', str(outcome)
             
             display.print_board_letters(pieces)
 
             log = game.get_gamelog()
             move_log = log.get_log_move()
 
-            print('Game Turn on exit: ', str(game.i_turn))
-            print('Len of Log Moves:  ', str(len(move_log)))
+            print 'Game Turn on exit: ', str(game.i_turn)
+            print 'Len of Log Moves:  ', str(len(move_log))
 
 
 elif run_type == "randomplay2":
@@ -121,7 +121,7 @@ elif run_type == "randomplay2":
     except Exception as e:
         
         #Game Broke, so let's look at the previous move, what happend?
-        print('exception: ', str(e))
+        print 'exception: ', str(e)
 
         log = game.get_gamelog()
         move_log = log.get_log_move()
@@ -153,24 +153,24 @@ elif run_type == "randomplay2":
         ret2 = g2.play()
         pieces2, board2 = ret2['pieces'], ret2['board']
 
-        print('Game 2 moves before break')
+        print 'Game 2 moves before break'
         display.print_board_letters(board0, pieces0, True)    
         
-        print('Game 2 moves before break')
+        print 'Game 2 moves before break'
         display.print_board_letters(board1, pieces1, True)    
         
-        print('Game 1 move before break')
+        print 'Game 1 move before break'
         display.print_board_letters(board2, pieces2, True)
 
     #What does end game look like?
-    print('Outcome: ', str(outcome))
+    print 'Outcome: ', str(outcome)
     display.print_board_letters(board, pieces, True)
-    print("\n".join([str(x) for x in board.data_by_player]))
+    print "\n".join([str(x) for x in board.data_by_player])
 
     #Verify checkmate with naive algo
     if False and outcome[2] == 'CHECKMATE':
         
-        print('its a checkmate, so lets cross examine')
+        print 'its a checkmate, so lets cross examine'
 
         losing_player = outcome[0]
 
@@ -184,7 +184,7 @@ elif run_type == "randomplay2":
                                 ,filter_check_opt = False
                                 )
 
-        print('Moves available: ', str(ret_moves['moves']))
+        print 'Moves available: ', str(ret_moves['moves'])
 
     # try:
     #     outcome, board = game.play()
@@ -192,15 +192,15 @@ elif run_type == "randomplay2":
     #     print 'exception!'
     #     print e
 
-    print('Outcome: ', str(outcome))
+    print 'Outcome: ', str(outcome)
 
     display.print_board_letters(board, pieces, True)
 
     log = game.get_gamelog()
     move_log = log.get_log_move()
 
-    print('Game Turn on exit: ', str(game.i_turn))
-    print('Len of Log Moves:  ', str(len(move_log)))
+    print 'Game Turn on exit: ', str(game.i_turn)
+    print 'Len of Log Moves:  ', str(len(move_log))
 
 elif run_type == 'replay':
 
@@ -208,12 +208,12 @@ elif run_type == 'replay':
     s = f.readlines()
     f.close()
     s = s[0]
-    print(s)
+    print s
 
     game = Game(s_instructions = s, test_exit_moves = 64)
     ret = game.play()
-    print('i_turn: ', str(game.i_turn))
-    print(ret)
+    print 'i_turn: ', str(game.i_turn)
+    print ret
 
     # moves = ret['moves']
     # print moves

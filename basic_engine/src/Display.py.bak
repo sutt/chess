@@ -4,7 +4,7 @@ def print2(data, arg1="", arg2="", arg3="",arg4=""):
     '''for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630'''
     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
     try:
-        print(data)
+        print data
     except:
         pass
 
@@ -69,9 +69,9 @@ class Display:
 
         for i,row in enumerate(p_data):
             if b_abs:
-                s_row = [str(abs(int_i)) for int_i in row]
+                s_row = map(lambda int_i: str(abs(int_i)),row)
             else:
-                s_row = [str(int_i) for int_i in row]
+                s_row = map(lambda int_i: str(int_i),row)
             
             if b_show_grid:
                 out += row_grid[i]
@@ -79,7 +79,7 @@ class Display:
             out += " ".join(s_row)
             out += "\n"        
         
-        print(out)
+        print out
         return out
 
     

@@ -1,8 +1,8 @@
 import random
 
-from .utils import *
-from .basic import *
-from .datatypes import moveHolder
+from utils import *
+from basic import *
+from datatypes import moveHolder
 Move = moveHolder()
 
 def increment_turn(player, i_turn):
@@ -16,7 +16,7 @@ def get_available_moves(pieces, board, player):
         if p.white == player:
             
             moves_p = p.get_available_moves(board, move_type_flag = True)
-            moves_p = [_m for _m in moves_p if len(_m) > 0]
+            moves_p = filter(lambda _m: len(_m) > 0, moves_p)
             
             d_moves = [Move(p.pos, _m.pos1, _m.code) for _m in moves_p]
             
@@ -67,18 +67,18 @@ def check_endgame(moves, pieces, board, player):
 
         else:
             
-            white_pieces = [p for p in pieces if p.white]
-            black_pieces = [p for p in pieces if not(p.white)]
+            white_pieces = filter(lambda p: p.white,  pieces)
+            black_pieces = filter(lambda p: not(p.white),  pieces)
             
             b_white_more = len(white_pieces) > len(black_pieces)
 
             more_pieces = white_pieces if b_white_more else black_pieces
             
-            more_piece_names = [p.__class__.__name__ for p in more_pieces]
+            more_piece_names = map(lambda p: p.__class__.__name__, more_pieces)
 
             alive_pieces =  ("Pawn", "Queen", "Rook")
             
-            alives_in_more = [ap in more_piece_names for ap in alive_pieces]
+            alives_in_more = map(lambda ap: ap in more_piece_names, alive_pieces)
 
             if not(any(alives_in_more)):
                 outcome = (player, 'STALEMATE', 'NOQUEENPAWNROOK')
@@ -165,8 +165,9 @@ def apply_move(move, board, pieces, _player):
         kill_pos = pos1 if not(b_enpassant) else board.en_passant_pos(pos1, _player)
         
         #TODO - helper func
-        killed_piece_i = [_p for _p in enumerate(pieces) if (_p[1].pos == kill_pos) and 
-                                            not(_p[1].white == _player)]
+        killed_piece_i = filter(lambda _p: (_p[1].pos == kill_pos) and 
+                                            not(_p[1].white == _player)
+                                ,enumerate(pieces))
         killed_piece_i = killed_piece_i[0][0]
 
         #TODO - don't pop piece in hypothetical_pieces=True
@@ -303,7 +304,7 @@ class Mirror():
     @staticmethod
     def match(class_move_type, move_type, move_space):
         
-        temp_class_move_type = [x[0] for x in class_move_type]
+        temp_class_move_type = map(lambda x: x[0], class_move_type)
 
         if move_type in temp_class_move_type:
 
@@ -361,7 +362,7 @@ def get_possible_check_optimal(pieces, board, move, player):
         Then Mirror class to see if any of those threats is capable.'''
 
     #Helper func: piece_by_class_player
-    player_king = [p for p in pieces if p.white == player and p.__class__.__name__ == "King"]
+    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
     
     player_king_pos = player_king[0].pos 
 

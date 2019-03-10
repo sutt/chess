@@ -7,12 +7,12 @@ import copy
 sys.path.append('../')
 
 from src.main import Game
-from .utils import convert_pgn_to_a1
+from utils import convert_pgn_to_a1
 
-from .schema_module import TimeAnalysisSchema
-from .schema_module import TurnAttributeSchema
+from schema_module import TimeAnalysisSchema
+from schema_module import TurnAttributeSchema
 
-from .db_module import TasPerfDB
+from db_module import TasPerfDB
 
 
 # Different Experiments --------------------------------------------------
@@ -144,7 +144,7 @@ def print_formatted_results(dims_out, data):
     for col in dims_out:
         s_row += align_col(col[0], chars_=col[1] )
         s_row += align_col('', chars_ = col[2])
-    print(s_row)
+    print s_row
 
     #print data
     for row in data:
@@ -166,14 +166,14 @@ def print_formatted_results(dims_out, data):
 
             s_row += align_col('', chars_=_spacer_len)
 
-        print(s_row)
+        print s_row
 
 #Interpret Functions (slice and calc on results) -------------------------
 
 def interpret_basic_data(results):
     '''Build a five col printout for avg trial time of different tests'''
-    temp = [0 for i in range(len(list(results.keys())))]
-    for k in list(results.keys()):
+    temp = [0 for i in range(len(results.keys()))]
+    for k in results.keys():
         d_test = results[k]
         test_name = str(k)
         order_test = d_test['order']
@@ -205,8 +205,8 @@ def interpret_basic_data(results):
 
 def interpret_variation_data(results):
     '''Find Min/Max from the dataset'''
-    temp = [0 for i in range(len(list(results.keys())))]
-    for k in list(results.keys()):
+    temp = [0 for i in range(len(results.keys()))]
+    for k in results.keys():
         d_test = results[k]
         test_name = str(k)
         order_test = d_test['order']
@@ -232,7 +232,7 @@ def interpret_turn_time_data(results):
 
     turn_time_data = [ [], [] ]
 
-    for k in list(results.keys()):
+    for k in results.keys():
         
         data_test = results[k]
 
@@ -243,10 +243,10 @@ def interpret_turn_time_data(results):
         # TODO - remove this section, plus its buggy
         order_test = data_test['order']
         if order_test == 0:
-            print('Test A: ', test_name)
+            print 'Test A: ', test_name
         else:
-            print('Test B: ', test_name)
-            print('N tests: ', str(n_test), '\n')
+            print 'Test B: ', test_name
+            print 'N tests: ', str(n_test), '\n'
 
         list_trial_times = data_test['turn_time']
         list_num_moves = data_test['num_available']
@@ -579,7 +579,7 @@ class BatchAnalysis:
                     ,algo_style="opt_yk"
                     ,analysis_type="analysis2"
                     ,analysis_tbl="basic_tas"
-                    ,games_requested=list(range(1,6))
+                    ,games_requested=range(1,6)
                     ,path_db=None
                     ):
         
@@ -733,7 +733,7 @@ class BatchAnalysis:
         for triplet in self.collected_batch:
             d_collected[triplet[0]] = triplet[1]
         
-        for _gameId in list(self.results.keys()):
+        for _gameId in self.results.keys():
             if d_collected[_gameId]:
                 self.db.add_tas_record(_gameId
                                         ,self.results[_gameId]
@@ -762,7 +762,7 @@ class BatchAnalysis:
     
     def interactiveWrite(self):
         ''' wait until after runBatch and a print to verify writing '''
-        input_return = eval(input("'y' to save to db:" + str(self.db.conn) + ' >'))
+        input_return = input("'y' to save to db:" + str(self.db.conn) + ' >')
         if "y" in input_return:
             self.writeOut()
         #TODO - add an attribute-msg to the data record: e.g. "with netflix running"
@@ -861,16 +861,16 @@ if __name__ == "__main__":
         b_piece_init=True
 
         N = 250
-        print('\n Just Play Timing \n')
+        print '\n Just Play Timing \n'
         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
                     ,b_time_init=False)
-        print('\n With Consturctor Timing \n')
+        print '\n With Consturctor Timing \n'
         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
                     ,b_time_init=True)
-        print('\n Just Play Timing (again) \n')
+        print '\n Just Play Timing (again) \n'
         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
                     ,b_time_init=False)
-        print('\n With Consturctor Timing (again) \n')
+        print '\n With Consturctor Timing (again) \n'
         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
                     ,b_time_init=True)
 
@@ -879,10 +879,10 @@ if __name__ == "__main__":
             s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
             s_tests = ["baseline_nk", "opt_yk"]   #they dont call play(b_load)
             
-            print('\n With Consturctor Timing \n')
+            print '\n With Consturctor Timing \n'
             analysis2(s_tests, s_instructions, n=N, b_piece_init=False)
             
-            print('\n Just Play Timing \n')
+            print '\n Just Play Timing \n'
             analysis2(s_tests, s_instructions, n=N, b_piece_init=True)
 
     
@@ -903,10 +903,10 @@ if __name__ == "__main__":
             testType = "a" if i_trial % 2 == 0 else "b"
 
             if testType == "a":
-                print(sA)
+                print sA
                 testUsePgn, testConvertPgn = True, False
             elif testType == "b":
-                print(sB)
+                print sB
                 testUsePgn, testConvertPgn = False, True
 
             analysis1(s_tests
@@ -923,7 +923,7 @@ if __name__ == "__main__":
     if args["populategames"]:
         db = TasPerfDB(data_dir = "../data/perf/perf_db.db", populate=True)
         db.closeConn()
-        print('done with populate')
+        print 'done with populate'
 
 
     if args["singledemo"]:
@@ -946,23 +946,23 @@ if __name__ == "__main__":
         ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
         ba.setGames([1,12])
         ba.collect_batch()
-        print('Running analysis on games: ')
-        print("\n".join([str(item[0]) for item in copy.copy(ba.collected_batch)]))
+        print 'Running analysis on games: '
+        print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
 
-        print('Running batch...')
+        print 'Running batch...'
         ba.runBatch(b_write=False)
 
         results = ba.getResults()
-        gameIds = [str(item[0]) for item in copy.copy(ba.collected_batch)]
+        gameIds = map(lambda item: str(item[0]), copy.copy(ba.collected_batch))
         tas0 = results[gameIds[0]]
 
-        print('Num Results: ', str(len(list(results.keys()))))
+        print 'Num Results: ', str(len(results.keys()))
 
         s_tas0 = str(tas0.get_all())
-        print('preview of TAS 0:')
-        print(s_tas0[:min(len(s_tas0), 1000)])
+        print 'preview of TAS 0:'
+        print s_tas0[:min(len(s_tas0), 1000)]
 
-        print('num_trials: ', str(len(tas0.get_all()['trials'])))
+        print 'num_trials: ', str(len(tas0.get_all()['trials']))
 
 
 
@@ -970,11 +970,11 @@ if __name__ == "__main__":
 
         if args["gamesrequested"]:
             s_cmd = args["gamesrequested"]
-            cmd_games_requested = list(map(int, s_cmd.split(",")))
+            cmd_games_requested = map(int, s_cmd.split(","))
             #TODO - single game
             #TODO - range of games
         else:
-            cmd_games_requested = list(range(1,11)) #[1,2,3]
+            cmd_games_requested = range(1,11) #[1,2,3]
 
         if args["n"]:
             cmd_n = int(args["n"])
@@ -1004,9 +1004,9 @@ if __name__ == "__main__":
         ba.collect_batch()
         
         if args["verbose"]:
-            print('Running analysis on games: ')
-            print("\n".join([str(item[0]) for item in copy.copy(ba.collected_batch)]))
-            print('Running batch...')
+            print 'Running analysis on games: '
+            print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
+            print 'Running batch...'
             t0 = time()
         
         ba.runBatch(b_write=True)
@@ -1014,13 +1014,13 @@ if __name__ == "__main__":
         results = ba.getResults()
 
         if args["verbose"]:
-            print('Total Time: ', str(time() - t0))
-            print('Num Results: ', str(len(list(results.keys()))))
-            for k in list(results.keys()):
-                print(str(k), " trials: ", str(len(results[k].get_all()['trials'])))
-            print(ba.db.getErrLog())
+            print 'Total Time: ', str(time() - t0)
+            print 'Num Results: ', str(len(results.keys()))
+            for k in results.keys():
+                print str(k), " trials: ", str(len(results[k].get_all()['trials']))
+            print ba.db.getErrLog()
 
-    print('script done.')
+    print 'script done.'
         
 
 
@@ -1492,7 +1492,7 @@ if __name__ == "__main__":
 # Unit Tests --------------------------------------------------------
 
 import types
-from .db_module import DBDriver
+from db_module import DBDriver
 
 def test_basic_perf_pattern():
     ''' Test invoking a Game and play '''
@@ -1526,7 +1526,7 @@ def test_tas_aggregate_y():
     tas = TimeAnalysisSchema()
     
     aggregated_y = tas.aggregate_y(dummy_turn_times)
-    rounded_aggregated_y = [round(x, 2) for x in aggregated_y]
+    rounded_aggregated_y = map(lambda x: round(x, 2), aggregated_y)
     #TODO - from numpy import double or import decimal *
     
     assert rounded_aggregated_y == [0.1, 0.2, 0.15, 0.1]
@@ -1549,11 +1549,11 @@ def test_tas_load_1():
 
     d_from_json = tas.get_all()
 
-    assert type(d_from_json) == dict 
+    assert type(d_from_json) == types.DictionaryType 
     
     assert d_from_json.get('trials', None) is not None
     assert d_from_json.get('meta_analysis', None) is not None    
-    assert 'log' in d_from_json
+    assert d_from_json.has_key('log')
 
 
 def test_turn_attribute_1():
@@ -1580,7 +1580,7 @@ def test_tas_weighted_avg_1():
 
     weighted_y = tas.weighted_avg(list_n, list_list_y)
 
-    rounded_weighted_y = [round(x, 3) for x in weighted_y]
+    rounded_weighted_y = map(lambda x: round(x, 3), weighted_y)
 
     assert rounded_weighted_y == [0.19, 0.2, 0.13]
 
@@ -1590,7 +1590,7 @@ def test_imported_dbdriver_errlog_1():
         doesnt bite us here with multiple instantiated DBDriver instances.
         Similiar to db_module:test_different_errlogs_respectively_1() '''
 
-    from .db_module import DBDriver
+    from db_module import DBDriver
     
     db = DBDriver(data_dir="../data/perf/mock_db.db")
     db.execStr("select * from BAD_TABLE", b_fetch=True)
@@ -1629,11 +1629,11 @@ def test_batch_class_collect_batch_1():
     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-102",))
     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-103",))
     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-104",))
-    print(db.getErrLog())    # if test fails, dump errlog
+    print db.getErrLog()    # if test fails, dump errlog
     
     #Request games of the ones which are blank
     ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
-    ba.setGames(list(range(102,105)))
+    ba.setGames(range(102,105))
     assert ba.games_requested[2] == 104
     
     #Analyze the triplet data structure of collected_batch list
@@ -1654,7 +1654,7 @@ def test_batch_class_collect_batch_2():
 
     #Request games which are in basic_tas
     ba = BatchAnalysis(path_db="../data/perf/mock_db.db")
-    ba.setGames(list(range(1,4)))
+    ba.setGames(range(1,4))
     ba.collect_batch()
     _collected_batch = ba.collected_batch
 
@@ -1666,10 +1666,10 @@ def test_batch_class_collect_batch_2():
     
     #Make sure you loaded an existing TAS
     _tas = _collected_batch[0][2].get_all()
-    assert type(_tas) == dict
+    assert type(_tas) == types.DictionaryType
     assert _tas['log']['s_instructions'] == '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 \n'
     assert _tas['log']['num_available'] == [20, 20, 22, 22, 26, 23, 26, 24, 31, 28, 31, 36, 40, 35, 46, 35, 44, 35, 40, 36, 40, 35, 47, 35, 45, 37, 44, 35, 42, 35, 42, 38, 43, 33, 47, 32, 32, 32, 31, 32, 30]
-    assert type(_tas['trials']) == list
+    assert type(_tas['trials']) == types.ListType
 
 
 def test_batch_analysis_run_1():
@@ -1685,7 +1685,7 @@ def test_batch_analysis_run_1():
     s_tas0 = db.c.fetchall()[0][1]
     # print db.getErrLog()
     # [0][1]
-    print(s_tas0)
+    print s_tas0
     db.closeConn()
     tas0.from_json(s_json=s_tas0,path_fn=None)
     tas0_num_trials = len(tas0.get_all()['trials'])

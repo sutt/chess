@@ -52,7 +52,7 @@ def build_modulo_print_data(data, modulo_print):
         return [data]    
 
     else:
-        assert type(modulo_print) == int
+        assert type(modulo_print) == types.IntType
         try:
             data_modulo = []
             for i in range(len(data) / modulo_print):        
@@ -70,14 +70,17 @@ def filter_data_by_source_key(data, list_source_keys):
         returns: data only for records where there is a list
     '''
     
-    s_list_source_keys = [str(uni_s) for uni_s in list_source_keys]
+    s_list_source_keys = map(lambda uni_s: str(uni_s), list_source_keys)
 
     
-    ret = [d for d in data if any(
-                [s_key == str(d['source-key'])[-len(s_key):] \
+    ret = filter(lambda d: any(
+                map(lambda s_key: 
+                        s_key == str(d['source-key'])[-len(s_key):] \
                         and \
-                        str(d['source-key'])[-(len(s_key)+1)] == "-" for s_key in s_list_source_keys]
-                    )]
+                        str(d['source-key'])[-(len(s_key)+1)] == "-" \
+                    ,s_list_source_keys)
+                    )          
+                ,data)
 
     return ret
 
@@ -97,15 +100,15 @@ def verify_has_outcome_str(data, b_assert=False):
             assert (s_outcome is not None)
         else:
             if s_outcome is None:
-                print(i)
-                print(data_elem['source-key'])
+                print i
+                print data_elem['source-key']
 
 
 def manual_batch_has_outcome_str():
     '''Run this verify with printout instead of assert.'''    
     data = load_xpgn_data(max_tests=None)
     verify_has_outcome_str(data, b_assert=False)
-    print('done.')
+    print 'done.'
 
 
 def test_batch_has_outcome_str():
@@ -135,8 +138,8 @@ def verify_standard_outcome(data, b_assert=False):
             assert b_test == True
         else:
             if not(b_test):
-                print('i: ' + str(i) + ' ' + str(data_elem['source-key']))
-                print(s_outcome)
+                print 'i: ' + str(i) + ' ' + str(data_elem['source-key'])
+                print s_outcome
 
 
 def test_batch_standard_outcome():
@@ -146,7 +149,7 @@ def test_batch_standard_outcome():
 def manual_batch_standard_outcome():
     data = load_xpgn_data(max_tests=None)
     verify_standard_outcome(data, b_assert=True)
-    print('done.')
+    print 'done.'
 
 
 def verify_last_player_move_at_least_ties(data, b_print=False):
@@ -172,15 +175,15 @@ def verify_last_player_move_at_least_ties(data, b_print=False):
         except AssertionError:
             
             if b_print:
-                print(i)
-                print(s_gameSchema)
+                print i
+                print s_gameSchema
             
             return exceptions.AssertionError()
 
 def manual_last_player_move_at_least_ties():
     data = load_xpgn_data(max_tests=None)
     verify_last_player_move_at_least_ties(data, b_print=True)
-    print('done.')
+    print 'done.'
 
 def test_batch_last_player_move_at_least_ties():
     data = load_xpgn_data(exclude_inds = [49])
@@ -222,7 +225,7 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
             
             #this case does not pass, identify it
             if not(b_pass):
-                print(str(i) + ' | ' + data_elem['source-key'])
+                print str(i) + ' | ' + data_elem['source-key']
 
                 #investigate the case
                 if b_details:
@@ -251,10 +254,10 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
 
                     s_player = 'White' if (_i_turn % 2 == 1) else 'Black'
 
-                    print('First Turn Check doesnt match (_i_turn format): ', str(_i_turn))
-                    print('Player allegedly in check: ', s_player)
-                    print('play() check value: ', str(v_check))
-                    print('schema check value: ', str(schema_check_schedule[_i_turn]))
+                    print 'First Turn Check doesnt match (_i_turn format): ', str(_i_turn)
+                    print 'Player allegedly in check: ', s_player
+                    print 'play() check value: ', str(v_check)
+                    print 'schema check value: ', str(schema_check_schedule[_i_turn])
 
                     #Perform a replay, show board state at the kickout move
                     try:
@@ -267,13 +270,13 @@ def verify_check_schedule_match(data, b_naive_check=False, b_assert=True
 
                         replay_pieces = ret['pieces']
 
-                        print('Board State pre-move at i_turn: ', str(_i_turn + 2), '\n')
+                        print 'Board State pre-move at i_turn: ', str(_i_turn + 2), '\n'
                         display = Display()
                         ret = display.print_board_letters(replay_pieces)
-                        print('PGN: \n')
-                        print(s_pgn)
+                        print 'PGN: \n'
+                        print s_pgn
                     except:
-                        print('could not replay the game to the move desired.\n')
+                        print 'could not replay the game to the move desired.\n'
 
 
 
@@ -295,7 +298,7 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
     for i, data_section in enumerate(data_modulo):
         try:
 
-            print('Starting Section i: ', str(i))
+            print 'Starting Section i: ', str(i)
 
             verify_check_schedule_match(data_section
                                         ,b_naive_check=False
@@ -304,12 +307,12 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
         except Exception as e:
 
             if type(e) == exceptions.KeyboardInterrupt:
-                print('BREAKING')
+                print 'BREAKING'
                 break
             else:
-                print('exception in data_section_i: ', str(i))
+                print 'exception in data_section_i: ', str(i)
 
-    print('done.')
+    print 'done.'
 
 
 def verify_move_available(data
@@ -349,8 +352,8 @@ def verify_move_available(data
             assert b_pass == True
         else:
             if not(b_pass):
-                print(str(i) + ' | ' + data_elem['source-key'])
-                print(ret)
+                print str(i) + ' | ' + data_elem['source-key']
+                print ret
 
                 if b_details:
                     pass
@@ -365,7 +368,7 @@ def manual_move_available(n = None, b_naive_check=False, modulo_print=100):
     for i, data_section in enumerate(data_modulo):
         try:
 
-            print('Starting Section i: ', str(i))
+            print 'Starting Section i: ', str(i)
 
             verify_move_available(data_section
                                     ,b_naive_check=False
@@ -374,12 +377,12 @@ def manual_move_available(n = None, b_naive_check=False, modulo_print=100):
         except Exception as e:
 
             if type(e) == exceptions.KeyboardInterrupt:
-                print('BREAKING')
+                print 'BREAKING'
                 break
             else:
-                print('exception in data_section_i: ', str(i))
+                print 'exception in data_section_i: ', str(i)
 
-    print('done.')
+    print 'done.'
 
 def test_batch_move_available():
     
@@ -429,14 +432,14 @@ def kickouts_details():
     
     data_specific = filter_data_by_source_key(data, specific_keys)
 
-    print('Analyzing ', str(len(data_specific)), 'kickouts: \n')
+    print 'Analyzing ', str(len(data_specific)), 'kickouts: \n'
 
     #Check if they kickout with naive_check
     verify_check_schedule_match(data_specific
                                 ,b_assert=False
                                 ,b_naive_check=True
                                 )
-    print('done verifying naive check. \n')
+    print 'done verifying naive check. \n'
 
     #Produce the errors with details
     verify_check_schedule_match(data_specific

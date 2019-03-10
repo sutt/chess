@@ -33,10 +33,10 @@ def simple_popen_wsl(b_lines=True, num_lines=5):
     with open('tmp.txt', 'r') as f2:
     
         if b_lines:
-            print(''.join(f2.readlines()))
+            print ''.join(f2.readlines())
         else:
             for i in range(num_lines):
-                print(f2.readline())
+                print f2.readline()
 
     
     
@@ -46,11 +46,11 @@ def full_flask_1():
     if 'tmp2.txt' in os.listdir(os.getcwd()):
         try:
             os.remove('tmp2.txt')
-            print('removed tmp2.txt')
+            print 'removed tmp2.txt'
         except:
-            print('couldnt remove tmp2.txt')
+            print 'couldnt remove tmp2.txt'
     else:
-        print('couldnt find tmp2.txt')
+        print 'couldnt find tmp2.txt'
     
     
     f = open('tmp2.txt', 'w')
@@ -86,25 +86,25 @@ def full_flask_1():
         while(True):
 
             if time.time() - t0 > 5:
-                print('timed out')
+                print 'timed out'
                 break
             
             line = f2.readline()
             if line.find('http:') > -1:
-                print(line)
-                print('time to find: ', str(time.time() - t0)[:4])
+                print line
+                print 'time to find: ', str(time.time() - t0)[:4]
                 #reliably 0.63-0.65 secs
                 break
 
             time.sleep(.1)
     
     
-    print('three seconds till proc kill')
+    print 'three seconds till proc kill'
     time.sleep(3)
     proc.kill()    
     
     
-    print('done.')
+    print 'done.'
 
 
 if __name__ == "__main__":
