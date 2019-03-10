@@ -1869,6 +1869,28 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                 "search.useIgnoreFiles": true
 
 
+3/10
+
+    [ ] Experiment with py2to3
+        [ ] branch: py3
+
+    Notes on previous
+        in basic_engine/tests/ >python runtests.py -vv --all 
+        use --clearcache when switching between wsl and win32
+        all tests pass in win32 and wsl
+
+        >python C:/Python27/Tools/scripts/2to3.py src/main.py
+
+    https://docs.python.org/3.0/library/2to3.html#to3-reference
+    
+    diffs highlight:
+
+-        if json_data.has_key(k):
++        if k in json_data:
+
+-        black_pieces = filter(lambda p: not(p.white),  pieces)
++        black_pieces = [p for p in pieces if not(p.white)]
+
     
     Major Things Dev-Features
 

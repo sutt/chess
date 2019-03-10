@@ -1,0 +1,2216 @@
+--- basic_engine/docs\path_examples\brother_import.py	(original)
++++ basic_engine/docs\path_examples\brother_import.py	(refactored)
+@@ -1,17 +1,17 @@
+ import os
+ 
+ def ppath():
+-    print __name__ + '\n'
++    print(__name__ + '\n')
+     
+-    print ' __file__:   %s'    % __file__
++    print(' __file__:   %s'    % __file__)
+ 
+-    print ' dirname :   %s'     % os.path.dirname(__file__)
++    print(' dirname :   %s'     % os.path.dirname(__file__))
+     
+-    print ' cwd     :   %s'     % os.getcwd()
++    print(' cwd     :   %s'     % os.getcwd())
+     
+-    print ' relpath :   %s'     % os.path.relpath(os.path.dirname(__file__))
++    print(' relpath :   %s'     % os.path.relpath(os.path.dirname(__file__)))
+ 
+-    print '\n'
++    print('\n')
+ 
+ 
+ 
+--- basic_engine/docs\path_examples\p1.py	(original)
++++ basic_engine/docs\path_examples\p1.py	(refactored)
+@@ -1,7 +1,7 @@
+ import os
+-from p_demo.p_import import ppath as  import_ppath
+-from brother_import import ppath as brother_ppath
+-from p_demo.p_2.p_import_2 import find_path
++from .p_demo.p_import import ppath as  import_ppath
++from .brother_import import ppath as brother_ppath
++from .p_demo.p_2.p_import_2 import find_path
+ 
+ def get_rel_path():
+     try:
+@@ -9,19 +9,19 @@
+     except:
+         return ""
+ 
+-print __name__ + '\n'
++print(__name__ + '\n')
+ 
+-print ' __file__:   %s'    % __file__
++print(' __file__:   %s'    % __file__)
+ 
+-print ' dirname :   %s'     % os.path.dirname(__file__)
++print(' dirname :   %s'     % os.path.dirname(__file__))
+ 
+-print ' cwd     :   %s'     % os.getcwd()
++print(' cwd     :   %s'     % os.getcwd())
+ 
+-print ' relpath :   %s'     % get_rel_path()
++print(' relpath :   %s'     % get_rel_path())
+ 
+-print ' abspath :   %s'     % os.path.abspath(get_rel_path()) 
++print(' abspath :   %s'     % os.path.abspath(get_rel_path())) 
+ 
+-print '\n'
++print('\n')
+ 
+ import_ppath()
+ 
+--- basic_engine/docs\path_examples\p_demo\p_import.py	(original)
++++ basic_engine/docs\path_examples\p_demo\p_import.py	(refactored)
+@@ -1,17 +1,17 @@
+ import os
+ 
+ def ppath():
+-    print __name__ + '\n'
++    print(__name__ + '\n')
+     
+-    print ' __file__:   %s'    % __file__
++    print(' __file__:   %s'    % __file__)
+ 
+-    print ' dirname :   %s'     % os.path.dirname(__file__)
++    print(' dirname :   %s'     % os.path.dirname(__file__))
+     
+-    print ' cwd     :   %s'     % os.getcwd()
++    print(' cwd     :   %s'     % os.getcwd())
+     
+-    print ' relpath :   %s'     % os.path.relpath(os.path.dirname(__file__))
++    print(' relpath :   %s'     % os.path.relpath(os.path.dirname(__file__)))
+ 
+-    print '\n'
++    print('\n')
+     
+     # os.path.abspath
+     # print 'p_demo.p_import __name__: %s' % __name__
+--- basic_engine/docs\path_examples\p_demo\p_2\p_import_2.py	(original)
++++ basic_engine/docs\path_examples\p_demo\p_2\p_import_2.py	(refactored)
+@@ -5,40 +5,40 @@
+     here_abs = os.path.abspath(os.path.dirname(__file__))
+ 
+     _path = here_abs
+-    print here_abs
++    print(here_abs)
+     
+     for i in range(6):
+     # while(True):
+     
+         try:
+             _head, _tail = os.path.split(_path)
+-            print _tail
++            print(_tail)
+             if str.lower(_tail) == str.lower('path_examples'):
+                 break
+             _path = _head
+ 
+         except:
+-            print 'exception'
++            print('exception')
+             break
+ 
+     
+-    print 'found path: %s' % os.path.abspath(_path)
++    print('found path: %s' % os.path.abspath(_path))
+ 
+     p3_path = os.path.join(_path,'p_3')
+     p4_path = os.path.join(_path,'p_3', 'p_4')
+-    print p3_path
++    print(p3_path)
+ 
+     p3_rel = os.path.relpath(p3_path, start = os.getcwd())
+-    print os.getcwd()
+-    print p3_rel
++    print(os.getcwd())
++    print(p3_rel)
+ 
+ 
+-    print 'p_3/ contains tmp.txt: %s' % str(os.listdir(p3_path))
+-    print 'p_3/ contains tmp.txt: %s' % str(os.listdir(p3_rel))
++    print('p_3/ contains tmp.txt: %s' % str(os.listdir(p3_path)))
++    print('p_3/ contains tmp.txt: %s' % str(os.listdir(p3_rel)))
+ 
+-    print 'p_3/p_4/ contains tmp2.txt: %s' % str(os.listdir(p4_path))
++    print('p_3/p_4/ contains tmp2.txt: %s' % str(os.listdir(p4_path)))
+ 
+ if __name__ == "__main__":
+-    print __file__
++    print(__file__)
+     find_path()
+         
+--- basic_engine/docs\wrappers\demo_wrap.py	(original)
++++ basic_engine/docs\wrappers\demo_wrap.py	(refactored)
+@@ -9,14 +9,14 @@
+     return decorate
+ 
+ def trace_in(func, *args, **kwargs):
+-    print "Entering function",  func.__name__
++    print("Entering function",  func.__name__)
+  
+ def trace_out(func, *args, **kwargs):
+-    print "Leaving function", func.__name__
++    print("Leaving function", func.__name__)
+  
+ @wrap(trace_in, trace_out)
+ def calc(x, y):
+-    print 'executing function'
++    print('executing function')
+     return x + y
+ 
+ calc(1,2)
+--- basic_engine/docs\wrappers\demo_wrap2.py	(original)
++++ basic_engine/docs\wrappers\demo_wrap2.py	(refactored)
+@@ -9,7 +9,7 @@
+     def addMsg(self, funcName):
+         self.msg.append(funcName)
+         if self.verbose:
+-            print 'FAILURE:', str(funcName)
++            print('FAILURE:', str(funcName))
+ 
+     def getMsg(self):
+         return self.msg
+@@ -66,22 +66,22 @@
+         return (x / y)  + self.z
+ 
+ 
+-print 'using decorate_class:\n'
++print('using decorate_class:\n')
+ mc = MyClass()
+-print mc.calc(1,2)
+-print mc.calc(1,0)
+-print mc.calc(1,2)
++print(mc.calc(1,2))
++print(mc.calc(1,0))
++print(mc.calc(1,2))
+ # these cant log an MyClass-ownde errLog because 
+ # as classmethod, it doesn't have an instance data
+ 
+-print 'using regular_class:\n'
++print('using regular_class:\n')
+ mc = MyClass(errLog)
+-print mc.calc2(1,2)
+-print mc.calc2(1,0)
+-print mc.calc2(1,2)
++print(mc.calc2(1,2))
++print(mc.calc2(1,0))
++print(mc.calc2(1,2))
+ 
+-print 'Local Variable errLog.msg: '
+-print str(errLog.getMsg())
++print('Local Variable errLog.msg: ')
++print(str(errLog.getMsg()))
+ 
+-print 'MyClass contained reference to local errLog: '
+-print str(mc.getErrLog().getMsg())
++print('MyClass contained reference to local errLog: ')
++print(str(mc.getErrLog().getMsg()))
+--- basic_engine/docs\wsl_thread\a.py	(original)
++++ basic_engine/docs\wsl_thread\a.py	(refactored)
+@@ -33,10 +33,10 @@
+     with open('tmp.txt', 'r') as f2:
+     
+         if b_lines:
+-            print ''.join(f2.readlines())
++            print(''.join(f2.readlines()))
+         else:
+             for i in range(num_lines):
+-                print f2.readline()
++                print(f2.readline())
+ 
+     
+     
+@@ -46,11 +46,11 @@
+     if 'tmp2.txt' in os.listdir(os.getcwd()):
+         try:
+             os.remove('tmp2.txt')
+-            print 'removed tmp2.txt'
++            print('removed tmp2.txt')
+         except:
+-            print 'couldnt remove tmp2.txt'
++            print('couldnt remove tmp2.txt')
+     else:
+-        print 'couldnt find tmp2.txt'
++        print('couldnt find tmp2.txt')
+     
+     
+     f = open('tmp2.txt', 'w')
+@@ -86,25 +86,25 @@
+         while(True):
+ 
+             if time.time() - t0 > 5:
+-                print 'timed out'
++                print('timed out')
+                 break
+             
+             line = f2.readline()
+             if line.find('http:') > -1:
+-                print line
+-                print 'time to find: ', str(time.time() - t0)[:4]
++                print(line)
++                print('time to find: ', str(time.time() - t0)[:4])
+                 #reliably 0.63-0.65 secs
+                 break
+ 
+             time.sleep(.1)
+     
+     
+-    print 'three seconds till proc kill'
++    print('three seconds till proc kill')
+     time.sleep(3)
+     proc.kill()    
+     
+     
+-    print 'done.'
++    print('done.')
+ 
+ 
+ if __name__ == "__main__":
+--- basic_engine/src\Display.py	(original)
++++ basic_engine/src\Display.py	(refactored)
+@@ -4,7 +4,7 @@
+     '''for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630'''
+     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
+     try:
+-        print data
++        print(data)
+     except:
+         pass
+ 
+@@ -69,9 +69,9 @@
+ 
+         for i,row in enumerate(p_data):
+             if b_abs:
+-                s_row = map(lambda int_i: str(abs(int_i)),row)
++                s_row = [str(abs(int_i)) for int_i in row]
+             else:
+-                s_row = map(lambda int_i: str(int_i),row)
++                s_row = [str(int_i) for int_i in row]
+             
+             if b_show_grid:
+                 out += row_grid[i]
+@@ -79,7 +79,7 @@
+             out += " ".join(s_row)
+             out += "\n"        
+         
+-        print out
++        print(out)
+         return out
+ 
+     
+--- basic_engine/src\GameLog.py	(original)
++++ basic_engine/src\GameLog.py	(refactored)
+@@ -1,5 +1,5 @@
+ import time, copy, json
+-from utils import parse_pgn_instructions
++from .utils import parse_pgn_instructions
+ 
+ 
+ class GameSchema:
+@@ -39,27 +39,27 @@
+     def from_json(self,json_data):
+         
+         k = 'pgn_instructions'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_instructions = json_data[k]
+ 
+         k = 'pgn_check_schedule'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_check_schedule = json_data[k]
+ 
+         k = 'pgn_capture_schedule'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_capture_schedule = json_data[k]
+ 
+         k = 'pgn_mate_turn'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_mate_turn = json_data[k]
+ 
+         k = 'pgn_player_last_move'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_player_last_move = json_data[k]
+ 
+         k = 'pgn_s_outcome'
+-        if json_data.has_key(k):
++        if k in json_data:
+             self.pgn_s_outcome = json_data[k]
+         
+     
+@@ -294,7 +294,7 @@
+             self.log_num_pieces.append(num_pieces)
+ 
+         if self.b_num_player_pieces:
+-            num_player_pieces = len(filter(lambda p: p.white==player, pieces))
++            num_player_pieces = len([p for p in pieces if p.white==player])
+             self.log_num_player_pieces.append(num_player_pieces)
+ 
+         if self.b_num_irregular:
+--- basic_engine/src\StockfishCLApi.py	(original)
++++ basic_engine/src\StockfishCLApi.py	(refactored)
+@@ -1,8 +1,8 @@
+ import os
+-from utils import alphamove_to_posmove
+-from utils import pos_to_alphanum
+-from utils import find_app_path_root
+-from StockfishLib import Stockfish
++from .utils import alphamove_to_posmove
++from .utils import pos_to_alphanum
++from .utils import find_app_path_root
++from .StockfishLib import Stockfish
+ 
+ class StockfishCLApi():
+ 
+@@ -97,7 +97,7 @@
+ 
+ 
+ 
+-from datatypes import moveHolder, moveAHolder
++from .datatypes import moveHolder, moveAHolder
+ Move = moveHolder()
+ MoveA = moveAHolder()
+ 
+--- basic_engine/src\StockfishLib.py	(original)
++++ basic_engine/src\StockfishLib.py	(refactored)
+@@ -51,7 +51,7 @@
+         self.__put('setoption name %s value %s' % (optionname, str(value)))
+         stdout = self.__isready()
+         if stdout.find('No such') >= 0:
+-            print('stockfish was unable to set option %s' % optionname)
++            print(('stockfish was unable to set option %s' % optionname))
+ 
+     def __isready(self):
+         self.__put('isready')
+--- basic_engine/src\StockfishNetwork.py	(original)
++++ basic_engine/src\StockfishNetwork.py	(refactored)
+@@ -2,13 +2,13 @@
+ import requests
+ import subprocess
+ import time
+-from utils import find_app_path_root
+-from utils import alphamove_to_posmove
+-from utils import pos_to_alphanum
++from .utils import find_app_path_root
++from .utils import alphamove_to_posmove
++from .utils import pos_to_alphanum
+ 
+ def demo_request():
+     r = requests.get("http://127.0.0.1:5000/")
+-    print r.text
++    print(r.text)
+ 
+ 
+ class StockfishNetworking():
+@@ -86,15 +86,15 @@
+                             break
+                 
+                 if not(self._check_server_is_up()):
+-                    print 'failed to validate the stockfish server is up.'
++                    print('failed to validate the stockfish server is up.')
+                 else:
+                     self._del_tmp_file()
+-                    print 'server setup in secs: %s' % str(time.time() - t0)[:4]
++                    print('server setup in secs: %s' % str(time.time() - t0)[:4])
+ 
+             else:
+-                print 'Sleeping 4 seconds to launch stockfish server...'
++                print('Sleeping 4 seconds to launch stockfish server...')
+                 time.sleep(4)
+-                print 'Server initialized'
++                print('Server initialized')
+ 
+     def get_move(self, list_log_moves, available_moves):
+         ''' Args:
+@@ -108,12 +108,12 @@
+ 
+         if str_log != "":                   #disregard for first ply
+             if not(self._set_position(str_log)):
+-                print 'set_position http call failed'
++                print('set_position http call failed')
+                 return None
+ 
+         str_best_move = self._get_best_move()
+         if str_best_move == "":
+-            print 'best_position http call failed'
++            print('best_position http call failed')
+             return None
+             
+         movetuple_best_move = self._movestr_to_movecode(str_best_move)
+@@ -217,7 +217,7 @@
+ 
+     def __del__(self):
+         if self.serverProcess is not None:
+-            print 'tearing down StockfishNetwork server'
++            print('tearing down StockfishNetwork server')
+             self.serverProcess.kill()
+     
+ 
+@@ -231,7 +231,7 @@
+ 
+ 
+ 
+-from datatypes import moveHolder, moveAHolder
++from .datatypes import moveHolder, moveAHolder
+ Move = moveHolder()
+ MoveA = moveAHolder()
+ 
+--- basic_engine/src\TurnStage.py	(original)
++++ basic_engine/src\TurnStage.py	(refactored)
+@@ -1,8 +1,8 @@
+ import random
+ 
+-from utils import *
+-from basic import *
+-from datatypes import moveHolder
++from .utils import *
++from .basic import *
++from .datatypes import moveHolder
+ Move = moveHolder()
+ 
+ def increment_turn(player, i_turn):
+@@ -16,7 +16,7 @@
+         if p.white == player:
+             
+             moves_p = p.get_available_moves(board, move_type_flag = True)
+-            moves_p = filter(lambda _m: len(_m) > 0, moves_p)
++            moves_p = [_m for _m in moves_p if len(_m) > 0]
+             
+             d_moves = [Move(p.pos, _m.pos1, _m.code) for _m in moves_p]
+             
+@@ -67,18 +67,18 @@
+ 
+         else:
+             
+-            white_pieces = filter(lambda p: p.white,  pieces)
+-            black_pieces = filter(lambda p: not(p.white),  pieces)
++            white_pieces = [p for p in pieces if p.white]
++            black_pieces = [p for p in pieces if not(p.white)]
+             
+             b_white_more = len(white_pieces) > len(black_pieces)
+ 
+             more_pieces = white_pieces if b_white_more else black_pieces
+             
+-            more_piece_names = map(lambda p: p.__class__.__name__, more_pieces)
++            more_piece_names = [p.__class__.__name__ for p in more_pieces]
+ 
+             alive_pieces =  ("Pawn", "Queen", "Rook")
+             
+-            alives_in_more = map(lambda ap: ap in more_piece_names, alive_pieces)
++            alives_in_more = [ap in more_piece_names for ap in alive_pieces]
+ 
+             if not(any(alives_in_more)):
+                 outcome = (player, 'STALEMATE', 'NOQUEENPAWNROOK')
+@@ -165,9 +165,8 @@
+         kill_pos = pos1 if not(b_enpassant) else board.en_passant_pos(pos1, _player)
+         
+         #TODO - helper func
+-        killed_piece_i = filter(lambda _p: (_p[1].pos == kill_pos) and 
+-                                            not(_p[1].white == _player)
+-                                ,enumerate(pieces))
++        killed_piece_i = [_p for _p in enumerate(pieces) if (_p[1].pos == kill_pos) and 
++                                            not(_p[1].white == _player)]
+         killed_piece_i = killed_piece_i[0][0]
+ 
+         #TODO - don't pop piece in hypothetical_pieces=True
+@@ -304,7 +303,7 @@
+     @staticmethod
+     def match(class_move_type, move_type, move_space):
+         
+-        temp_class_move_type = map(lambda x: x[0], class_move_type)
++        temp_class_move_type = [x[0] for x in class_move_type]
+ 
+         if move_type in temp_class_move_type:
+ 
+@@ -362,7 +361,7 @@
+         Then Mirror class to see if any of those threats is capable.'''
+ 
+     #Helper func: piece_by_class_player
+-    player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)
++    player_king = [p for p in pieces if p.white == player and p.__class__.__name__ == "King"]
+     
+     player_king_pos = player_king[0].pos 
+ 
+--- basic_engine/src\basic.py	(original)
++++ basic_engine/src\basic.py	(refactored)
+@@ -1,5 +1,5 @@
+ import sys, copy, time
+-from datatypes import moveAHolder
++from .datatypes import moveAHolder
+ 
+ #Params and Enums ---------------------------
+ 
+@@ -34,7 +34,7 @@
+     '''for VS-code debugging issue: https://github.com/Microsoft/vscode/issues/36630'''
+     out = str(data) + str(arg1) + str(arg2) + str(arg3) + str(arg4)
+     try:
+-        print data
++        print(data)
+     except:
+         pass
+ 
+@@ -176,7 +176,7 @@
+ 
+     #Atomic Move Types
+ 
+-    def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
++    def get_diagonals(self, pos, spaces = BOARD_WIDTH - 1, i_dir = list(range(4))):
+         """ input: pos, [spaces (int > 0)] [only_direction (tuple)]
+             returns: list of list of pos's, ordered closest from piece
+                      starting pos to furthest"""
+@@ -198,7 +198,7 @@
+         return [ret[i] for i in range(len(ret)) if i in i_dir]
+ 
+     
+-    def get_upacross(self, pos, spaces = BOARD_WIDTH - 1, i_dir = range(4)):
++    def get_upacross(self, pos, spaces = BOARD_WIDTH - 1, i_dir = list(range(4))):
+         """ input: pos, [spaces (int > 0)]
+             returns: list of list of pos's, ordered closest from piece
+                      starting pos to furthest"""
+@@ -288,8 +288,8 @@
+         mine_mult = 1 if self.white else -1
+         yours_mult = -1 if self.white else 1
+         
+-        mine = map(lambda v: v * mine_mult, piece_enums)
+-        yours = map(lambda v: v * yours_mult, piece_enums)
++        mine = [v * mine_mult for v in piece_enums]
++        yours = [v * yours_mult for v in piece_enums]
+         
+         yours_king = -3 if self.white else 3
+         yours_enpassant_pawn = -2 if self.white else 2
+@@ -358,7 +358,7 @@
+         
+         # Handling king castling here, check for clear back row, all other conditions satisfied
+         if b_king:
+-            castling_moves = filter(lambda move_set: len(move_set) > 1, moves)
++            castling_moves = [move_set for move_set in moves if len(move_set) > 1]
+             if len(castling_moves) > 0:
+                 [moves.pop(moves.index(_x)) for _x in castling_moves]  #dont process them below
+                 
+@@ -867,7 +867,7 @@
+     white_king.king_can_castle = False
+ 
+     moves = white_king.get_available_moves(board,move_type_flag = True)
+-    print moves
++    print(moves)
+     assert moves == [((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+ 
+ def test_castling_disallowed2():
+@@ -877,7 +877,7 @@
+     
+     board.rooks_can_castle[0][1] = False
+     moves = white_king.get_available_moves(board,move_type_flag = True)
+-    print moves
++    print(moves)
+     assert moves == [((7, 2), 2), ((6, 4), 0), ((7, 5), 0), ((7, 3), 0), ((6, 3), 0), ((6, 5), 0)]
+ 
+     board.rooks_can_castle[0][0] = False
+--- basic_engine/src\main.py	(original)
++++ basic_engine/src\main.py	(refactored)
+@@ -1,29 +1,29 @@
+ import os, sys, random, time
+ 
+-from basic import *
+-from utils import *
+-from GameLog import *
+-from datatypes import moveHolder
+-from GameLog import GameLog
+-from GameLog import GameSchema
+-from Display import Display
+-from TurnStage import increment_turn, get_available_moves, apply_move
+-from TurnStage import check_endgame
+-from TurnStage import is_king_in_check
+-from TurnStage import filter_check_naive
+-from TurnStage import filter_check_opt   
+-
+-from TurnStage import filter_check_test_copy   
+-from TurnStage import filter_check_test_copy_apply   
+-from TurnStage import filter_check_test_copy_apply_2
+-from TurnStage import filter_check_test_copy_apply_3
+-from TurnStage import filter_check_test_copy_opt
++from .basic import *
++from .utils import *
++from .GameLog import *
++from .datatypes import moveHolder
++from .GameLog import GameLog
++from .GameLog import GameSchema
++from .Display import Display
++from .TurnStage import increment_turn, get_available_moves, apply_move
++from .TurnStage import check_endgame
++from .TurnStage import is_king_in_check
++from .TurnStage import filter_check_naive
++from .TurnStage import filter_check_opt   
++
++from .TurnStage import filter_check_test_copy   
++from .TurnStage import filter_check_test_copy_apply   
++from .TurnStage import filter_check_test_copy_apply_2
++from .TurnStage import filter_check_test_copy_apply_3
++from .TurnStage import filter_check_test_copy_opt
+ 
+ b_use_clapi = True
+ if os.name == 'nt' and not(b_use_clapi):
+-    from StockfishNetwork import StockfishNetworking
++    from .StockfishNetwork import StockfishNetworking
+ if os.name == 'posix' or b_use_clapi:
+-    from StockfishCLApi import StockfishCLApi
++    from .StockfishCLApi import StockfishCLApi
+ 
+ 
+ 
+@@ -143,7 +143,7 @@
+         elif int(player) in self.stockfish_control:
+             move = self.stockfish_interface.get_move(self.log.get_log_move(), moves)
+         else:
+-            move_i = random.sample(range(0,len(moves)),1)[0]
++            move_i = random.sample(list(range(0,len(moves))),1)[0]
+             move = moves[move_i]
+         return move
+ 
+@@ -389,7 +389,7 @@
+     
+     moves = game.play()
+     moves = moves['moves']
+-    print moves
++    print(moves)
+     assert moves == [ ( (7,0),(7,1),0) ]
+ 
+ def test_king_in_check3():
+@@ -426,7 +426,7 @@
+     
+     moves = game.play()
+     moves = moves['moves']
+-    print moves
++    print(moves)
+     assert moves == [ ( (7,0),(6,0),0) ]
+ 
+ def test_post_castling_move_rook():
+@@ -516,19 +516,19 @@
+     assert board.data_by_player[0][2] == 1
+     
+     #Test there is no pawn at that pos
+-    back_row_pawns = filter(lambda p: p.white and p.__class__.__name__ == "Pawn"
+-                              and p.pos == (0,2) ,pieces)
++    back_row_pawns = [p for p in pieces if p.white and p.__class__.__name__ == "Pawn"
++                              and p.pos == (0,2)]
+     assert len(back_row_pawns) == 0
+ 
+     #Test there is a queen there
+-    queen_at_pos = filter(lambda p: p.__class__.__name__ == "Queen" 
+-                            and p.pos == (0,2) ,pieces)
++    queen_at_pos = [p for p in pieces if p.__class__.__name__ == "Queen" 
++                            and p.pos == (0,2)]
+ 
+     assert len(queen_at_pos) == 1
+     
+     #Test there are two queens total
+-    white_queens = filter(lambda p: p.__class__.__name__ == "Queen" 
+-                            and p.white,pieces)
++    white_queens = [p for p in pieces if p.__class__.__name__ == "Queen" 
++                            and p.white]
+ 
+     assert len(white_queens) == 2
+ 
+@@ -567,7 +567,7 @@
+     ret_data = game.play()
+     
+     moves = ret_data['moves']
+-    print moves
++    print(moves)
+     
+     my_board = ret_data['board']
+     my_pieces = ret_data['pieces']    
+@@ -586,7 +586,7 @@
+     display.print_board_letters(my_pieces2)
+     
+     moves2 = ret_data2['moves']
+-    print moves2
++    print(moves2)
+ 
+     my_board2 = ret_data2['board']
+ 
+@@ -634,8 +634,8 @@
+     opt_check_moves = ret_data2b['moves']
+ 
+     #Assess the difference
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     #Heres the key move that Opt doesnt allow
+     assert  Move(pos0=(3, 6), pos1=(4, 5), code=0) in generic_check_moves
+@@ -734,8 +734,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -772,8 +772,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -819,8 +819,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -857,8 +857,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -900,8 +900,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print "\n".join(map(lambda s: str(s), generic_check_moves))
+-    print opt_check_moves
++    print("\n".join([str(s) for s in generic_check_moves]))
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -943,8 +943,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -990,8 +990,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -1032,8 +1032,8 @@
+                                 )
+     opt_check_moves = ret_data_opt['moves']
+ 
+-    print generic_check_moves
+-    print opt_check_moves
++    print(generic_check_moves)
++    print(opt_check_moves)
+ 
+     assert opt_check_moves == generic_check_moves
+ 
+@@ -1071,7 +1071,7 @@
+ 
+     moves = ret['moves']
+ 
+-    print "\n".join(map(lambda s:str(s), moves))
++    print("\n".join([str(s) for s in moves]))
+ 
+     assert Move(pos0=(0, 4), pos1=(0, 5), code=0) in moves
+     assert Move(pos0=(0, 4), pos1=(0, 6), code=2) in moves
+@@ -1310,23 +1310,23 @@
+         ret = game.play()
+         
+         #Printout
+-        print 'Line Num: ', str(i + 1)
++        print('Line Num: ', str(i + 1))
+ 
+         if isinstance(ret, dict):
+             s_last_player = str(ret.get('last_player', 'N/A: no last_player'))
+-            print 'last player to move: ', s_last_player
++            print('last player to move: ', s_last_player)
+         if isinstance(ret, int):
+-            print 'exited from move incompatiability'            
+-            print 'game.i_turn: ', str(ret)
++            print('exited from move incompatiability')            
++            print('game.i_turn: ', str(ret))
+             
+             b_whites_move = ((ret % 2) == 1)
+ 
+             pgn_turn = (ret + int(b_whites_move)) / 2
+             s_player = 'White' if b_whites_move else 'Black'
+ 
+-            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
+-            print '\n'
+-            print s_game
++            print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
++            print('\n')
++            print(s_game)
+ 
+ 
+ def test_kasparov_game_10_pgn_err():
+@@ -1369,7 +1369,7 @@
+     err_cntr = 0
+ 
+     b_naive_check = kwargs.get('naive_check', False)
+-    print b_naive_check
++    print(b_naive_check)
+ 
+     for i, s_game in enumerate(s_games):
+         
+@@ -1381,36 +1381,36 @@
+             else:
+                 ret = game.play()
+         except Exception as e:
+-            print 'Error in play() | line_i: ', str(i + 1)
+-            print str(e)
++            print('Error in play() | line_i: ', str(i + 1))
++            print(str(e))
+             err_cntr += 1
+             continue
+             
+         if i % modulo_print == 0:
+             s_secs = str(time.time() - t).split(".")[0]
+             t = time.time()
+-            print 'line_i: ', str(i + 1), '  secs: ', s_secs
++            print('line_i: ', str(i + 1), '  secs: ', s_secs)
+         
+         
+         if isinstance(ret, dict):
+             s_last_player = str(ret.get('last_player', None))
+             if s_last_player is None:
+-                print 'No Last Player | line_i: ', str(i + 1)
+-                print ret
++                print('No Last Player | line_i: ', str(i + 1))
++                print(ret)
+                 err_cntr += 1
+             
+         if isinstance(ret, int):
+-            print 'Move Incompatibility | line_i: ', str(i + 1)
+-            print 'game.i_turn: ', str(ret)    
++            print('Move Incompatibility | line_i: ', str(i + 1))
++            print('game.i_turn: ', str(ret))    
+             b_whites_move = ((ret % 2) == 1)
+             pgn_turn = (ret + int(b_whites_move)) / 2
+             s_player = 'White' if b_whites_move else 'Black'
+-            print 'On PGN turn: ', str(pgn_turn), ' Player: ', s_player
++            print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
+             err_cntr += 1
+             # print '\n'
+             # print s_game
+ 
+-    print 'err_cntr: ', str(err_cntr)
++    print('err_cntr: ', str(err_cntr))
+ 
+ def test_filter_check_pinned_piece_1():
+     
+--- basic_engine/src\utils.py	(original)
++++ basic_engine/src\utils.py	(refactored)
+@@ -1,7 +1,7 @@
+ import sys, time, json, os
+-from basic import *
+-from datatypes import moveHolder
+-from Display import Display
++from .basic import *
++from .datatypes import moveHolder
++from .Display import Display
+ 
+ Move = moveHolder()
+ 
+@@ -150,7 +150,7 @@
+ 
+             #Verify destination
+             if (len(destination_a1) != 2 ):
+-                print 'Not 2!'
++                print('Not 2!')
+ 
+             #Piece 
+             piece_letter = _s[0] if str.isupper(_s[0]) else "P"
+@@ -212,13 +212,13 @@
+     try:
+         inputs = inp.split(" ")
+         if len(inputs) != 2:
+-            print 'could not parse alphanumeric move'
++            print('could not parse alphanumeric move')
+         else:
+             pos0 = alphanum_to_pos(inputs[0])
+             pos1 = alphanum_to_pos(inputs[1])
+             return (pos0,pos1)
+     except:
+-        print 'exception while parsing input.'
++        print('exception while parsing input.')
+         return -1
+         
+ 
+@@ -240,7 +240,7 @@
+             data = out
+     except:
+         data = []
+-        print 'failure in routine to parse user input.'
++        print('failure in routine to parse user input.')
+     return ret, data
+ 
+ class PGN:
+@@ -413,7 +413,7 @@
+     msg = "Type your move. Or type 'hint' or 'out_log'..."
+     msg += "\n"
+     while(True):
+-        raw = raw_input(msg)    #example: >1,1 | 2,2
++        raw = input(msg)    #example: >1,1 | 2,2
+         ret, the_move = parse_player_input(raw, board, 'alphanum')
+         if ret == 0:
+             #TODO - call common return function
+@@ -421,13 +421,13 @@
+                 if the_move == (_m.pos0, _m.pos1):
+                     return Move(_m.pos0, _m.pos1, _m.code)
+             else:
+-                print 'this move is not legal according to the game engine.'
++                print('this move is not legal according to the game engine.')
+         if ret == 1: 
+-            print moves_player
++            print(moves_player)
+         if ret == 2:
+-            print format_move_log(log.get_log_move())
++            print(format_move_log(log.get_log_move()))
+         if ret == -1:
+-            print 'could not recognize move ', str(raw), ". Try again:"
++            print('could not recognize move ', str(raw), ". Try again:")
+ 
+ 
+ def _find_blank(list_str, find_str):
+@@ -450,9 +450,9 @@
+     #or if there are stray blank marks within the string/graphic
+ 
+     blank_ind = [_find_blank(x, s_blank) for x in lines]
+-    first_blank = filter(lambda ind: ind[1] >= 0, enumerate(blank_ind))
++    first_blank = [ind for ind in enumerate(blank_ind) if ind[1] >= 0]
+     top_line = first_blank[0][0]
+-    left_side = min(filter(lambda ind: ind >= 0, blank_ind))
++    left_side = min([ind for ind in blank_ind if ind >= 0])
+     
+     board_lines = lines[top_line:top_line + 8]
+     
+@@ -495,7 +495,7 @@
+                                     )
+                     _piece_val = 3
+                 else:
+-                    print 'could not determine piece in board.'
++                    print('could not determine piece in board.')
+                     continue
+                 
+                 pieces.append(_piece)
+@@ -576,7 +576,7 @@
+     
+     out = parse_pgn_instructions(s)
+ 
+-    print out
++    print(out)
+ 
+     assert out == [('f3', 'N', None), ('e6', 'P', None), ('c4', 'P', None), ('b6', 'P', None), ('g3', 'P', None), ('b7', 'B', None), ('g2', 'B', None), ('c5', 'P', None), ('g1', 'K', None), ('f6', 'N', None), ('c3', 'N', None), ('e7', 'B', None), ('d4', 'P', None), ('d4', 'P', 'c'), ('d4', 'Q', None), ('c6', 'N', None), ('f4', 'Q', None), ('g8', 'K', None), ('d1', 'R', None), ('b8', 'Q', None), ('e4', 'P', None), ('d6', 'P', None), ('b3', 'P', None), ('a6', 'P', None), ('b2', 'B', None), ('d8', 'R', None), ('e3', 'Q', None), ('a7', 'Q', None), ('a3', 'B', None), ('f8', 'B', None), ('h3', 'P', None), ('b5', 'P', None), ('a7', 'Q', None), ('a7', 'N', None), ('e5', 'P', None), ('e5', 'P', 'd'), ('f8', 'B', None), ('f8', 'K', None), ('e5', 'N', None), ('g2', 'B', None), ('g2', 'K', None), ('c4', 'P', 'b'), ('c4', 'P', 'b'), ('e8', 'K', None), ('b1', 'R', 'a'), ('d1', 'R', None), ('d1', 'N', None), ('e4', 'N', None), ('b7', 'R', None), ('d6', 'N', None), ('c7', 'R', None), ('c8', 'N', 'a'), ('c5', 'P', None), ('e4', 'N', None), ('f7', 'R', None), ('a7', 'R', None), ('f4', 'R', None), ('f6', 'N', None), ('e3', 'N', None), ('c7', 'R', None), ('c4', 'R', None), ('e7', 'N', None), ('f4', 'P', None), ('c6', 'N', None), ('g4', 'N', '3'), ('d5', 'N', None), ('c6', 'N', None), ('c6', 'R', None), ('f3', 'K', None), ('c7', 'R', None), ('e5', 'N', None), ('d8', 'K', None), ('c6', 'P', None), ('e7', 'K', None), ('a4', 'R', None), ('a7', 'R', None), ('f2', 'K', None), ('d6', 'K', None), ('h4', 'P', None), ('a5', 'P', None), ('f3', 'K', None), ('c3', 'N', None), ('d4', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('g6', 'P', None), ('g4', 'P', None), ('c7', 'K', None), ('d2', 'R', None), ('a4', 'P', None), ('f5', 'P', None), ('f6', 'N', None), ('f4', 'K', None), ('f5', 'P', 'e'), ('f5', 'P', 'g'), ('a5', 'R', None), ('g6', 'P', 'f'), ('g6', 'P', 'h'), ('b2', 'R', None), ('d5', 'N', None), ('e4', 'K', None), ('b6', 'N', None), ('f2', 'R', None), ('a3', 'P', None), ('f7', 'R', None), ('c8', 'K', None), ('g6', 'N', None), ('a4', 'R', None), ('e5', 'K', None), ('b4', 'R', None), ('e7', 'N', None), ('d8', 'K', None), ('c7', 'P', None), ('e8', 'K', None), ('h7', 'R', None), ('c4', 'R', None), ('d5', 'N', None), ('c5', 'R', None), ('h8', 'R', None), ('d7', 'K', None), ('d8', 'R', None)]
+ 
+--- basic_engine/src\xpgn.py	(original)
++++ basic_engine/src\xpgn.py	(refactored)
+@@ -1,8 +1,8 @@
+ import os
+ import json
+ import time
+-from utils import find_app_path_root
+-from GameLog import GameSchema
++from .utils import find_app_path_root
++from .GameLog import GameSchema
+ 
+ def pgn_to_xpgn(pgn_fn
+                 ,xpgn_fn
+@@ -133,9 +133,9 @@
+                             ,max_lines = 100
+                             ,b_silent = True)
+ 
+-    assert s_json.has_key('data')
++    assert 'data' in s_json
+ 
+-    assert s_json['data'][0].has_key('source-key')
++    assert 'source-key' in s_json['data'][0]
+     
+     assert len(s_json['data']) == 6
+ 
+@@ -152,7 +152,7 @@
+     fns_before = os.listdir(test_dir)
+     
+     if target_fn in fns_before:
+-        print 'first removing file...' + str(target_fn)
++        print('first removing file...' + str(target_fn))
+         os.remove(test_dir + target_fn)
+         assert not(target_fn in os.listdir(test_dir))
+     
+@@ -172,7 +172,7 @@
+ 
+     xpgn_json = json.loads(lines[0])
+ 
+-    assert xpgn_json.has_key('data')
++    assert 'data' in xpgn_json
+ 
+     assert len(xpgn_json['data']) > 0
+     
+--- basic_engine/tests\batchverify.py	(original)
++++ basic_engine/tests\batchverify.py	(refactored)
+@@ -52,7 +52,7 @@
+         return [data]    
+ 
+     else:
+-        assert type(modulo_print) == types.IntType
++        assert type(modulo_print) == int
+         try:
+             data_modulo = []
+             for i in range(len(data) / modulo_print):        
+@@ -70,17 +70,14 @@
+         returns: data only for records where there is a list
+     '''
+     
+-    s_list_source_keys = map(lambda uni_s: str(uni_s), list_source_keys)
+-
+-    
+-    ret = filter(lambda d: any(
+-                map(lambda s_key: 
+-                        s_key == str(d['source-key'])[-len(s_key):] \
++    s_list_source_keys = [str(uni_s) for uni_s in list_source_keys]
++
++    
++    ret = [d for d in data if any(
++                [s_key == str(d['source-key'])[-len(s_key):] \
+                         and \
+-                        str(d['source-key'])[-(len(s_key)+1)] == "-" \
+-                    ,s_list_source_keys)
+-                    )          
+-                ,data)
++                        str(d['source-key'])[-(len(s_key)+1)] == "-" for s_key in s_list_source_keys]
++                    )]
+ 
+     return ret
+ 
+@@ -100,15 +97,15 @@
+             assert (s_outcome is not None)
+         else:
+             if s_outcome is None:
+-                print i
+-                print data_elem['source-key']
++                print(i)
++                print(data_elem['source-key'])
+ 
+ 
+ def manual_batch_has_outcome_str():
+     '''Run this verify with printout instead of assert.'''    
+     data = load_xpgn_data(max_tests=None)
+     verify_has_outcome_str(data, b_assert=False)
+-    print 'done.'
++    print('done.')
+ 
+ 
+ def test_batch_has_outcome_str():
+@@ -138,8 +135,8 @@
+             assert b_test == True
+         else:
+             if not(b_test):
+-                print 'i: ' + str(i) + ' ' + str(data_elem['source-key'])
+-                print s_outcome
++                print('i: ' + str(i) + ' ' + str(data_elem['source-key']))
++                print(s_outcome)
+ 
+ 
+ def test_batch_standard_outcome():
+@@ -149,7 +146,7 @@
+ def manual_batch_standard_outcome():
+     data = load_xpgn_data(max_tests=None)
+     verify_standard_outcome(data, b_assert=True)
+-    print 'done.'
++    print('done.')
+ 
+ 
+ def verify_last_player_move_at_least_ties(data, b_print=False):
+@@ -175,15 +172,15 @@
+         except AssertionError:
+             
+             if b_print:
+-                print i
+-                print s_gameSchema
++                print(i)
++                print(s_gameSchema)
+             
+             return exceptions.AssertionError()
+ 
+ def manual_last_player_move_at_least_ties():
+     data = load_xpgn_data(max_tests=None)
+     verify_last_player_move_at_least_ties(data, b_print=True)
+-    print 'done.'
++    print('done.')
+ 
+ def test_batch_last_player_move_at_least_ties():
+     data = load_xpgn_data(exclude_inds = [49])
+@@ -225,7 +222,7 @@
+             
+             #this case does not pass, identify it
+             if not(b_pass):
+-                print str(i) + ' | ' + data_elem['source-key']
++                print(str(i) + ' | ' + data_elem['source-key'])
+ 
+                 #investigate the case
+                 if b_details:
+@@ -254,10 +251,10 @@
+ 
+                     s_player = 'White' if (_i_turn % 2 == 1) else 'Black'
+ 
+-                    print 'First Turn Check doesnt match (_i_turn format): ', str(_i_turn)
+-                    print 'Player allegedly in check: ', s_player
+-                    print 'play() check value: ', str(v_check)
+-                    print 'schema check value: ', str(schema_check_schedule[_i_turn])
++                    print('First Turn Check doesnt match (_i_turn format): ', str(_i_turn))
++                    print('Player allegedly in check: ', s_player)
++                    print('play() check value: ', str(v_check))
++                    print('schema check value: ', str(schema_check_schedule[_i_turn]))
+ 
+                     #Perform a replay, show board state at the kickout move
+                     try:
+@@ -270,13 +267,13 @@
+ 
+                         replay_pieces = ret['pieces']
+ 
+-                        print 'Board State pre-move at i_turn: ', str(_i_turn + 2), '\n'
++                        print('Board State pre-move at i_turn: ', str(_i_turn + 2), '\n')
+                         display = Display()
+                         ret = display.print_board_letters(replay_pieces)
+-                        print 'PGN: \n'
+-                        print s_pgn
++                        print('PGN: \n')
++                        print(s_pgn)
+                     except:
+-                        print 'could not replay the game to the move desired.\n'
++                        print('could not replay the game to the move desired.\n')
+ 
+ 
+ 
+@@ -298,7 +295,7 @@
+     for i, data_section in enumerate(data_modulo):
+         try:
+ 
+-            print 'Starting Section i: ', str(i)
++            print('Starting Section i: ', str(i))
+ 
+             verify_check_schedule_match(data_section
+                                         ,b_naive_check=False
+@@ -307,12 +304,12 @@
+         except Exception as e:
+ 
+             if type(e) == exceptions.KeyboardInterrupt:
+-                print 'BREAKING'
++                print('BREAKING')
+                 break
+             else:
+-                print 'exception in data_section_i: ', str(i)
+-
+-    print 'done.'
++                print('exception in data_section_i: ', str(i))
++
++    print('done.')
+ 
+ 
+ def verify_move_available(data
+@@ -352,8 +349,8 @@
+             assert b_pass == True
+         else:
+             if not(b_pass):
+-                print str(i) + ' | ' + data_elem['source-key']
+-                print ret
++                print(str(i) + ' | ' + data_elem['source-key'])
++                print(ret)
+ 
+                 if b_details:
+                     pass
+@@ -368,7 +365,7 @@
+     for i, data_section in enumerate(data_modulo):
+         try:
+ 
+-            print 'Starting Section i: ', str(i)
++            print('Starting Section i: ', str(i))
+ 
+             verify_move_available(data_section
+                                     ,b_naive_check=False
+@@ -377,12 +374,12 @@
+         except Exception as e:
+ 
+             if type(e) == exceptions.KeyboardInterrupt:
+-                print 'BREAKING'
++                print('BREAKING')
+                 break
+             else:
+-                print 'exception in data_section_i: ', str(i)
+-
+-    print 'done.'
++                print('exception in data_section_i: ', str(i))
++
++    print('done.')
+ 
+ def test_batch_move_available():
+     
+@@ -432,14 +429,14 @@
+     
+     data_specific = filter_data_by_source_key(data, specific_keys)
+ 
+-    print 'Analyzing ', str(len(data_specific)), 'kickouts: \n'
++    print('Analyzing ', str(len(data_specific)), 'kickouts: \n')
+ 
+     #Check if they kickout with naive_check
+     verify_check_schedule_match(data_specific
+                                 ,b_assert=False
+                                 ,b_naive_check=True
+                                 )
+-    print 'done verifying naive check. \n'
++    print('done verifying naive check. \n')
+ 
+     #Produce the errors with details
+     verify_check_schedule_match(data_specific
+--- basic_engine/tests\runtests.py	(original)
++++ basic_engine/tests\runtests.py	(refactored)
+@@ -22,7 +22,7 @@
+ import subprocess
+ import argparse
+ import time
+-from pytest_utils import reset_pytest
++from .pytest_utils import reset_pytest
+ 
+ import argparse
+ ap = argparse.ArgumentParser()
+@@ -63,8 +63,8 @@
+ if args["stockfish"]:
+     b_stockfish     = True
+ if args["clearcache"]:
+-    print 'clearing pytest caches: deleting __pycache__ folder and all .pyc in'
+-    print 'src/ tools/ and tests/ ...'
++    print('clearing pytest caches: deleting __pycache__ folder and all .pyc in')
++    print('src/ tools/ and tests/ ...')
+     reset_pytest()
+ 
+ if os.name != "nt":
+@@ -116,9 +116,9 @@
+     #TODO - add stockfish_test.py unittest
+ 
+ 
+-print 'done with runtests.'
++print('done with runtests.')
+ 
+ if args["hang"]:
+-    print '..hanging for a long time...'
++    print('..hanging for a long time...')
+     time.sleep(999999)
+ 
+--- basic_engine/tests\stockfish_test.py	(original)
++++ basic_engine/tests\stockfish_test.py	(refactored)
+@@ -48,7 +48,7 @@
+         self.assertTrue(self.stockConn._check_server_is_up())
+         response_t1 = time.time()
+ 
+-        print 'response time: %s' % str(response_t1 - response_t0)[:7]
++        print('response time: %s' % str(response_t1 - response_t0)[:7])
+         self.assertTrue(response_t1 - response_t0 > 0.001)
+         self.assertTrue(response_t1 - response_t0 < 0.1)
+ 
+--- basic_engine/tools\alphanum_legacy_conv.py	(original)
++++ basic_engine/tools\alphanum_legacy_conv.py	(refactored)
+@@ -77,7 +77,7 @@
+             final_string += s_input[ind] 
+             ind += 1
+ 
+-    print final_string
++    print(final_string)
+     return final_string
+             
+ 
+--- basic_engine/tools\analysis_utils.py	(original)
++++ basic_engine/tools\analysis_utils.py	(refactored)
+@@ -1,9 +1,9 @@
+ import os, sys, json
+-from db_module import TasPerfDB
+-from schema_module import TimeAnalysisSchema
++from .db_module import TasPerfDB
++from .schema_module import TimeAnalysisSchema
+ 
+ def mic_check():
+-    print '1,3'
++    print('1,3')
+ 
+ 
+ def load_data(gameIds, analysis_type, algo_style):
+--- basic_engine/tools\db_module.py	(original)
++++ basic_engine/tools\db_module.py	(refactored)
+@@ -1,7 +1,7 @@
+ import sqlite3
+ import os
+ import json
+-from schema_module import TimeAnalysisSchema
++from .schema_module import TimeAnalysisSchema
+ 
+ 
+ DATA_DIR = "../data/perf/perf_db.db"
+@@ -60,7 +60,7 @@
+                             )
+                 
+                 if self.verbose:
+-                    print 'failure: ', str(method_name)
++                    print('failure: ', str(method_name))
+                 
+             return result
+         return call
+@@ -161,11 +161,11 @@
+             s = "SELECT * FROM games"
+             self.c.execute(s)
+             if len(self.c.fetchall()) > 1:
+-                print str(self.conn)
+-                print 'already populated'
++                print(str(self.conn))
++                print('already populated')
+                 return
+             
+-            print 'Populating games table:'
++            print('Populating games table:')
+             fn = POPULATE_GAMES_DATA_DIR + POPULATE_GAMES_DATA_FN
+             with open(fn,'r') as f:
+                 instructions = f.readlines()
+@@ -187,18 +187,18 @@
+             rows = self.c.fetchall()
+             numRows = len(rows)
+             if numRows < 1:
+-                print 'failed to load!'
++                print('failed to load!')
+                 errLog = self.getErrLog()
+-                print 'ErrLog length: ', str(len(errLog))
++                print('ErrLog length: ', str(len(errLog)))
+                 # print 'first seven errors: '
+                 # print errLog[:min(len(errLog), 7)]
+             else:
+-                print 'Num Rows in game table: ', str(numRows)
+-                print 'First 3 rows...'
+-                print rows[:3]
++                print('Num Rows in game table: ', str(numRows))
++                print('First 3 rows...')
++                print(rows[:3])
+ 
+         if populate:
+-            print 'starting populate'
++            print('starting populate')
+             initPopulateGamesTable()
+             
+             
+@@ -365,10 +365,10 @@
+     def decorate(func):
+         def call(*args, **kwargs):
+             try:
+-                print 'starting calc'
++                print('starting calc')
+                 result = func(*args, **kwargs)
+             except:
+-                print 'failure! ', str( func.__name__ )
++                print('failure! ', str( func.__name__ ))
+                 return -1
+             return result
+         return call
+@@ -380,7 +380,7 @@
+ 
+         @decorate
+         def calc(self,x, y):
+-            print 'executing function'
++            print('executing function')
+             return (x / y)  + self.z
+ 
+     mc = MyClass()
+--- basic_engine/tools\perf_test.py	(original)
++++ basic_engine/tools\perf_test.py	(refactored)
+@@ -7,12 +7,12 @@
+ sys.path.append('../')
+ 
+ from src.main import Game
+-from utils import convert_pgn_to_a1
+-
+-from schema_module import TimeAnalysisSchema
+-from schema_module import TurnAttributeSchema
+-
+-from db_module import TasPerfDB
++from .utils import convert_pgn_to_a1
++
++from .schema_module import TimeAnalysisSchema
++from .schema_module import TurnAttributeSchema
++
++from .db_module import TasPerfDB
+ 
+ 
+ # Different Experiments --------------------------------------------------
+@@ -144,7 +144,7 @@
+     for col in dims_out:
+         s_row += align_col(col[0], chars_=col[1] )
+         s_row += align_col('', chars_ = col[2])
+-    print s_row
++    print(s_row)
+ 
+     #print data
+     for row in data:
+@@ -166,14 +166,14 @@
+ 
+             s_row += align_col('', chars_=_spacer_len)
+ 
+-        print s_row
++        print(s_row)
+ 
+ #Interpret Functions (slice and calc on results) -------------------------
+ 
+ def interpret_basic_data(results):
+     '''Build a five col printout for avg trial time of different tests'''
+-    temp = [0 for i in range(len(results.keys()))]
+-    for k in results.keys():
++    temp = [0 for i in range(len(list(results.keys())))]
++    for k in list(results.keys()):
+         d_test = results[k]
+         test_name = str(k)
+         order_test = d_test['order']
+@@ -205,8 +205,8 @@
+ 
+ def interpret_variation_data(results):
+     '''Find Min/Max from the dataset'''
+-    temp = [0 for i in range(len(results.keys()))]
+-    for k in results.keys():
++    temp = [0 for i in range(len(list(results.keys())))]
++    for k in list(results.keys()):
+         d_test = results[k]
+         test_name = str(k)
+         order_test = d_test['order']
+@@ -232,7 +232,7 @@
+ 
+     turn_time_data = [ [], [] ]
+ 
+-    for k in results.keys():
++    for k in list(results.keys()):
+         
+         data_test = results[k]
+ 
+@@ -243,10 +243,10 @@
+         # TODO - remove this section, plus its buggy
+         order_test = data_test['order']
+         if order_test == 0:
+-            print 'Test A: ', test_name
++            print('Test A: ', test_name)
+         else:
+-            print 'Test B: ', test_name
+-            print 'N tests: ', str(n_test), '\n'
++            print('Test B: ', test_name)
++            print('N tests: ', str(n_test), '\n')
+ 
+         list_trial_times = data_test['turn_time']
+         list_num_moves = data_test['num_available']
+@@ -579,7 +579,7 @@
+                     ,algo_style="opt_yk"
+                     ,analysis_type="analysis2"
+                     ,analysis_tbl="basic_tas"
+-                    ,games_requested=range(1,6)
++                    ,games_requested=list(range(1,6))
+                     ,path_db=None
+                     ):
+         
+@@ -733,7 +733,7 @@
+         for triplet in self.collected_batch:
+             d_collected[triplet[0]] = triplet[1]
+         
+-        for _gameId in self.results.keys():
++        for _gameId in list(self.results.keys()):
+             if d_collected[_gameId]:
+                 self.db.add_tas_record(_gameId
+                                         ,self.results[_gameId]
+@@ -762,7 +762,7 @@
+     
+     def interactiveWrite(self):
+         ''' wait until after runBatch and a print to verify writing '''
+-        input_return = input("'y' to save to db:" + str(self.db.conn) + ' >')
++        input_return = eval(input("'y' to save to db:" + str(self.db.conn) + ' >'))
+         if "y" in input_return:
+             self.writeOut()
+         #TODO - add an attribute-msg to the data record: e.g. "with netflix running"
+@@ -861,16 +861,16 @@
+         b_piece_init=True
+ 
+         N = 250
+-        print '\n Just Play Timing \n'
++        print('\n Just Play Timing \n')
+         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                     ,b_time_init=False)
+-        print '\n With Consturctor Timing \n'
++        print('\n With Consturctor Timing \n')
+         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                     ,b_time_init=True)
+-        print '\n Just Play Timing (again) \n'
++        print('\n Just Play Timing (again) \n')
+         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                     ,b_time_init=False)
+-        print '\n With Consturctor Timing (again) \n'
++        print('\n With Consturctor Timing (again) \n')
+         analysis1(s_tests, s_instructions, n=N, b_just_basic=True, b_piece_init=b_piece_init
+                     ,b_time_init=True)
+ 
+@@ -879,10 +879,10 @@
+             s_instructions = "1. b1 c3 2. b7 b5 3. d2 d4 4. b5 b4 5. c1 e3 6. b4 c3 7. d1 d3 8. c3 b2 9. h2 h4 10. b2 a1 11. e1 c1 12. h7 h5"
+             s_tests = ["baseline_nk", "opt_yk"]   #they dont call play(b_load)
+             
+-            print '\n With Consturctor Timing \n'
++            print('\n With Consturctor Timing \n')
+             analysis2(s_tests, s_instructions, n=N, b_piece_init=False)
+             
+-            print '\n Just Play Timing \n'
++            print('\n Just Play Timing \n')
+             analysis2(s_tests, s_instructions, n=N, b_piece_init=True)
+ 
+     
+@@ -903,10 +903,10 @@
+             testType = "a" if i_trial % 2 == 0 else "b"
+ 
+             if testType == "a":
+-                print sA
++                print(sA)
+                 testUsePgn, testConvertPgn = True, False
+             elif testType == "b":
+-                print sB
++                print(sB)
+                 testUsePgn, testConvertPgn = False, True
+ 
+             analysis1(s_tests
+@@ -923,7 +923,7 @@
+     if args["populategames"]:
+         db = TasPerfDB(data_dir = "../data/perf/perf_db.db", populate=True)
+         db.closeConn()
+-        print 'done with populate'
++        print('done with populate')
+ 
+ 
+     if args["singledemo"]:
+@@ -946,23 +946,23 @@
+         ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
+         ba.setGames([1,12])
+         ba.collect_batch()
+-        print 'Running analysis on games: '
+-        print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
+-
+-        print 'Running batch...'
++        print('Running analysis on games: ')
++        print("\n".join([str(item[0]) for item in copy.copy(ba.collected_batch)]))
++
++        print('Running batch...')
+         ba.runBatch(b_write=False)
+ 
+         results = ba.getResults()
+-        gameIds = map(lambda item: str(item[0]), copy.copy(ba.collected_batch))
++        gameIds = [str(item[0]) for item in copy.copy(ba.collected_batch)]
+         tas0 = results[gameIds[0]]
+ 
+-        print 'Num Results: ', str(len(results.keys()))
++        print('Num Results: ', str(len(list(results.keys()))))
+ 
+         s_tas0 = str(tas0.get_all())
+-        print 'preview of TAS 0:'
+-        print s_tas0[:min(len(s_tas0), 1000)]
+-
+-        print 'num_trials: ', str(len(tas0.get_all()['trials']))
++        print('preview of TAS 0:')
++        print(s_tas0[:min(len(s_tas0), 1000)])
++
++        print('num_trials: ', str(len(tas0.get_all()['trials'])))
+ 
+ 
+ 
+@@ -970,11 +970,11 @@
+ 
+         if args["gamesrequested"]:
+             s_cmd = args["gamesrequested"]
+-            cmd_games_requested = map(int, s_cmd.split(","))
++            cmd_games_requested = list(map(int, s_cmd.split(",")))
+             #TODO - single game
+             #TODO - range of games
+         else:
+-            cmd_games_requested = range(1,11) #[1,2,3]
++            cmd_games_requested = list(range(1,11)) #[1,2,3]
+ 
+         if args["n"]:
+             cmd_n = int(args["n"])
+@@ -1004,9 +1004,9 @@
+         ba.collect_batch()
+         
+         if args["verbose"]:
+-            print 'Running analysis on games: '
+-            print "\n".join(map(lambda item: str(item[0]), copy.copy(ba.collected_batch)))
+-            print 'Running batch...'
++            print('Running analysis on games: ')
++            print("\n".join([str(item[0]) for item in copy.copy(ba.collected_batch)]))
++            print('Running batch...')
+             t0 = time()
+         
+         ba.runBatch(b_write=True)
+@@ -1014,13 +1014,13 @@
+         results = ba.getResults()
+ 
+         if args["verbose"]:
+-            print 'Total Time: ', str(time() - t0)
+-            print 'Num Results: ', str(len(results.keys()))
+-            for k in results.keys():
+-                print str(k), " trials: ", str(len(results[k].get_all()['trials']))
+-            print ba.db.getErrLog()
+-
+-    print 'script done.'
++            print('Total Time: ', str(time() - t0))
++            print('Num Results: ', str(len(list(results.keys()))))
++            for k in list(results.keys()):
++                print(str(k), " trials: ", str(len(results[k].get_all()['trials'])))
++            print(ba.db.getErrLog())
++
++    print('script done.')
+         
+ 
+ 
+@@ -1492,7 +1492,7 @@
+ # Unit Tests --------------------------------------------------------
+ 
+ import types
+-from db_module import DBDriver
++from .db_module import DBDriver
+ 
+ def test_basic_perf_pattern():
+     ''' Test invoking a Game and play '''
+@@ -1526,7 +1526,7 @@
+     tas = TimeAnalysisSchema()
+     
+     aggregated_y = tas.aggregate_y(dummy_turn_times)
+-    rounded_aggregated_y = map(lambda x: round(x, 2), aggregated_y)
++    rounded_aggregated_y = [round(x, 2) for x in aggregated_y]
+     #TODO - from numpy import double or import decimal *
+     
+     assert rounded_aggregated_y == [0.1, 0.2, 0.15, 0.1]
+@@ -1549,11 +1549,11 @@
+ 
+     d_from_json = tas.get_all()
+ 
+-    assert type(d_from_json) == types.DictionaryType 
++    assert type(d_from_json) == dict 
+     
+     assert d_from_json.get('trials', None) is not None
+     assert d_from_json.get('meta_analysis', None) is not None    
+-    assert d_from_json.has_key('log')
++    assert 'log' in d_from_json
+ 
+ 
+ def test_turn_attribute_1():
+@@ -1580,7 +1580,7 @@
+ 
+     weighted_y = tas.weighted_avg(list_n, list_list_y)
+ 
+-    rounded_weighted_y = map(lambda x: round(x, 3), weighted_y)
++    rounded_weighted_y = [round(x, 3) for x in weighted_y]
+ 
+     assert rounded_weighted_y == [0.19, 0.2, 0.13]
+ 
+@@ -1590,7 +1590,7 @@
+         doesnt bite us here with multiple instantiated DBDriver instances.
+         Similiar to db_module:test_different_errlogs_respectively_1() '''
+ 
+-    from db_module import DBDriver
++    from .db_module import DBDriver
+     
+     db = DBDriver(data_dir="../data/perf/mock_db.db")
+     db.execStr("select * from BAD_TABLE", b_fetch=True)
+@@ -1629,11 +1629,11 @@
+     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-102",))
+     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-103",))
+     db.execStr("delete from basic_tas where id = ?",  ("GarryKasparovGames.txt-104",))
+-    print db.getErrLog()    # if test fails, dump errlog
++    print(db.getErrLog())    # if test fails, dump errlog
+     
+     #Request games of the ones which are blank
+     ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
+-    ba.setGames(range(102,105))
++    ba.setGames(list(range(102,105)))
+     assert ba.games_requested[2] == 104
+     
+     #Analyze the triplet data structure of collected_batch list
+@@ -1654,7 +1654,7 @@
+ 
+     #Request games which are in basic_tas
+     ba = BatchAnalysis(path_db="../data/perf/mock_db.db")
+-    ba.setGames(range(1,4))
++    ba.setGames(list(range(1,4)))
+     ba.collect_batch()
+     _collected_batch = ba.collected_batch
+ 
+@@ -1666,10 +1666,10 @@
+     
+     #Make sure you loaded an existing TAS
+     _tas = _collected_batch[0][2].get_all()
+-    assert type(_tas) == types.DictionaryType
++    assert type(_tas) == dict
+     assert _tas['log']['s_instructions'] == '1. c4 Nf6 2. Nc3 g6 3. g3 c5 4. Bg2 Nc6 5. Nf3 d6 6. d4 cxd4 7. Nxd4 Bd7 8. O-O Bg7 9. Nxc6 Bxc6 10. e4 O-O 11. Be3 a6 12. Rc1 Nd7 13. Qe2 b5 14. b4 Ne5 15. cxb5 axb5 16. Nxb5 Bxb5 17. Qxb5 Qb8 18. a4 Qxb5 19. axb5 Rfb8 20. b6 Ng4 21. b7 \n'
+     assert _tas['log']['num_available'] == [20, 20, 22, 22, 26, 23, 26, 24, 31, 28, 31, 36, 40, 35, 46, 35, 44, 35, 40, 36, 40, 35, 47, 35, 45, 37, 44, 35, 42, 35, 42, 38, 43, 33, 47, 32, 32, 32, 31, 32, 30]
+-    assert type(_tas['trials']) == types.ListType
++    assert type(_tas['trials']) == list
+ 
+ 
+ def test_batch_analysis_run_1():
+@@ -1685,7 +1685,7 @@
+     s_tas0 = db.c.fetchall()[0][1]
+     # print db.getErrLog()
+     # [0][1]
+-    print s_tas0
++    print(s_tas0)
+     db.closeConn()
+     tas0.from_json(s_json=s_tas0,path_fn=None)
+     tas0_num_trials = len(tas0.get_all()['trials'])
+--- basic_engine/tools\pgn_convert.py	(original)
++++ basic_engine/tools\pgn_convert.py	(refactored)
+@@ -38,14 +38,14 @@
+     data = f.readlines()
+     f.close()
+ 
+-    print 'lines: ', str(len(data))
++    print('lines: ', str(len(data)))
+ 
+     valid = []
+     for line in data:
+         if line[:3] == '1. ':
+             valid.append(line)
+ 
+-    print 'valids: ', str(len(valid))
++    print('valids: ', str(len(valid)))
+ 
+     path_fn = 'data/GarryKasparovGames.txt'
+     f = open(path_fn, 'w')
+@@ -72,9 +72,9 @@
+             min_moves = len(moves)
+             min_moves_ind = cntr
+ 
+-    print 'max_moves: ', max_moves
+-    print 'min_moves: ', min_moves
+-    print 'min_moves_ind: ', min_moves_ind
++    print('max_moves: ', max_moves)
++    print('min_moves: ', min_moves)
++    print('min_moves_ind: ', min_moves_ind)
+ 
+ if True:
+ 
+--- basic_engine/tools\profile_test.py	(original)
++++ basic_engine/tools\profile_test.py	(refactored)
+@@ -22,16 +22,16 @@
+     if b_json_style:
+         import json
+         out = json.dumps(d,indent=4)
+-        print out
++        print(out)
+         return None
+     
+     out = ""
+-    for k in d.keys():
++    for k in list(d.keys()):
+         out += str(k)
+         out += " : "
+         out += str(d[k])
+         out += "\n"
+-    print out
++    print(out)
+ 
+ 
+ def build_code_str(s_instruct, d_params, b_import=True, b_pgn=False):
+@@ -76,7 +76,7 @@
+     ''' input: d_params (dict of dicts), s_instruct (str)
+         return: dict of dicts with cmd-string as val '''
+     d_out = {}
+-    for _k in test_data_params.keys():
++    for _k in list(test_data_params.keys()):
+         d_out[_k] = build_code_str(s_instruct, test_data_params[_k], True, b_pgn)
+     return d_out
+ 
+@@ -259,26 +259,26 @@
+     args = vars(ap.parse_args())
+ 
+     if not(any(args.values())):
+-        print 'Yes need to set at least one flag to run this util. Exiting.'
++        print('Yes need to set at least one flag to run this util. Exiting.')
+         sys.exit()
+ 
+     b_display_all_functions = args["displayallfunctions"]
+     b_pgn_instruct = False
+     
+     if args["current"]:
+-        print """
++        print("""
+             Showing current best algo w/ many function profile on 65 move game. \n
+-        """
++        """)
+         test_data_params = param_data_just_opt()
+         s_instruct = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. h3 Bb7 9. d3 d6 10. a3 Na5 11. Ba2 c5 12. Nc3 Nc6 13. Bg5 Qd7 14. Nh2 Ne8 15. Bd2 Nc7 16. Nf1 Kh8 17. Ng3 Nd4 18. Nce2 Nde6 19. b4 d5 20. bxc5 Bxc5 21. Bb4 Rfe8 22. Bxc5 Nxc5 23. Nc3 Rad8 24. Qh5 f6 25. d4 exd4 26. Nxd5 Re5 27. Qh4 Nxd5 28. exd5 Bxd5 29. Rxe5 fxe5 30. Bxd5 Qxd5 31. Re1 Ne6 32. Nf5 Nf4 33. Qg5 Rd7 34. Nh4 h6 35. Qg4 g5 36. Nf3 e4 37. Rxe4 Qxe4 38. Qxd7 d3 39. cxd3 Qxd3 40. Qc8+ Kg7 41. Qb7+ Kg8 42. Qxa6 Ne2+ 43. Kh2 Qe4 44. Qf6 Qf4+ 45. Qxf4 gxf4 46. g4 fxg3+ 47. fxg3 Nc3 48. Nd4 h5 49. h4 Kf7 50. Kh3 Kf6 51. g4 hxg4+ 52. Kxg4 Kg6 53. h5+ Kh7 54. Kh4 Kg8 55. h6 Kh7 56. Kh5 Ne4 57. Nxb5 Nf6+ 58. Kg5 Ne4+ 59. Kf5 Nc5 60. Ke5 Kxh6 61. Kd4 Na6 62. Kd5 Kg6 63. Nd4 Kf6 64. Kd6 Kf7 65. Ne6 '
+         b_pgn_instruct = True
+         b_display_all_functions = True
+ 
+     if args["classiccomparison"]:
+-        print """
++        print("""
+                 Showing the difference between filter_check algos
+                 using only the opening move. \n
+-        """
++        """)
+         test_data_params = param_data_different_filter_algos()
+         s_instruct = "1. g1 h3"  
+         
+@@ -291,10 +291,10 @@
+         b_pgn_instruct = False
+         
+     if args["verboseparams"]:
+-        print 'Test Data Params: \n', pretty_print(test_data_params, b_json_style=True)
++        print('Test Data Params: \n', pretty_print(test_data_params, b_json_style=True))
+         d_cmdstr = batch_build_code_strs(test_data_params, s_instruct, b_pgn_instruct)
+-        print 'Literal Command Strings:'
+-        print "\n".join([v for v in d_cmdstr.values()])
++        print('Literal Command Strings:')
++        print("\n".join([v for v in list(d_cmdstr.values())]))
+ 
+ 
+     #MAIN FUNCTIONS ----------------------
+@@ -460,10 +460,10 @@
+     ref1['two'] = 2
+     ref1['one'] = 17
+ 
+-    print 'd0: ',   str(d0)
+-    print 'ref0: ', str(ref0)
+-    print 'd1: ',   str(d1)
+-    print 'ref1: ', str(ref1)
++    print('d0: ',   str(d0))
++    print('ref0: ', str(ref0))
++    print('d1: ',   str(d1))
++    print('ref1: ', str(ref1))
+ 
+     assert  ref0 == d0      #without copy, you overide
+     assert not(ref1 == d1)  #with copy.copy you're OK.
+@@ -521,7 +521,7 @@
+ 
+     list_s_cmd = []
+     
+-    for test_key in test_data.keys():
++    for test_key in list(test_data.keys()):
+         
+         test_name = str(test_key)
+         test_params = test_data[test_key]
+@@ -554,12 +554,12 @@
+ 
+     d_s_cmd = {}
+     
+-    for test_key in test_data.keys():
++    for test_key in list(test_data.keys()):
+         
+         test_name = str(test_key)
+         test_params = test_data[test_key]
+ 
+-        print test_name
++        print(test_name)
+         if test_name == "legacy_instruct":
+             test_s_instruct = "1. g1 h3"  
+             b_pgn_instruct = False
+--- basic_engine/tools\run.py	(original)
++++ basic_engine/tools\run.py	(refactored)
+@@ -1,7 +1,7 @@
+ import sys
+ from main import Game
+ from Display import Display
+-from utils import format_move_log
++from .utils import format_move_log
+ 
+ display = Display()
+ 
+@@ -9,7 +9,7 @@
+ run_type = "interactive"
+ if len(sys.argv) > 1:
+     run_type = str(sys.argv[1])
+-print '\nRunning: ', run_type, '\n'
++print('\nRunning: ', run_type, '\n')
+ 
+ # run_type = 'randomplay2'    #for debugging
+ # run_type = 'replay'    #for debugging
+@@ -37,20 +37,20 @@
+     ret = game.play()
+     
+     if game.i_turn == 1000:
+-        print '1000 turn game'
++        print('1000 turn game')
+     else:
+         
+         outcome, board, pieces = ret
+ 
+-        print 'Outcome: ', str(outcome)
++        print('Outcome: ', str(outcome))
+         
+         display.print_board_letters(pieces)
+ 
+         log = game.get_gamelog()
+         move_log = log.get_log_move()
+ 
+-        print 'Game Turn on exit: ', str(game.i_turn)
+-        print 'Len of Log Moves:  ', str(len(move_log))
++        print('Game Turn on exit: ', str(game.i_turn))
++        print('Len of Log Moves:  ', str(len(move_log)))
+ 
+ if run_type == '20random':
+     
+@@ -64,20 +64,20 @@
+         ret = game.play()
+         
+         if game.i_turn == 1000:
+-            print '1000 turn game'
++            print('1000 turn game')
+         else:
+             
+             outcome, board, pieces = ret
+ 
+-            print 'Outcome: ', str(outcome)
++            print('Outcome: ', str(outcome))
+             
+             display.print_board_letters(pieces)
+ 
+             log = game.get_gamelog()
+             move_log = log.get_log_move()
+ 
+-            print 'Game Turn on exit: ', str(game.i_turn)
+-            print 'Len of Log Moves:  ', str(len(move_log))
++            print('Game Turn on exit: ', str(game.i_turn))
++            print('Len of Log Moves:  ', str(len(move_log)))
+ 
+ if run_type == 'manyrandom':
+     
+@@ -91,20 +91,20 @@
+         ret = game.play()
+         
+         if game.i_turn == 1000:
+-            print '1000 turn game'
++            print('1000 turn game')
+         else:
+             
+             outcome, board, pieces = ret
+ 
+-            print 'Outcome: ', str(outcome)
++            print('Outcome: ', str(outcome))
+             
+             display.print_board_letters(pieces)
+ 
+             log = game.get_gamelog()
+             move_log = log.get_log_move()
+ 
+-            print 'Game Turn on exit: ', str(game.i_turn)
+-            print 'Len of Log Moves:  ', str(len(move_log))
++            print('Game Turn on exit: ', str(game.i_turn))
++            print('Len of Log Moves:  ', str(len(move_log)))
+ 
+ 
+ elif run_type == "randomplay2":
+@@ -121,7 +121,7 @@
+     except Exception as e:
+         
+         #Game Broke, so let's look at the previous move, what happend?
+-        print 'exception: ', str(e)
++        print('exception: ', str(e))
+ 
+         log = game.get_gamelog()
+         move_log = log.get_log_move()
+@@ -153,24 +153,24 @@
+         ret2 = g2.play()
+         pieces2, board2 = ret2['pieces'], ret2['board']
+ 
+-        print 'Game 2 moves before break'
++        print('Game 2 moves before break')
+         display.print_board_letters(board0, pieces0, True)    
+         
+-        print 'Game 2 moves before break'
++        print('Game 2 moves before break')
+         display.print_board_letters(board1, pieces1, True)    
+         
+-        print 'Game 1 move before break'
++        print('Game 1 move before break')
+         display.print_board_letters(board2, pieces2, True)
+ 
+     #What does end game look like?
+-    print 'Outcome: ', str(outcome)
++    print('Outcome: ', str(outcome))
+     display.print_board_letters(board, pieces, True)
+-    print "\n".join([str(x) for x in board.data_by_player])
++    print("\n".join([str(x) for x in board.data_by_player]))
+ 
+     #Verify checkmate with naive algo
+     if False and outcome[2] == 'CHECKMATE':
+         
+-        print 'its a checkmate, so lets cross examine'
++        print('its a checkmate, so lets cross examine')
+ 
+         losing_player = outcome[0]
+ 
+@@ -184,7 +184,7 @@
+                                 ,filter_check_opt = False
+                                 )
+ 
+-        print 'Moves available: ', str(ret_moves['moves'])
++        print('Moves available: ', str(ret_moves['moves']))
+ 
+     # try:
+     #     outcome, board = game.play()
+@@ -192,15 +192,15 @@
+     #     print 'exception!'
+     #     print e
+ 
+-    print 'Outcome: ', str(outcome)
++    print('Outcome: ', str(outcome))
+ 
+     display.print_board_letters(board, pieces, True)
+ 
+     log = game.get_gamelog()
+     move_log = log.get_log_move()
+ 
+-    print 'Game Turn on exit: ', str(game.i_turn)
+-    print 'Len of Log Moves:  ', str(len(move_log))
++    print('Game Turn on exit: ', str(game.i_turn))
++    print('Len of Log Moves:  ', str(len(move_log)))
+ 
+ elif run_type == 'replay':
+ 
+@@ -208,12 +208,12 @@
+     s = f.readlines()
+     f.close()
+     s = s[0]
+-    print s
++    print(s)
+ 
+     game = Game(s_instructions = s, test_exit_moves = 64)
+     ret = game.play()
+-    print 'i_turn: ', str(game.i_turn)
+-    print ret
++    print('i_turn: ', str(game.i_turn))
++    print(ret)
+ 
+     # moves = ret['moves']
+     # print moves
+--- basic_engine/tools\schema_module.py	(original)
++++ basic_engine/tools\schema_module.py	(refactored)
+@@ -104,21 +104,21 @@
+         try:
+             assert len(data) > 1
+             len0  = len(data[0])
+-            assert all(map(lambda data_i: len(data_i) == len0, data))
++            assert all([len(data_i) == len0 for data_i in data])
+         except AssertionError:
+-            print 'data fed to aggregate_y is of different length; cant aggregate that.'
++            print('data fed to aggregate_y is of different length; cant aggregate that.')
+             return None
+         try:
+             temp = []
+             n = len(data)
+             j = len(data[0])
+             for _j in range(j):
+-                sum_elems = sum(map(lambda d: d[_j], data))
++                sum_elems = sum([d[_j] for d in data])
+                 avg_elems = float(sum_elems) / float(n)
+                 temp.append(avg_elems)
+             return temp
+         except:
+-            print 'failed to aggregate, but did not catch in exception'
++            print('failed to aggregate, but did not catch in exception')
+             return None
+ 
+     @staticmethod
+@@ -131,7 +131,7 @@
+         cum_sum_y = [0 for j in range(num_turns)]
+         
+         for i in range(num_elems):
+-            weighted_y = map(lambda elem: elem * float(list_n[i]), list_list_y[i])
++            weighted_y = [elem * float(list_n[i]) for elem in list_list_y[i]]
+             cum_sum_y = [cum_sum_y[j] + weighted_y[j] for j in range(num_turns)]
+ 
+         avg_y = [float(cum_sum_y[j]) / float(total_n) for j in range(num_turns)]
+@@ -182,9 +182,9 @@
+             with open(data_dir + data_fn, 'w') as f:
+                 json.dump(tas, f)
+         except:
+-            print 'failed to write file output'
+-            return None
+-        print 'wrote output to: ', data_dir, data_fn
++            print('failed to write file output')
++            return None
++        print('wrote output to: ', data_dir, data_fn)
+ 
+     
+     def from_json(self, path_fn="../data/perf/demo.tas", s_json=None):
+@@ -195,7 +195,7 @@
+                 with open(path_fn, "r") as f:
+                     d_tas = json.load(f)
+             except:
+-                print 'could not load json from: ', str(path_fn)
++                print('could not load json from: ', str(path_fn))
+                 return None
+ 
+         if s_json is not None:
+@@ -204,8 +204,8 @@
+                 
+                 d_tas['log']['s_instructions'] = str(d_tas['log']['s_instructions'])
+             except:
+-                print 'could not load json from string.' 
+-                print 'arg of type: ', str(type(s_json))
++                print('could not load json from string.') 
++                print('arg of type: ', str(type(s_json)))
+                 return None
+ 
+         try:
+@@ -214,7 +214,7 @@
+             self.trials = d_tas['trials']
+ 
+         except:
+-            print 'could not convert json to TAS'
++            print('could not convert json to TAS')
+             return None
+ 
+         return 0
+@@ -251,7 +251,7 @@
+             game = Game(s_pgn_instructions=self.s_pgn_instructions
+                         ,b_log_full=True)
+         else:
+-            print 'could not find instructions to run create_data()'
++            print('could not find instructions to run create_data()')
+             return None
+ 
+         game.play()
+--- basic_engine/tools\utils.py	(original)
++++ basic_engine/tools\utils.py	(refactored)
+@@ -22,7 +22,7 @@
+ if __name__ == "__main__":
+     
+     s_input = "1. c4"
+-    print convert_pgn_to_a1(s_input)
++    print(convert_pgn_to_a1(s_input))
+ 
+ 
+ def test_convert_pgn_to_a1_1():
