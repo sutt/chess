@@ -1989,7 +1989,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
     [ ] Build diff of diffs
 
-    [ ] replicate running tests on --src
+    [x] replicate running tests on --src
     
     [x] get main to run
 
@@ -2101,17 +2101,30 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
     [ ] convert rest of tests
 
-        [ ] StockfishCLApi
-        [ ] tools/
-        [ ] batchverify
-        [ ] stockfish
-            [ ] run_pytest_file.bat
-        [ ] stockfish-pkg-own-unittests
+        [x] StockfishCLApi
+        [x] tools/
+        [x] batchverify
+        [x] stockfish
+            [x] run_pytest_file.bat
+        [~] stockfish-pkg-own-unittests
             - could have changed since I downloaded for py2 compatibility
+            these are already run in runtests.py --all (?) ->no
+
+    [ ] flask-server is still run with py2 in wsl
+
+    [ ] delve into the mystery that is bash.exe path
+
+    [ ] run tools/: profile_test.py, perf_test.py, pgn_convert.py, etc.
+
+    [ ] move .bak files to a separate folder
+
+    [x] does tests/stockfish_test.py ever get called?
+        -> no (?) but its 3 tests do pass
 
     [ ] make all tests pass on py3: win+wsl
-
-        [ ] does wsl have py3?
+        [x] py3+win32 = pass
+        [ ] py3+wsl = pass
+        [x] does wsl have py3? -> no
 
     [ ] batchverify, alter BATCH_SAMPLING_N=
 
@@ -2138,11 +2151,205 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
     [ ] root/main.py should juggle version/architectures
 
-    [ ] is stockfish working? why isn't it priniting out,
+    [x] is stockfish working? why isn't it priniting out,
         especially when it's torn-down?
 
         - 2to3 hasn't been run on that folder!?
         - subprocess are calling py2
+
+    [x] fix tests in --tools
+
+        initially:
+        === 13 failed, 18 passed, 1 warnings in 4.21 seconds ===
+
+        corrections:
+        -return (x / y)  + self.z
+        +return (x // y)  + self.z
+
+        == 12 failed, 19 passed, 1 warnings in 3.97 seconds ==
+
+        exception-object has new property: 'args', not 'message'
+        try:
+            msgDict['exception_msg'] = exception_class.message
+        except:
+            msgDict['exception_msg'] = 'could not generate e.message'
+        try:
+            msgDict['exception_msg'] = exception_class.args
+        except:
+            msgDict['exception_msg'] = 'could not generate e.args'
+
+        ==== 3 failed, 28 passed, 1 warnings in 2.22 seconds ==
+
+        -assert e1['exception_msg'] == 'no such table: BAD_TABLE'
+        +assert e1['exception_msg'] == ('no such table: BAD_TABLE',)
+
+        === 2 failed, 29 passed, 1 warnings in 2.19 seconds ==
+        
+        === 31 passed, 1 warnings in 1.80 seconds ==
+
+        text generated from a dict changes order: 
+            (see arg order in game.play())
+        old: """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+        new: '''from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=True);'''
+
+        === 31 passed, 1 warnings in 1.80 seconds ===
+
+    [x] fix batchverify
+
+        initial corrections
+        
+        -import exceptions
+        +[nil]
+        
+        -return exceptions.AssertionError()
+        +return AssertionError
+
+        -assert type(ret) == AssertionError        
+        +assert ret == AssertionError        
+
+    [x] fix stockfishnetworking
+
+        initial corrections:
+
+        build >python[3] -m pytest (instead of >pytest) logic into
+            .bat's that launch the tests for 
+    
+        >pip3 install requests
+
+        === 4 failed, 3 passed in 1.22 seconds ====
+
+            self.serverProcess = subprocess.Popen(
+                                [
+        -                       'c:/windows/sysnative/bash.exe'
+        +                       'c:/windows/system32/bash.exe'
+                                ,'-c'
+                                ...
+                                ...
+        
+        -    assert r.content == "Hello, Flask! <br> New Line?" 
+        +    content = r.content
+        +    if sys.version_info.major == 3:
+        +        content = content.decode()
+        +     assert content == "Hello, Flask! <br> New Line?"
+        
+        === 2 failed, 5 passed in 6.94 seconds ===
+
+        if r.status_code == 200:
+            content = r.content
+            if sys.version_info.major == 3:
+                content = content.decode()
+            return content
+
+        ==== 7 passed in 6.81 seconds ===
+
+        [x] allow py2 to still run
+
+        
+        looks like Popen is the perfroming differently
+        https://stackoverflow.com/questions/46910430/subprocess-popen-differences-btw-python-2-7-and-3
+
+        need to build a dev/test env:
+            how to execute StockfishNetworking()
+            how to see when flask is running?
+            do it with 2 to see flask run
+            do it with 3, does flask not run?
+            run pre-config + flask cmds in wsl shell
+
+            can't find this via cmd:
+                c:/windows/sysnative/bash.exe
+
+            but somehow it works when py2 call to Popen
+
+
+
+    [ ] Install CTags to enable Python workspace symbols?
+
+        note: with jedi re-enabled now goto-symbol is broken
+        and now debug os broken too? -> need to remove stopOnEntry from launch.json
+
+        https://github.com/universal-ctags/ctags-win32/releases
+
+    [ ] So how to debug tools/ tests
+
+        [ ] we still can't do it with datapaths
+        
+        since tools/ is a package, the relative imports
+        don't work when it's run as __main__ in debug
+
+        - anything import from tools? ->no
+        - what exactly do we want to do with tools?
+            call to profile
+            call to pgn_converter
+
+        
+        [x] have pytest printout __name__ + __package__
+            says it calls from tools/
+            but 
+            __name__: tools.db_module
+            __package__: tools
+            cwd: 'C:\\Users\\wsutt\\Desktop\\files\\chess\\basic_engine\\tools'
+
+        [ ] how to debug directly from pytest?
+
+            [ ] python -m pytest tools/ --pdb in launcher.json
+
+            [ ] using --pdb
+                >import inspect
+                >inspect.stack()
+
+                >import trackeback
+                >trackeback.print_stack()
+                
+
+            [ ] how does pytest get it "so right"
+
+                maybe:
+                    collects test_* functions into a tempfile
+                    within tools/
+                    then executes those functions
+                [x] do this manually, see if it matches up -> nope
+                    tools/test_runner.py
+
+             _run_module_as_main at top of stack trace, but this is because we're running pytest as a module, true?
+             File "C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib\runpy.py", line 193, in _run_module_as_main
+
+             Helpful command flags
+             https://docs.pytest.org/en/latest/usage.html
+
+             relevant
+             https://docs.pytest.org/en/latest/goodpractices.html#test-discovery
+
+             https://docs.pytest.org/en/latest/goodpractices.html#test-package-name
+
+            [ ] why does test_reveal_sys_vars() cause pytest to stop?
+
+        [ ] remove from sys.path: C:\WINDOWS\SYSTEM32\python27.zip
+
+        [~] modify ptvsd_launcher.py
+
+            c:\Users\wsutt\.vscode\extensions\ms-python.python-2019.2.5558\pythonFiles\ptvsd_launcher.py
+
+        [x] got it to work with this:
+
+            [ ] still this won't work as cwd() is not correct for data-paths
+                correct?
+
+            {
+            "name": "py3-basic",
+            "type": "python",
+            "request": "launch",
+            "pythonPath": "C:\\Users\\wsutt\\AppData\\Local\\Programs\\Python\\Python37\\python3.exe",
+            "module": "tools.${fileBasenameNoExtension}",
+            "cwd": "basic_engine/",
+            "console": "integratedTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            },
+
+        https://github.com/Microsoft/ptvsd/issues/991
+        https://github.com/Microsoft/ptvsd/issues/748
+        https://github.com/Microsoft/ptvsd/issues/745#issuecomment-414700314
+
 
 
 

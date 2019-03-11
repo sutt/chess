@@ -92,26 +92,37 @@ if args["3"]:
 
 
 if b_src:
-    cmd =  copy.copy(pytest_cmd)
+    
+    cmd = copy.copy(pytest_cmd)
     cmd.extend([verbose_arg])
-    print(cmd)
+    
     p = subprocess.Popen(cmd, cwd="../src/")
     p.wait()
 
 if b_linux and b_src:
-    cmd =  copy.copy(pytest_cmd)
-    cmd.extend(verbose_arg)
-    p = subprocess.Popen(["pytest", verbose_arg, "StockfishCLApi.py"]
-                            ,cwd = "../src/")
+    
+    cmd = copy.copy(pytest_cmd)
+    cmd.extend([verbose_arg])
+    cmd.extend(["StockfishCLApi.py"])
+    
+    p = subprocess.Popen(cmd, cwd="../src/")
     p.wait()
 
 if b_tools:
-    p = subprocess.Popen(["pytest", verbose_arg], cwd="../tools/")
+
+    cmd = copy.copy(pytest_cmd)
+    cmd.extend([verbose_arg])
+
+    p = subprocess.Popen(cmd, cwd="../tools/")
     p.wait()
 
 if b_batchverify:
+
+    cmd = copy.copy(pytest_cmd)
+    cmd.extend([verbose_arg])
+    cmd.extend(["batchverify.py"])
     
-    p = subprocess.Popen(["pytest", verbose_arg, "batchverify.py"])
+    p = subprocess.Popen(cmd)
     p.wait()
 
 if b_stockfish:
@@ -121,7 +132,11 @@ if b_stockfish:
     if "test_tmp.txt" in os.listdir(os.getcwd()):
         os.remove("test_tmp.txt")
 
-    p = subprocess.Popen( [  'run_pytest_file.bat'
+    launch_bat_fn = 'run_pytest_file_py2.bat'
+    if args['3']:
+        launch_bat_fn = 'run_pytest_file_py3.bat'
+        
+    p = subprocess.Popen( [  launch_bat_fn
                             ,'../src/StockfishNetwork.py'
                             ,verbose_arg_flag
                           ]

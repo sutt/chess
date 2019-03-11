@@ -1,5 +1,5 @@
 import sqlite3
-import os
+import os, sys
 import json
 from .schema_module import TimeAnalysisSchema
 
@@ -27,7 +27,15 @@ class DBErrLog:
         msgDict['method_name'] = method_name
         msgDict['method_args'] = method_args
         msgDict['method_kwargs'] = method_kwargs
-        msgDict['exception_msg'] = exception_class.message
+        try:
+            msgDict['exception_msg'] = exception_class.message
+        except:
+            msgDict['exception_msg'] = 'could not generate e.message'
+            try:
+                msgDict['exception_msg'] = exception_class.args
+            except:
+                msgDict['exception_msg'] = 'could not generate e.args'
+
         #TODO - stacktrace
         
         self.msgList.append(msgDict)
@@ -344,6 +352,16 @@ if __name__ == "__main__":
 
 #Unit Tests ----------------------------------------------------------
 
+# def test_reveal_sys_vars():
+#     print('+++++++++++++++++++++++++++++++++++++++++++++')
+#     print('__name__:', __name__)
+#     print('__package__:', __package__)
+#     print('cwd:', os.getcwd())
+#     print("\n".join([str(x) for x in sys.path]))
+#     print('+++++++++++++++++++++++++++++++++++++++++++++')
+#     assert False
+    
+
 def test_calling_instance_method_in_init():
     ''' Testing Design Pattern: call function below init, in init '''
 
@@ -381,7 +399,7 @@ def test_class_wrapper_1():
         @decorate
         def calc(self,x, y):
             print('executing function')
-            return (x / y)  + self.z
+            return (x // y)  + self.z
 
     mc = MyClass()
     assert mc.calc(1,2) == 1
@@ -437,7 +455,7 @@ def test_errlog_msg_2():
     assert e1['method_name'] == "execStr"
     assert e1['method_args'][1] == "select * from BAD_TABLE"
     assert e1['method_kwargs'] == {}
-    assert e1['exception_msg'] == 'no such table: BAD_TABLE'
+    assert e1['exception_msg'] == ('no such table: BAD_TABLE',)
 
 
 
@@ -460,7 +478,7 @@ def test_errlog_msg_3():
     
     assert badOperationItem is not None
     
-    assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
+    assert badOperationItem['exception_msg'] == ('Error binding parameter 0 - probably unsupported type.',)
 
     assert badOperationItem['method_kwargs']['id'] == (1, 1)
     assert badOperationItem['method_kwargs']['b_basic'] == True
@@ -518,4 +536,6 @@ def test_err_execmany_1():
 
 if __name__ == "__main__":
     # test_errlog_msg_2()
+    # test_reveal_sys_vars()
+    test_different_errlogs_respectively_1()
     pass

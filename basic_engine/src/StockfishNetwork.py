@@ -1,4 +1,4 @@
-import os
+import os, sys
 import requests
 import subprocess
 import time
@@ -25,7 +25,6 @@ class StockfishNetworking():
         
         self.serverProcess = None
 
-        
         if b_launch_server:
 
             if b_read_stderr:
@@ -37,9 +36,13 @@ class StockfishNetworking():
             else:
                 _stderr = subprocess.PIPE
 
+            bash_path = 'c:/windows/sysnative/bash.exe'
+            if sys.version_info.major == 3:
+                bash_path = 'c:/windows/system32/bash.exe'
+                
             self.serverProcess = subprocess.Popen(
                             [
-                            'c:/windows/sysnative/bash.exe'
+                             bash_path
                             ,'-c'
                             ,"printenv"
                             ,"&&"
@@ -145,7 +148,10 @@ class StockfishNetworking():
         url += "best_move/default"
         r = requests.get(url)
         if r.status_code == 200:
-            return r.content
+            content = r.content
+            if sys.version_info.major == 3:
+                content = content.decode()
+            return content
         else:
             return ""
 
@@ -197,7 +203,10 @@ class StockfishNetworking():
         ''' do a simple check if server is takign requests. Return True if it does '''
         try:
             r = requests.get(self.url_root + 'check_server_is_up/')
-            if r.content == 'ok':
+            content = r.content
+            if sys.version_info.major == 3:
+                content = content.decode()
+            if content == 'ok':
                 return True
         except:
             pass
@@ -280,7 +289,10 @@ def test_sn_launch_server_1():
 
     r = requests.get("http://127.0.0.1:5000/")
 
-    assert r.content == "Hello, Flask! <br> New Line?"
+    content = r.content
+    if sys.version_info.major == 3:
+        content = content.decode()
+    assert content == "Hello, Flask! <br> New Line?"
 
 
 def test_sn_launch_server_2():
@@ -290,7 +302,10 @@ def test_sn_launch_server_2():
 
     r = requests.get("http://127.0.0.1:5000/check_server_params/")
 
-    assert r.content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
+    content = r.content
+    if sys.version_info.major == 3:
+        content = content.decode()
+    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
     
     
 def test_sn_get_best_move_1():

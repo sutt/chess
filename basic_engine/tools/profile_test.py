@@ -537,8 +537,25 @@ def test_build_code_str():
         list_s_cmd.append(s_cmd)
 
     #Now test the strings:
-    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
-    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
+    
+    #TODO - py3: can't expect the exact order of args in play() to be duplicated across python implementations
+
+    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=True);"""
+    if sys.version_info.major == 2:
+        answer = answer_old
+    if sys.version_info.major == 3:
+        answer = answer_new
+    assert list_s_cmd[0] == answer
+
+    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
+    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=False);"""
+    if sys.version_info.major == 2:
+        answer = answer_old
+    if sys.version_info.major == 3:
+        answer = answer_new
+    assert list_s_cmd[1] == answer
+    
 
 
 def test_build_code_str_b_pgn():

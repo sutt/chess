@@ -59,11 +59,11 @@ class MyClass:
 
     @decorate_class
     def calc(self,x, y):
-        return (x / y)  + self.z
+        return (x // y)  + self.z
 
     @decorate_regular
     def calc2(self,x, y):
-        return (x / y)  + self.z
+        return (x // y)  + self.z
 
 
 print('using decorate_class:\n')

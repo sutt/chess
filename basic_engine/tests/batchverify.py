@@ -1,4 +1,5 @@
-import os, sys, time, json, copy, exceptions, types
+import os, sys, time, json, copy, types
+# import exceptions
 sys.path.append('../')
 
 from src.main import Game
@@ -175,7 +176,7 @@ def verify_last_player_move_at_least_ties(data, b_print=False):
                 print(i)
                 print(s_gameSchema)
             
-            return exceptions.AssertionError()
+            return AssertionError
 
 def manual_last_player_move_at_least_ties():
     data = load_xpgn_data(max_tests=None)
@@ -303,7 +304,7 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
                                         )        
         except Exception as e:
 
-            if type(e) == exceptions.KeyboardInterrupt:
+            if type(e) == KeyboardInterrupt:
                 print('BREAKING')
                 break
             else:
@@ -373,7 +374,7 @@ def manual_move_available(n = None, b_naive_check=False, modulo_print=100):
                                     )        
         except Exception as e:
 
-            if type(e) == exceptions.KeyboardInterrupt:
+            if type(e) == KeyboardInterrupt:
                 print('BREAKING')
                 break
             else:
@@ -558,11 +559,13 @@ def test_verify_last_player_move_at_least_ties_true_negative():
     data = load_xpgn_data(exclude_inds = [49])
     ret = verify_last_player_move_at_least_ties(data,b_print=False)
 
-    assert not(type(ret) == exceptions.AssertionError)
+    # assert not(type(ret) == AssertionError)
+    assert not(ret == AssertionError)
 
 
     #Test Case: the function should return an assertion error
     data = load_xpgn_data(exclude_inds = [15])
     ret = verify_last_player_move_at_least_ties(data,b_print=False)
 
-    assert type(ret) == exceptions.AssertionError
+    # assert type(ret) == AssertionError
+    assert ret == AssertionError
