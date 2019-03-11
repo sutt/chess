@@ -1,0 +1,47 @@
+-----------------
+('__name__:', '__main__')
+('__package__:', None)
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\WINDOWS\SYSTEM32\python27.zip
+C:\Python27\DLLs
+C:\Python27\lib
+C:\Python27\lib\plat-win
+C:\Python27\lib\lib-tk
+C:\Python27
+C:\Python27\lib\site-packages
+-----------------
+-----------------
+('__name__:', 'subA.modB')
+('__package__:', 'subA')
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\WINDOWS\SYSTEM32\python27.zip
+C:\Python27\DLLs
+C:\Python27\lib
+C:\Python27\lib\plat-win
+C:\Python27\lib\lib-tk
+C:\Python27
+C:\Python27\lib\site-packages
+-----------------
+hello
+-----------------
+import in modA (of modB) succeeds, as expected in py2
+-----------------
+-----------------
+('__name__:', 'subA.modA')
+('__package__:', 'subA')
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\WINDOWS\SYSTEM32\python27.zip
+C:\Python27\DLLs
+C:\Python27\lib
+C:\Python27\lib\plat-win
+C:\Python27\lib\lib-tk
+C:\Python27
+C:\Python27\lib\site-packages
+-----------------
+hello
+-----------------
+the import in main failed as expected in py versions!
+No module named foo2

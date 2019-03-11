@@ -1,0 +1,45 @@
+-----------------
+__name__: __main__
+__package__: None
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\python37.zip
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\DLLs
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37
+C:\Users\wsutt\AppData\Roaming\Python\Python37\site-packages
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib\site-packages
+-----------------
+-----------------
+__name__: subA.modB
+__package__: subA
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\python37.zip
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\DLLs
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37
+C:\Users\wsutt\AppData\Roaming\Python\Python37\site-packages
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib\site-packages
+-----------------
+hello
+-----------------
+the import in modA (of modB) failed, as expected in py3
+No module named 'modB'
+-----------------
+-----------------
+__name__: subA.modA
+__package__: subA
+-----------------
+C:\Users\wsutt\Desktop\files\chess\basic_engine\docs\py3_imports
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\python37.zip
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\DLLs
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37
+C:\Users\wsutt\AppData\Roaming\Python\Python37\site-packages
+C:\Users\wsutt\AppData\Local\Programs\Python\Python37\lib\site-packages
+-----------------
+hello
+-----------------
+the import in main failed as expected in py versions!
+No module named 'subA.modA.foo2'; 'subA.modA' is not a package

@@ -1985,7 +1985,168 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [ ] Maybe a good search is for ")[0]" b/c this seems to be 
         how I did maps/filter patterns to get one elem
 
+3/11
 
+    [ ] Build diff of diffs
+
+    [ ] replicate running tests on --src
+    
+    [x] get main to run
+
+        basic_engine/src/main works as pkg:
+        >python3 -m src.main (from basic_engine/)
+
+            fails:
+            >python3 -m basic_engine.src.main  (from chess/)
+
+        works as normal:
+        >python3 main.py (from basic_engine/)
+        >python3 basic_engine/main.py (from chess/)
+
+            uses: from src.main import Game
+            
+            but intellisense doesnt recognize this
+                after commenting out in settings.json (user settings) this line
+                    "python.jediEnabled": false,
+                it works
+
+    [ ] understand relative vs absolute imports
+
+        https://www.python.org/dev/peps/pep-0328/
+        https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
+        https://chrisyeh96.github.io/2017/08/08/definitive-guide-python-imports.html#python-2-vs-python-3
+        https://www.python.org/dev/peps/pep-0420/
+
+        [~] is the problem just the *star*?
+
+        """python attempted relative import in non-package"""
+
+        [ ] how is pytest running it?
+
+        [x] build a demo program
+            in docs/py3_imports/
+
+            [x] print out path/import stuff to a .txt, and save it
+
+        [ ] Let's get some definitions:
+
+            [ ] What is an abolute what is relative?
+
+                "import foo; To resolve the ambiguity, it is proposed that foo will always be a module or package reachable from sys.path. This is called an absolute import."
+                "that is, import foo as a bare term will always be an absolute import"
+
+            [ ] with/without a dot it's a ...?
+
+
+        [x] Definitive guide:
+
+            ---------------------------------------
+            File Structure:
+            --------------------------------------
+            root (basic_engine)
+            
+                main.py 
+                [no __init__.py]
+                
+                src/
+                
+                    __init__.py
+                    main.py
+                    basic.py
+                    basic2.py
+                
+                tests/
+                
+                    __init__.py
+                    runtests.py
+                    tests1.py
+                    tests2.py
+
+                tools/
+
+                    __init__.py
+                    toolA.py
+                    toolB.py
+            
+            other-root (stockfish)
+
+                do we need __init__? it's there
+
+            ------------------------------------
+
+            -------------------------------------
+            in root/main.py
+            -------------------------------------
+            from src.main import Game
+
+            game = Game()
+            game.play()
+
+            -------------------------------------
+
+            -------------------------------------
+            in root/src/main.py
+            -------------------------------------
+            from .GameLog import GameLog
+
+            gamelog = GameLog()
+
+            -------------------------------------
+
+    [x] make sure intellisense is tarrgetting correct py version
+
+        C:\Users\wsutt\AppData\Local\Programs\Python\Python37\python3.exe
+
+        CmdPallette (Ctrl+Shift+P)"Python:Select Interpreter"
+
+    [ ] convert rest of tests
+
+        [ ] StockfishCLApi
+        [ ] tools/
+        [ ] batchverify
+        [ ] stockfish
+            [ ] run_pytest_file.bat
+        [ ] stockfish-pkg-own-unittests
+            - could have changed since I downloaded for py2 compatibility
+
+    [ ] make all tests pass on py3: win+wsl
+
+        [ ] does wsl have py3?
+
+    [ ] batchverify, alter BATCH_SAMPLING_N=
+
+        [ ] use this for timing
+
+    [ ] fix raw_input-> input
+
+    [x] input() breaks for python2 (works for python3)
+
+        -> raw_input() -> input() [via 2to3]
+
+            in src/utils.py:player_control_input(line 416)
+
+        """
+            move = player_control_input(board, moves, self.log)
+            File "C:\Users\wsutt\Desktop\files\chess\basic_engine\src\utils.py", line 416, in player_contro
+            l_input
+                raw = input(msg)    #example: >1,1 | 2,2
+            File "<string>", line 1
+                a2 a4
+                    ^
+            SyntaxError: unexpected EOF while parsing
+        """
+
+    [ ] root/main.py should juggle version/architectures
+
+    [ ] is stockfish working? why isn't it priniting out,
+        especially when it's torn-down?
+
+        - 2to3 hasn't been run on that folder!?
+        - subprocess are calling py2
+
+
+
+Non-dated Stuff --------------------------------------------------
 
     Major Things Dev-Features
 
