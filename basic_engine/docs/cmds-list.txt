@@ -4,9 +4,10 @@ List commands for this workspace here:
 
     In tests/
 
-        >start python runtests.py --all --hang
+        >start python runtests.py --all --hang [--2]
 
         [open a new window to prevent encoding bug]
+        [use --2 to run tests with python2]
 
     or:
         >python runtests.py --src
@@ -19,6 +20,15 @@ List commands for this workspace here:
         >python runtests.py --src --clearcache
 
         [erases files that get confused b/w the two os's]
+
+
+Run an interactive game:
+
+    In ~/basic_engine/
+
+        >python[3] main.py
+
+    [allows you to play against computer; try "a2 a4" as input cmd (no quotes)]
 
 
 Display profiling stats:
@@ -37,6 +47,19 @@ Display profiling stats:
 
         > python profile_test.py --current --shortgame --verboseparams
         > python profile_test.py --classiccomparison --longgame
+
+
+Display perf stats:
+
+    Run in ~/basic_engine/
+
+    [useful for time logging of processing speed]
+
+        >python[3] -m tools.perf_test --demo
+        
+        >python[3] -m tools.perf_test --batch --gamesrequested 2,3,4 --mockrun --verbose
+
+    [see perf_test:line782 for full list of cmds]
 
 
 Run profiling unit tests:

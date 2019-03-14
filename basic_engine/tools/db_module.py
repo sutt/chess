@@ -2,6 +2,7 @@ import sqlite3
 import os, sys
 import json
 from .schema_module import TimeAnalysisSchema
+from .utils import find_app_path_root
 
 
 DATA_DIR = "../data/perf/perf_db.db"
@@ -174,7 +175,7 @@ class TasPerfDB(DBDriver):
                 return
             
             print('Populating games table:')
-            fn = POPULATE_GAMES_DATA_DIR + POPULATE_GAMES_DATA_FN
+            fn = os.path.join(POPULATE_GAMES_DATA_DIR + POPULATE_GAMES_DATA_FN)
             with open(fn,'r') as f:
                 instructions = f.readlines()
             game_records = [ (

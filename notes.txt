@@ -2099,7 +2099,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         CmdPallette (Ctrl+Shift+P)"Python:Select Interpreter"
 
-    [ ] convert rest of tests
+    [x] convert rest of tests
 
         [x] StockfishCLApi
         [x] tools/
@@ -2110,11 +2110,11 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             - could have changed since I downloaded for py2 compatibility
             these are already run in runtests.py --all (?) ->no
 
-    [ ] flask-server is still run with py2 in wsl
+    [~] flask-server is still run with py2 in wsl
 
-    [ ] delve into the mystery that is bash.exe path
+    [x] delve into the mystery that is bash.exe path
 
-    [ ] run tools/: profile_test.py, perf_test.py, pgn_convert.py, etc.
+    [~] run tools/: profile_test.py, perf_test.py, pgn_convert.py, etc.
 
         [ ] works already: (in tools/) 
             >python3 profile_test.py --current
@@ -2123,7 +2123,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
 
 
-    [ ] move .bak files to a separate folder
+    [~] move .bak files to a separate folder
 
     [x] does tests/stockfish_test.py ever get called?
         -> no (?) but its 3 tests do pass
@@ -2133,11 +2133,10 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] py3+wsl = pass
         [x] does wsl have py3? -> no
 
-    [ ] batchverify, alter BATCH_SAMPLING_N=
+    [~] batchverify, alter BATCH_SAMPLING_N=
+        [~] use this for timing
 
-        [ ] use this for timing
-
-    [ ] fix raw_input-> input
+    [x] fix raw_input-> input
 
     [x] input() breaks for python2 (works for python3)
 
@@ -2156,7 +2155,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             SyntaxError: unexpected EOF while parsing
         """
 
-    [ ] root/main.py should juggle version/architectures
+    [~] root/main.py should juggle version/architectures
 
     [x] is stockfish working? why isn't it priniting out,
         especially when it's torn-down?
@@ -2367,14 +2366,64 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                 [ ] use this for timing
             [ ] So how to debug tools/ tests
                 [ ] we still can't do it with datapaths
-            [ ] change default to --3 on tests
-                [ ] add a little print-msg for this
-            [ ] move basic_engine.diff (in root/) 
-            [ ] fix raw_input-> input
-                [ ] can we build a test that inputs text to input() on main.py?
-            [ ] make profile_test, etc run
-            [ ] move .bak files to a separate folder
-            [ ] py3+wsl = pass
+            [x] change default to --3 on tests
+                [x] add a little print-msg for this
+            [x] move basic_engine.diff (in root/) 
+            [x] fix raw_input-> input
+                [~] can we build a test that inputs text to input() on main.py?
+            [x] make profile_test, perf_test,  run
+                
+                profile_test.py
+                in tools/  (all these work)
+                in WSL:
+                >python3 profile_test.py --current
+                >python  profile_test.py --current
+                >python3 -m profile_test --current
+                >python  -m profile_test --current
+                in Windows:
+                (same)
+                -> this is because profile_test has very few imports
+                   and uses a sys.path.append('../')
+
+
+                perf_test.py
+                in basic_engine/ (these work)
+                [perf_test  has a db but it doesn't write perf-data
+                 to it AFAICT]
+                >python3 tools.perf_test --demo
+                >python  tools.perf_test --demo
+
+                    commands that fail:
+                    all working now, i think
+
+                [x] do these utilities actually use py3? when called with it?
+                    ->yes
+
+                for this perftest:
+                pythonX -m tools.perf_test --batch --gamesrequested 11,12,13 --n 200 --algo_style opt_yk --analysis_tbl tas_table  --verbose
+
+                    python2: Total Time:  259.223999977
+                    python3: Total Time:  219.17352318763733
+                    ->15% faster in py3
+
+            [x] move .bak files to a separate folder
+            [x] py3+wsl = pass
+                [x] get/install py3
+                    >sudo apt-get update
+                    -> already have it: 3.5.2
+                    but can't find pip3
+                    >sudo apt-get -y install python3-pip
+                [ ] which packages do i need?
+                    off the top of the head:
+                        flask? stockfish? - only for stockfish-server!
+                        pytest? - yes
+                [x] get tests to pass
+                    === 1 failed, 30 passed, 1 warnings in 2.77 seconds ===
+                        test_build_code_str(), dict-> args out-of-order
+                        this is a highly devious bug/test: the order of items returned
+                        in <d_params.get_test_data()> will cause test to sometimes
+                        pass and sometimes fail!
+                        -> the problem was in the test code itself, not src-code 
             [ ] flask-server is still run with py2 in wsl
             [x] Build diff of diffs
                  cleantests = 1c63eb
@@ -2385,6 +2434,11 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             [x] fix architecture if-switch (x64/32) not py2/py3 in subproc
         
         [ ] Merge with master
+
+        [x] are there cli on original main to change Game-params?
+            ->no, all controlled by editing main.py code
+
+        [x] update commands.txt
 
 
 

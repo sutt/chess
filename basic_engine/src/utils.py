@@ -413,7 +413,10 @@ def player_control_input(board, moves_player, log, **kwargs):
     msg = "Type your move. Or type 'hint' or 'out_log'..."
     msg += "\n"
     while(True):
-        raw = input(msg)    #example: >1,1 | 2,2
+        if sys.version_info.major == 3:
+            raw = input(msg)    
+        else:
+            raw = raw_input(msg)
         ret, the_move = parse_player_input(raw, board, 'alphanum')
         if ret == 0:
             #TODO - call common return function

@@ -1,4 +1,4 @@
-import sys
+import os, sys
 from time import time
 import json
 import pprint
@@ -7,13 +7,12 @@ import copy
 sys.path.append('../')
 
 from src.main import Game
-from .utils import convert_pgn_to_a1
+from .utils import (convert_pgn_to_a1, find_app_path_root)
 
 from .schema_module import TimeAnalysisSchema
 from .schema_module import TurnAttributeSchema
 
 from .db_module import TasPerfDB
-
 
 # Different Experiments --------------------------------------------------
 #  
@@ -599,7 +598,17 @@ class BatchAnalysis:
         self.instructions = None
 
         if path_db is None:
-            self.db = TasPerfDB()
+            
+            default_data_dir = os.path.join( 
+                        find_app_path_root(os.getcwd()) 
+                        ,'basic_engine'
+                        ,'data'
+                        ,'perf'
+                        ,'perf_db.db'
+                        )
+            
+            self.db = TasPerfDB(data_dir = default_data_dir)
+            
         else:
             self.db = TasPerfDB(data_dir = path_db)
 
@@ -772,6 +781,10 @@ class BatchAnalysis:
 
 # Cmds -------------------------------------------------------------
 
+
+##### This must be runa s a python-module:
+# > python -m tools.perf_test --arg1 --arg2...   (from basic_engine)
+
 ##### Show basic capabilities of this module
 # > python perf_test.py --demo
 # > python perf_test.py --singledemo
@@ -943,7 +956,7 @@ if __name__ == "__main__":
 
     if args["batchdemo"]:
         
-        ba = BatchAnalysis(path_db="../data/perf/perf_db.db")
+        ba = BatchAnalysis()
         ba.setGames([1,12])
         ba.collect_batch()
         print('Running analysis on games: ')
@@ -982,10 +995,27 @@ if __name__ == "__main__":
             cmd_n = 2
 
         if args["mockrun"]:
-            cmd_pth_db = "../data/perf/staging_db.db"      #non-impact to production
+            
+            #non-impact to production
+            cmd_pth_db = os.path.join( 
+                        find_app_path_root(os.getcwd()) 
+                        ,'basic_engine'
+                        ,'data'
+                        ,'perf'
+                        ,'staging_db.db'
+                        )
             cmd_n = 2
+            
         else:
-            cmd_pth_db = "../data/perf/perf_db.db"         #Production
+            
+            #Production
+            cmd_pth_db = os.path.join( 
+                        find_app_path_root(os.getcwd()) 
+                        ,'basic_engine'
+                        ,'data'
+                        ,'perf'
+                        ,'perf_db.db'
+                        )
             cmd_n = cmd_n
 
         if args["algo_style"]:

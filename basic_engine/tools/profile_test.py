@@ -519,7 +519,7 @@ def test_build_code_str():
 
     test_data = d_params.get_test_data()
 
-    list_s_cmd = []
+    dict_s_cmd = {}
     
     for test_key in list(test_data.keys()):
         
@@ -534,28 +534,32 @@ def test_build_code_str():
                                 ,b_pgn = False
                                 )
         
-        list_s_cmd.append(s_cmd)
+        dict_s_cmd[test_name] = s_cmd
 
     #Now test the strings:
-    
-    #TODO - py3: can't expect the exact order of args in play() to be duplicated across python implementations
+    #note we can't test order or arguments in game.play(...); only their prescence
 
-    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
-    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=True);"""
-    if sys.version_info.major == 2:
-        answer = answer_old
-    if sys.version_info.major == 3:
-        answer = answer_new
-    assert list_s_cmd[0] == answer
+    s_cmd = dict_s_cmd['bypass_on']
+    # answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+    arg0 = '''from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play('''
+    arg1 = 'bypass_irregular=True'
+    arg2 = 'filter_check_opt=True'
+    arg3 = 'check_for_check=False'
+    assert arg0 in s_cmd
+    assert arg1 in s_cmd
+    assert arg2 in s_cmd
+    assert arg3 in s_cmd
 
-    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
-    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=False);"""
-    if sys.version_info.major == 2:
-        answer = answer_old
-    if sys.version_info.major == 3:
-        answer = answer_new
-    assert list_s_cmd[1] == answer
-    
+    s_cmd = dict_s_cmd['bypass_off']
+    # answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
+    arg0 = '''from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play('''
+    arg1 = 'bypass_irregular=False'
+    arg2 = 'filter_check_opt=True'
+    arg3 = 'check_for_check=False'
+    assert arg0 in s_cmd
+    assert arg1 in s_cmd
+    assert arg2 in s_cmd
+    assert arg3 in s_cmd
 
 
 def test_build_code_str_b_pgn():

@@ -3,8 +3,8 @@
 
     >[start] python runtests.py [--hang]
 
-        --2             - run with python2, pytest2 (default right now)
-        --3             - run with python3, pytest3
+        --2             - run with python2, pytest2 
+        --3             - run with python3, pytest3 (DEFAULT)
 
         --all
         --src           - only src/ ; exlcudes StockfishNetwork.py
@@ -86,10 +86,10 @@ if args["vv"]:
     verbose_arg = "-vv"
 
 
-pytest_cmd = ["python", "-m" , "pytest"]
-if args["3"]:
-    pytest_cmd = ["python3", "-m" , "pytest"]
-
+pytest_cmd = ["python3", "-m" , "pytest"]
+if args["2"]:
+    pytest_cmd = ["python", "-m" , "pytest"]
+print('\nrunning tests with python%s\n' % ('2' if args['2'] else '3 (by default)'))
 
 if b_src:
     
@@ -132,9 +132,9 @@ if b_stockfish:
     if "test_tmp.txt" in os.listdir(os.getcwd()):
         os.remove("test_tmp.txt")
 
-    launch_bat_fn = 'run_pytest_file_py2.bat'
-    if args['3']:
-        launch_bat_fn = 'run_pytest_file_py3.bat'
+    launch_bat_fn = 'run_pytest_file_py3.bat'
+    if args['2']:
+        launch_bat_fn = 'run_pytest_file_py2.bat'
         
     p = subprocess.Popen( [  launch_bat_fn
                             ,'../src/StockfishNetwork.py'
