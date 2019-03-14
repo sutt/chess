@@ -2371,18 +2371,20 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                 [ ] add a little print-msg for this
             [ ] move basic_engine.diff (in root/) 
             [ ] fix raw_input-> input
+                [ ] can we build a test that inputs text to input() on main.py?
             [ ] make profile_test, etc run
             [ ] move .bak files to a separate folder
             [ ] py3+wsl = pass
             [ ] flask-server is still run with py2 in wsl
-            [ ] Build diff of diffs
+            [x] Build diff of diffs
+                 cleantests = 1c63eb
+                 post2to3   = fb2173
             [ ] Manually search for problems
                 [ ] Maybe a good search is for ")[0]" b/c this seems to be 
                     how I did maps/filter patterns to get one elem
             [x] fix architecture if-switch (x64/32) not py2/py3 in subproc
         
         [ ] Merge with master
-
 
 
 

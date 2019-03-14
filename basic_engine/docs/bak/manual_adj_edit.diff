@@ -1,0 +1,627 @@
+
+------------------------------------------------------------------
+NOTE: this is an edited result of the command:
+        >git diff fb2173 1c63eb > out.diff
+
+    shows the type of manual edits needed to get clean tests after 
+    the auto-converted has been run
+    edited to eliminate notes/added-documentation+demo-code
+    created 3/14
+
+    Summary:
+            - new main.py in root "outside of of src/-package"
+            - uncaught '//' vs '/'
+            - requests.content returns bytes not str, need to decode
+            - uncaught generator->list
+            - unit tests need if-switches for different outputs
+            - 32 vs 64 bit diff (not 2to3) causes changes to Popen on windows
+            - import exceptions; exceptions.AssertionError -> now AE is just built-in
+            - 'import .pytest_utils' -> 'import pytest_utils' 2to3 erroneous here
+            - Exception.message (method) -> Exception.args
+            - dict-keys return in different order
+-----------------------------------------------------------------
+
+diff --git a/basic_engine/main.py b/basic_engine/main.py
+new file mode 100644
+index 0000000..ed04893
+--- /dev/null
++++ b/basic_engine/main.py
+@@ -0,0 +1,9 @@
++import sys
++from src.main import Game
++
++game = Game( manual_control = (1,)
++                ,stockfish_control= (0,)
++                ,b_display_show_opponent = True
++                ,b_log_move = True
++                )
++game.play()
+\ No newline at end of file
+diff --git a/basic_engine/src/GameLog.py b/basic_engine/src/GameLog.py
+index 08a7c57..78f1170 100644
+--- a/basic_engine/src/GameLog.py
++++ b/basic_engine/src/GameLog.py
+@@ -137,7 +137,7 @@ class GameSchema:
+                                     player: 0=white,1=black
+         '''
+         player_int = int(not(i_turn % 2))
+-        pgn_turn = ((i_turn - 1) / 2) + 1
++        pgn_turn = ((i_turn - 1) // 2) + 1
+         return (pgn_turn, player_int)
+ 
+     @staticmethod
+diff --git a/basic_engine/src/StockfishNetwork.py b/basic_engine/src/StockfishNetwork.py
+index 29da999..f865271 100644
+--- a/basic_engine/src/StockfishNetwork.py
++++ b/basic_engine/src/StockfishNetwork.py
+@@ -1,4 +1,4 @@
+-import os
++import os, sys, math
+ import requests
+ import subprocess
+ import time
+@@ -25,7 +25,6 @@ class StockfishNetworking():
+         
+         self.serverProcess = None
+ 
+-        
+         if b_launch_server:
+ 
+             if b_read_stderr:
+@@ -37,9 +36,13 @@ class StockfishNetworking():
+             else:
+                 _stderr = subprocess.PIPE
+ 
++            bash_path = 'c:/windows/sysnative/bash.exe'
++            if math.log(sys.maxsize) > 22:   # 32-bit~21.4; 64-bit~43.7
++                bash_path = 'c:/windows/system32/bash.exe'
++                
+             self.serverProcess = subprocess.Popen(
+                             [
+-                            'c:/windows/sysnative/bash.exe'
++                             bash_path
+                             ,'-c'
+                             ,"printenv"
+                             ,"&&"
+@@ -145,7 +148,10 @@ class StockfishNetworking():
+         url += "best_move/default"
+         r = requests.get(url)
+         if r.status_code == 200:
+-            return r.content
++            content = r.content
++            if sys.version_info.major == 3:
++                content = content.decode()
++            return content
+         else:
+             return ""
+ 
+@@ -197,7 +203,10 @@ class StockfishNetworking():
+         ''' do a simple check if server is takign requests. Return True if it does '''
+         try:
+             r = requests.get(self.url_root + 'check_server_is_up/')
+-            if r.content == 'ok':
++            content = r.content
++            if sys.version_info.major == 3:
++                content = content.decode()
++            if content == 'ok':
+                 return True
+         except:
+             pass
+@@ -280,7 +289,10 @@ def test_sn_launch_server_1():
+ 
+     r = requests.get("http://127.0.0.1:5000/")
+ 
+-    assert r.content == "Hello, Flask! <br> New Line?"
++    content = r.content
++    if sys.version_info.major == 3:
++        content = content.decode()
++    assert content == "Hello, Flask! <br> New Line?"
+ 
+ 
+ def test_sn_launch_server_2():
+@@ -290,7 +302,10 @@ def test_sn_launch_server_2():
+ 
+     r = requests.get("http://127.0.0.1:5000/check_server_params/")
+ 
+-    assert r.content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
++    content = r.content
++    if sys.version_info.major == 3:
++        content = content.decode()
++    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
+     
+     
+ def test_sn_get_best_move_1():
+diff --git a/basic_engine/src/TurnStage.py b/basic_engine/src/TurnStage.py
+index 1787dca..b6c2165 100644
+--- a/basic_engine/src/TurnStage.py
++++ b/basic_engine/src/TurnStage.py
+@@ -112,7 +112,8 @@ def apply_move(move, board, pieces, _player):
+     pos0, pos1 = move[0], move[1]
+ 
+     #TODO - add helper func: piece_from_pos( index_=True)
+-    piece_i = filter(lambda _p: _p[1].pos == pos0, enumerate(pieces))[0][0]
++    #TODO - py3 : make this a list comprehension
++    piece_i = list(filter(lambda _p: _p[1].pos == pos0, enumerate(pieces)))[0][0]
+     #TODO - piece = pieces[piece_i]
+ 
+     kill_flag = False   # before the move, check if opp's piece is there
+@@ -144,7 +145,7 @@ def apply_move(move, board, pieces, _player):
+                                     ,left_side = castle_absolute_left)
+         
+         #TODO - helper func
+-        rook_i = filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces))[0][0]
++        rook_i = list(filter(lambda _p: _p[1].pos == r_pos0, enumerate(pieces)))[0][0]
+ 
+         pieces[rook_i].pos = r_pos1   
+         pieces[piece_i].pos = k_pos1   #piece_i already king
+@@ -181,7 +182,7 @@ def apply_move(move, board, pieces, _player):
+     #TODO - any promotions here    
+     if b_promotion:
+         
+-        pro_piece_i = filter(lambda _p: _p[1].pos == pos1, enumerate(pieces))[0][0]
++        pro_piece_i = list(filter(lambda _p: _p[1].pos == pos1, enumerate(pieces)))[0][0]
+         pro_piece = pieces.pop(pro_piece_i)
+ 
+         #new piece
+@@ -235,7 +236,7 @@ class Mirror():
+ 
+     @staticmethod
+     def get_piece_class(pieces, pos):
+-        piece = filter(lambda piece: piece.pos == pos, pieces)[0]
++        piece = list(filter(lambda piece: piece.pos == pos, pieces))[0]
+         return piece.__class__.__name__
+ 
+     def infer_move_type(self, move):
+@@ -471,7 +472,8 @@ class Mutator():
+         moving_piece_enum = self.old_mutation[1]
+         if (moving_piece_enum) == 3:
+             
+-            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
++            #TODO - py3
++            player_king = list(filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces))[0]
+             old_pos = player_king.pos
+             new_pos = self.new_mutation[0]
+ 
+@@ -492,7 +494,7 @@ class Mutator():
+             return pieces
+         else:
+             #TODO - helper func
+-            player_king = filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces)[0]
++            player_king = list(filter(lambda p: p.white == player and p.__class__.__name__ == "King" , pieces))[0]
+             old_pos = self.mutation_king_piece[0]
+             player_king.pos = old_pos
+             return pieces
+diff --git a/basic_engine/src/main.py b/basic_engine/src/main.py
+index 0890cfe..6858211 100644
+--- a/basic_engine/src/main.py
++++ b/basic_engine/src/main.py
+@@ -1321,7 +1321,7 @@ def test_multi_pgn_games_1():
+             
+             b_whites_move = ((ret % 2) == 1)
+ 
+-            pgn_turn = (ret + int(b_whites_move)) / 2
++            pgn_turn = (ret + int(b_whites_move)) // 2
+             s_player = 'White' if b_whites_move else 'Black'
+ 
+             print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
+@@ -1403,7 +1403,7 @@ def batchtest_multi_pgn_games_1(**kwargs):
+             print('Move Incompatibility | line_i: ', str(i + 1))
+             print('game.i_turn: ', str(ret))    
+             b_whites_move = ((ret % 2) == 1)
+-            pgn_turn = (ret + int(b_whites_move)) / 2
++            pgn_turn = (ret + int(b_whites_move)) // 2
+             s_player = 'White' if b_whites_move else 'Black'
+             print('On PGN turn: ', str(pgn_turn), ' Player: ', s_player)
+             err_cntr += 1
+diff --git a/basic_engine/src/utils.py b/basic_engine/src/utils.py
+index f9857e2..04764f3 100644
+--- a/basic_engine/src/utils.py
++++ b/basic_engine/src/utils.py
+@@ -143,7 +143,7 @@ def parse_pgn_instructions( s
+             
+ 
+             #first digit backwards
+-            i_first_digit = map(lambda s: str.isdigit(s), _s[::-1] ).index(True)
++            i_first_digit = list(map(lambda s: str.isdigit(s), _s[::-1] )).index(True)
+             i_first_digit =  len(_s) - i_first_digit
+ 
+             destination_a1 = _s[i_first_digit - 2: i_first_digit ]
+@@ -303,7 +303,7 @@ class PGN:
+     @staticmethod
+     def piece_class_from_pos(pieces, pos0):
+         '''return first letter (Captialized) of piece name'''
+-        p = filter(lambda p: p.pos == pos0, pieces)[0]
++        p = list(filter(lambda p: p.pos == pos0, pieces))[0]
+         p_name = p.__class__.__name__
+         p_symbol = p_name[0] if p_name != 'Knight' else "N"
+         return p_symbol
+@@ -526,8 +526,8 @@ H  ~ ~ ~ ~ ~ ~ ~ ~
+     
+     board, pieces = printout_to_data(s_test)
+ 
+-    white_king = filter(lambda p: p.white == True and 
+-                        p.__class__.__name__ == "King", pieces)[0]
++    white_king = list(filter(lambda p: p.white == True and 
++                        p.__class__.__name__ == "King", pieces))[0]
+     assert white_king.pos == (4,3)
+     
+     display = Display()
+@@ -550,8 +550,8 @@ def test_printout_to_data_2():
+     
+     board, pieces = printout_to_data(s_test)
+ 
+-    white_king = filter(lambda p: p.white == True and 
+-                        p.__class__.__name__ == "King", pieces)[0]
++    white_king = list(filter(lambda p: p.white == True and 
++                        p.__class__.__name__ == "King", pieces))[0]
+     assert white_king.pos == (4,3)
+     
+     display = Display()
+diff --git a/basic_engine/tests/batchverify.py b/basic_engine/tests/batchverify.py
+index 7eba61b..e4b9524 100644
+--- a/basic_engine/tests/batchverify.py
++++ b/basic_engine/tests/batchverify.py
+@@ -1,4 +1,5 @@
+-import os, sys, time, json, copy, exceptions, types
++import os, sys, time, json, copy, types
++# import exceptions
+ sys.path.append('../')
+ 
+ from src.main import Game
+@@ -55,7 +56,7 @@ def build_modulo_print_data(data, modulo_print):
+         assert type(modulo_print) == int
+         try:
+             data_modulo = []
+-            for i in range(len(data) / modulo_print):        
++            for i in range(len(data) // modulo_print):        
+                 data_modulo.append(data[i*modulo_print:(i+1)*modulo_print])
+             
+             data_modulo.append(data[(i+1)*modulo_print:])    #the fractional leftover
+@@ -175,7 +176,7 @@ def verify_last_player_move_at_least_ties(data, b_print=False):
+                 print(i)
+                 print(s_gameSchema)
+             
+-            return exceptions.AssertionError()
++            return AssertionError
+ 
+ def manual_last_player_move_at_least_ties():
+     data = load_xpgn_data(max_tests=None)
+@@ -303,7 +304,7 @@ def manual_check_schedule_match(n = None, b_naive_check=False, modulo_print=None
+                                         )        
+         except Exception as e:
+ 
+-            if type(e) == exceptions.KeyboardInterrupt:
++            if type(e) == KeyboardInterrupt:
+                 print('BREAKING')
+                 break
+             else:
+@@ -373,7 +374,7 @@ def manual_move_available(n = None, b_naive_check=False, modulo_print=100):
+                                     )        
+         except Exception as e:
+ 
+-            if type(e) == exceptions.KeyboardInterrupt:
++            if type(e) == KeyboardInterrupt:
+                 print('BREAKING')
+                 break
+             else:
+@@ -558,11 +559,13 @@ def test_verify_last_player_move_at_least_ties_true_negative():
+     data = load_xpgn_data(exclude_inds = [49])
+     ret = verify_last_player_move_at_least_ties(data,b_print=False)
+ 
+-    assert not(type(ret) == exceptions.AssertionError)
++    # assert not(type(ret) == AssertionError)
++    assert not(ret == AssertionError)
+ 
+ 
+     #Test Case: the function should return an assertion error
+     data = load_xpgn_data(exclude_inds = [15])
+     ret = verify_last_player_move_at_least_ties(data,b_print=False)
+ 
+-    assert type(ret) == exceptions.AssertionError
+\ No newline at end of file
++    # assert type(ret) == AssertionError
++    assert ret == AssertionError
+\ No newline at end of file
+diff --git a/basic_engine/tests/run_pytest_file_py2.bat b/basic_engine/tests/run_pytest_file_py2.bat
+new file mode 100644
+index 0000000..72b1884
+--- /dev/null
++++ b/basic_engine/tests/run_pytest_file_py2.bat
+@@ -0,0 +1,34 @@
++::This runs pytest but eliminates the cp65001 encoding error in 
++::python27\lib\site-packages\colorama\ansitowin32.py
++
++::Arg1:  - or "path/to/testfile.py"
++::Arg2:  - or -v or -vv
++
++::Examples: 
++::[terse+specific run]
++::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
++::[verbose+specific run]
++::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
++::[verbose+directory run]
++::  src/ >"../tests/run_pytest_file.bat" "-" "-vv"
++echo off
++
++IF "%~1"=="-" (
++    set arg1=""
++) ELSE (
++    set arg1=%1
++)
++
++IF "%~2"=="-" (
++    set arg2="-v"
++) ELSE (
++    set arg2=%2
++)
++
++echo on
++
++ECHO running: python -m pytest pytest %arg2% %arg1% > test_tmp.txt
++
++python -m pytest %arg2% %arg1% > test_tmp.txt
++
++type test_tmp.txt
+\ No newline at end of file
+diff --git a/basic_engine/tests/run_pytest_file_py3.bat b/basic_engine/tests/run_pytest_file_py3.bat
+new file mode 100644
+index 0000000..8161e99
+--- /dev/null
++++ b/basic_engine/tests/run_pytest_file_py3.bat
+@@ -0,0 +1,34 @@
++::This runs pytest but eliminates the cp65001 encoding error in 
++::python27\lib\site-packages\colorama\ansitowin32.py
++
++::Arg1:  - or "path/to/testfile.py"
++::Arg2:  - or -v or -vv
++
++::Examples: 
++::[terse+specific run]
++::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
++::[verbose+specific run]
++::  tests/ >run_pytest_file.bat "../src/StockfishNetwork.py" "-vv"
++::[verbose+directory run]
++::  src/ >"../tests/run_pytest_file.bat" "-" "-vv"
++echo off
++
++IF "%~1"=="-" (
++    set arg1=""
++) ELSE (
++    set arg1=%1
++)
++
++IF "%~2"=="-" (
++    set arg2="-v"
++) ELSE (
++    set arg2=%2
++)
++
++echo on
++
++ECHO running: python3 -m pytest %arg2% %arg1% > test_tmp.txt
++
++python3 -m pytest %arg2% %arg1% > test_tmp.txt
++
++type test_tmp.txt
+\ No newline at end of file
+diff --git a/basic_engine/tests/runtests.py b/basic_engine/tests/runtests.py
+index 8c33a8d..756e0a4 100644
+--- a/basic_engine/tests/runtests.py
++++ b/basic_engine/tests/runtests.py
+@@ -3,6 +3,9 @@
+ 
+     >[start] python runtests.py [--hang]
+ 
++        --2             - run with python2, pytest2 (default right now)
++        --3             - run with python3, pytest3
++
+         --all
+         --src           - only src/ ; exlcudes StockfishNetwork.py
+         --src-all       - includes StockfishNetwork.py and unittests
+@@ -13,7 +16,7 @@
+         --vv            - verbosity vv
+         --v             - verbosity v
+ 
+-        --clear-cache   - clears pytest caches to run b/w win/wsl
++        --clearcache   - clears pytest caches to run b/w win/wsl
+ 
+         --hang          -use time.sleep to keep cmd window open
+ '''
+@@ -22,10 +25,13 @@ import os
+ import subprocess
+ import argparse
+ import time
+-from .pytest_utils import reset_pytest
++import copy
++from pytest_utils import reset_pytest
+ 
+ import argparse
+ ap = argparse.ArgumentParser()
++ap.add_argument("--2", action="store_true")
++ap.add_argument("--3", action="store_true")
+ ap.add_argument("--v", action="store_true")
+ ap.add_argument("--vv", action="store_true")
+ ap.add_argument("--all", action="store_true")
+@@ -80,22 +86,43 @@ if args["vv"]:
+     verbose_arg = "-vv"
+ 
+ 
++pytest_cmd = ["python", "-m" , "pytest"]
++if args["3"]:
++    pytest_cmd = ["python3", "-m" , "pytest"]
++
++
+ if b_src:
+-    p = subprocess.Popen(["pytest", verbose_arg], cwd="../src/")
++    
++    cmd = copy.copy(pytest_cmd)
++    cmd.extend([verbose_arg])
++    
++    p = subprocess.Popen(cmd, cwd="../src/")
+     p.wait()
+ 
+ if b_linux and b_src:
+-    p = subprocess.Popen(["pytest", verbose_arg, "StockfishCLApi.py"]
+-                            ,cwd = "../src/")
++    
++    cmd = copy.copy(pytest_cmd)
++    cmd.extend([verbose_arg])
++    cmd.extend(["StockfishCLApi.py"])
++    
++    p = subprocess.Popen(cmd, cwd="../src/")
+     p.wait()
+ 
+ if b_tools:
+-    p = subprocess.Popen(["pytest", verbose_arg], cwd="../tools/")
++
++    cmd = copy.copy(pytest_cmd)
++    cmd.extend([verbose_arg])
++
++    p = subprocess.Popen(cmd, cwd="../tools/")
+     p.wait()
+ 
+ if b_batchverify:
++
++    cmd = copy.copy(pytest_cmd)
++    cmd.extend([verbose_arg])
++    cmd.extend(["batchverify.py"])
+     
+-    p = subprocess.Popen(["pytest", verbose_arg, "batchverify.py"])
++    p = subprocess.Popen(cmd)
+     p.wait()
+ 
+ if b_stockfish:
+@@ -105,7 +132,11 @@ if b_stockfish:
+     if "test_tmp.txt" in os.listdir(os.getcwd()):
+         os.remove("test_tmp.txt")
+ 
+-    p = subprocess.Popen( [  'run_pytest_file.bat'
++    launch_bat_fn = 'run_pytest_file_py2.bat'
++    if args['3']:
++        launch_bat_fn = 'run_pytest_file_py3.bat'
++        
++    p = subprocess.Popen( [  launch_bat_fn
+                             ,'../src/StockfishNetwork.py'
+                             ,verbose_arg_flag
+                           ]
+diff --git a/basic_engine/tools/db_module.py b/basic_engine/tools/db_module.py
+index 66dda3b..ecaef22 100644
+--- a/basic_engine/tools/db_module.py
++++ b/basic_engine/tools/db_module.py
+@@ -1,5 +1,5 @@
+ import sqlite3
+-import os
++import os, sys
+ import json
+ from .schema_module import TimeAnalysisSchema
+ 
+@@ -27,7 +27,15 @@ class DBErrLog:
+         msgDict['method_name'] = method_name
+         msgDict['method_args'] = method_args
+         msgDict['method_kwargs'] = method_kwargs
+-        msgDict['exception_msg'] = exception_class.message
++        try:
++            msgDict['exception_msg'] = exception_class.message
++        except:
++            msgDict['exception_msg'] = 'could not generate e.message'
++            try:
++                msgDict['exception_msg'] = exception_class.args
++            except:
++                msgDict['exception_msg'] = 'could not generate e.args'
++
+         #TODO - stacktrace
+         
+         self.msgList.append(msgDict)
+@@ -344,6 +352,16 @@ if __name__ == "__main__":
+ 
+ #Unit Tests ----------------------------------------------------------
+ 
++# def test_reveal_sys_vars():
++#     print('+++++++++++++++++++++++++++++++++++++++++++++')
++#     print('__name__:', __name__)
++#     print('__package__:', __package__)
++#     print('cwd:', os.getcwd())
++#     print("\n".join([str(x) for x in sys.path]))
++#     print('+++++++++++++++++++++++++++++++++++++++++++++')
++#     assert False
++    
++
+ def test_calling_instance_method_in_init():
+     ''' Testing Design Pattern: call function below init, in init '''
+ 
+@@ -381,7 +399,7 @@ def test_class_wrapper_1():
+         @decorate
+         def calc(self,x, y):
+             print('executing function')
+-            return (x / y)  + self.z
++            return (x // y)  + self.z
+ 
+     mc = MyClass()
+     assert mc.calc(1,2) == 1
+@@ -437,7 +455,12 @@ def test_errlog_msg_2():
+     assert e1['method_name'] == "execStr"
+     assert e1['method_args'][1] == "select * from BAD_TABLE"
+     assert e1['method_kwargs'] == {}
+-    assert e1['exception_msg'] == 'no such table: BAD_TABLE'
++    
++    answer = 'no such table: BAD_TABLE'
++    if sys.version_info.major == 3:
++        answer = (answer,)
++    
++    assert e1['exception_msg'] == answer
+ 
+ 
+ 
+@@ -459,8 +482,12 @@ def test_errlog_msg_3():
+             break
+     
+     assert badOperationItem is not None
++
++    answer = 'Error binding parameter 0 - probably unsupported type.'
++    if sys.version_info.major == 3:
++        answer = (answer,)
+     
+-    assert badOperationItem['exception_msg'] == 'Error binding parameter 0 - probably unsupported type.'
++    assert badOperationItem['exception_msg'] == answer
+ 
+     assert badOperationItem['method_kwargs']['id'] == (1, 1)
+     assert badOperationItem['method_kwargs']['b_basic'] == True
+@@ -518,4 +545,6 @@ def test_err_execmany_1():
+ 
+ if __name__ == "__main__":
+     # test_errlog_msg_2()
++    # test_reveal_sys_vars()
++    test_different_errlogs_respectively_1()
+     pass
+\ No newline at end of file
+diff --git a/basic_engine/tools/profile_test.py b/basic_engine/tools/profile_test.py
+index cb982f4..c3b155c 100644
+--- a/basic_engine/tools/profile_test.py
++++ b/basic_engine/tools/profile_test.py
+@@ -537,8 +537,25 @@ def test_build_code_str():
+         list_s_cmd.append(s_cmd)
+ 
+     #Now test the strings:
+-    assert list_s_cmd[0] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
+-    assert list_s_cmd[1] == """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
++    
++    #TODO - py3: can't expect the exact order of args in play() to be duplicated across python implementations
++
++    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=True);"""
++    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=True);"""
++    if sys.version_info.major == 2:
++        answer = answer_old
++    if sys.version_info.major == 3:
++        answer = answer_new
++    assert list_s_cmd[0] == answer
++
++    answer_old = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(filter_check_opt=True,check_for_check=False,bypass_irregular=False);"""
++    answer_new = """from src.main import Game; game = Game(s_instructions="1. g1 h3"); game.play(check_for_check=False,filter_check_opt=True,bypass_irregular=False);"""
++    if sys.version_info.major == 2:
++        answer = answer_old
++    if sys.version_info.major == 3:
++        answer = answer_new
++    assert list_s_cmd[1] == answer
++    
+ 
+
