@@ -1877,7 +1877,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         Adding #TODO - py3 : <msg>
         tags for refactoring to py3
         
-        [ ] do a diff of diffs! - diff1=2to3, diff2=manual-correction
+        [~] do a diff of diffs! - diff1=2to3, diff2=manual-correction
 
     Notes on previous
         in basic_engine/tests/ >python runtests.py -vv --all 
@@ -1982,12 +1982,12 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         === 121 passed in 2.96 seconds ===
     
-    [ ] Maybe a good search is for ")[0]" b/c this seems to be 
+    [~] Maybe a good search is for ")[0]" b/c this seems to be 
         how I did maps/filter patterns to get one elem
 
 3/11
 
-    [ ] Build diff of diffs
+    [~] Build diff of diffs
 
     [x] replicate running tests on --src
     
@@ -2010,7 +2010,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                     "python.jediEnabled": false,
                 it works
 
-    [ ] understand relative vs absolute imports
+    [x] understand relative vs absolute imports
 
         https://www.python.org/dev/peps/pep-0328/
         https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
@@ -2115,6 +2115,13 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
     [ ] delve into the mystery that is bash.exe path
 
     [ ] run tools/: profile_test.py, perf_test.py, pgn_convert.py, etc.
+
+        [ ] works already: (in tools/) 
+            >python3 profile_test.py --current
+        [ ] can be run as module (in basic_engine)
+            >python3 perf_test.py --demo
+
+
 
     [ ] move .bak files to a separate folder
 
@@ -2321,10 +2328,10 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
              https://docs.pytest.org/en/latest/goodpractices.html#test-package-name
 
-            [ ] why does test_reveal_sys_vars() cause pytest to stop?
+            [x] why does test_reveal_sys_vars() cause pytest to stop?
 
-        [ ] remove from sys.path: C:\WINDOWS\SYSTEM32\python27.zip
-
+        [x] remove from sys.path: C:\WINDOWS\SYSTEM32\python27.zip
+            
         [~] modify ptvsd_launcher.py
 
             c:\Users\wsutt\.vscode\extensions\ms-python.python-2019.2.5558\pythonFiles\ptvsd_launcher.py
@@ -2349,6 +2356,32 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         https://github.com/Microsoft/ptvsd/issues/991
         https://github.com/Microsoft/ptvsd/issues/748
         https://github.com/Microsoft/ptvsd/issues/745#issuecomment-414700314
+
+    3/14
+
+        [ ] Clean up Remaining items
+
+            [x] fix tests for --2 --tools
+                    test_errlog_msg_2 / _3
+            [ ] batchverify, alter BATCH_SAMPLING_N=
+                [ ] use this for timing
+            [ ] So how to debug tools/ tests
+                [ ] we still can't do it with datapaths
+            [ ] change default to --3 on tests
+                [ ] add a little print-msg for this
+            [ ] move basic_engine.diff (in root/) 
+            [ ] fix raw_input-> input
+            [ ] make profile_test, etc run
+            [ ] move .bak files to a separate folder
+            [ ] py3+wsl = pass
+            [ ] flask-server is still run with py2 in wsl
+            [ ] Build diff of diffs
+            [ ] Manually search for problems
+                [ ] Maybe a good search is for ")[0]" b/c this seems to be 
+                    how I did maps/filter patterns to get one elem
+            [x] fix architecture if-switch (x64/32) not py2/py3 in subproc
+        
+        [ ] Merge with master
 
 
 

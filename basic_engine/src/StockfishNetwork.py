@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, math
 import requests
 import subprocess
 import time
@@ -37,7 +37,7 @@ class StockfishNetworking():
                 _stderr = subprocess.PIPE
 
             bash_path = 'c:/windows/sysnative/bash.exe'
-            if sys.version_info.major == 3:
+            if math.log(sys.maxsize) > 22:   # 32-bit~21.4; 64-bit~43.7
                 bash_path = 'c:/windows/system32/bash.exe'
                 
             self.serverProcess = subprocess.Popen(

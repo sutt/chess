@@ -455,7 +455,12 @@ def test_errlog_msg_2():
     assert e1['method_name'] == "execStr"
     assert e1['method_args'][1] == "select * from BAD_TABLE"
     assert e1['method_kwargs'] == {}
-    assert e1['exception_msg'] == ('no such table: BAD_TABLE',)
+    
+    answer = 'no such table: BAD_TABLE'
+    if sys.version_info.major == 3:
+        answer = (answer,)
+    
+    assert e1['exception_msg'] == answer
 
 
 
@@ -477,8 +482,12 @@ def test_errlog_msg_3():
             break
     
     assert badOperationItem is not None
+
+    answer = 'Error binding parameter 0 - probably unsupported type.'
+    if sys.version_info.major == 3:
+        answer = (answer,)
     
-    assert badOperationItem['exception_msg'] == ('Error binding parameter 0 - probably unsupported type.',)
+    assert badOperationItem['exception_msg'] == answer
 
     assert badOperationItem['method_kwargs']['id'] == (1, 1)
     assert badOperationItem['method_kwargs']['b_basic'] == True
