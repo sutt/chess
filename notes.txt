@@ -2470,14 +2470,32 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
             [x] add python version to variable check page in flask
 
-            [ ] FLASK_ENV=development?
+            [~] FLASK_ENV=development?
 
             [ ] flask --version prints out python 3.5.2
                 after pip3 install flask
 
-            [ ] 2to3 on stockfish/api/ (or just serverA.py)
+            [x] 2to3 on stockfish/api/ (or just serverA.py)
+
+            calling from basic_engine/tests/
+                FileNotFoundError: [Errno 2] No such file or directory: '../Stockfish/bin/stockfish'
+                Exception ignored in: <bound method Stockfish.__del__ of <chess.stockfish.api.lib_stockfish.Stockfish object at 0x7f81b68ee748>>
+                Traceback (most recent call last):
+                File "/mnt/c/users/wsutt/desktop/files/chess/stockfish/api/lib_stockfish.py", line 159, in __del__
+                    self.stockfish.kill()
+                AttributeError: 'Stockfish' object has no attribute 'stockfish'
+
+            call from where popen in StockfishNetwork does: inside api
 
             [ ] stockfish/api/py_stockfish/stockfish/test_stockfish.py
+                doesnt work 
+                 python3 test_stockfish.py
+                    Traceback (most recent call last):
+                    File "test_stockfish.py", line 5, in <module>
+                        from .stockfish import Stockfish
+                    SystemError: Parent module '' not loaded, cannot perform relative import
+
+            [ ] organize .bak's
 
 
         [ ] Merge with master

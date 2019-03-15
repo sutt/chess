@@ -29,7 +29,7 @@ def stock_popen():
                             ,universal_newlines=True
                             )
     except Exception as e:
-        print(e)
+        print e
     return p
 
 def flush_process_stdout(p):
@@ -61,16 +61,16 @@ if __name__ =="__main__":
 
     send_cmd(p, "d")
     text = receive_text(p)
-    print('received text: \n')
-    print(''.join(text))
+    print 'received text: \n'
+    print ''.join(text)
     time.sleep(1)
 
     send_cmd(p, "position startpos moves e2e4")
     
     send_cmd(p, "d")
     text = receive_text(p)
-    print('received text: \n')
-    print(''.join(text))
+    print 'received text: \n'
+    print ''.join(text)
     time.sleep(1)
 
 
@@ -99,8 +99,8 @@ def test_stock_cmd_d():
     
     send_cmd(p, "d")
     txt = receive_text(p, exit_text = "Checkers:")
-    print('_________________________')
-    print(''.join(txt))
+    print '_________________________'
+    print ''.join(txt)
     assert txt[2] ==' +---+---+---+---+---+---+---+---+\n'
     assert txt[3] == ' | r | n | b | q | k | b | n | r |\n'
     

@@ -305,7 +305,7 @@ def test_sn_launch_server_2():
     content = r.content
     if sys.version_info.major == 3:
         content = content.decode()
-    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api"
+    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api|python3"
     
     
 def test_sn_get_best_move_1():
