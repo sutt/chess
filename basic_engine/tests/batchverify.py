@@ -1,4 +1,4 @@
-import os, sys, time, json, copy, types
+import os, sys, time, json, copy, types, random
 # import exceptions
 sys.path.append('../')
 
@@ -23,6 +23,7 @@ BATCH_KICKOUTS_LOG = '../data/tests/batchverify_kickout_log.txt'
 def load_xpgn_data(fn = BATCH_DATA_SOURCE
                     ,max_tests = BATCH_SAMPLING_N
                     ,exclude_inds = None
+                    ,b_sample = False
                     ):
 
     '''This loads data for verify() tests'''
@@ -33,9 +34,13 @@ def load_xpgn_data(fn = BATCH_DATA_SOURCE
     o_json = json.loads(lines[0])
     data = o_json['data']
 
-    if max_tests is not None:
+    if (max_tests is not None) and not(b_sample):
         data = data[:max_tests]
-        #TODO - add sampling not first N
+
+    elif (max_tests is not None) and b_sample:
+        rand_inds = random.sample(range(len(data)), max_tests)
+        data = [data[ind] for ind in rand_inds]
+        
 
     if exclude_inds is not None:
         #TODO- make this based off source-key so we can sample
@@ -457,7 +462,7 @@ def test_load_xpgn_data():
     
     assert len(data) == 1854
 
-    data = load_xpgn_data()
+    data = load_xpgn_data(max_tests=100)
     
     assert len(data) == 100
 
@@ -569,3 +574,13 @@ def test_verify_last_player_move_at_least_ties_true_negative():
 
     # assert type(ret) == AssertionError
     assert ret == AssertionError
+
+if __name__ == "__main__":
+    
+    data = load_xpgn_data(max_tests=BATCH_HEAVY_N)     #heavy computation, run less
+    
+    verify_check_schedule_match(data
+                                ,b_naive_check=False
+                                ,b_assert=False
+                                ,b_details=True
+                                )

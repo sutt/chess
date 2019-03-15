@@ -2440,6 +2440,94 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         [x] update commands.txt
 
+3/15
+
+    [ ] Remianing items
+
+        [x] batchverify, alter BATCH_SAMPLING_N
+                BATCH_HEAVY_N = 200
+                python3 === 1 failed, 10 passed in 52.45 seconds ==
+                python2 === 1 failed, 10 passed in 66.51 seconds ==
+                ->py3 is 20% faster
+    
+        [ ] So how to debug tools/ tests
+            [ ] we still can't do it with datapaths
+
+        [ ] flask-server is still run with py2 in wsl
+
+            [ ] which packages do i need?
+                off the top of the head:
+                    flask? stockfish? - only for stockfish-server!
+                    pytest? - yes
+                with a clean python install and no packages, we'll need to
+                activate venv prelaunch
+
+            [ ] since bash cmd is "flask run" how do i differentiate between py2 vs py3?
+                $ which flask 
+                  >/home/user/.local/bin/flask
+                $ printenv
+                  >FLASK_APP=/mnt/c/users/wsutt/desktop/files/chess/stockfish/api/serverA.py
+
+            [x] add python version to variable check page in flask
+
+            [ ] FLASK_ENV=development?
+
+            [ ] flask --version prints out python 3.5.2
+                after pip3 install flask
+
+            [ ] 2to3 on stockfish/api/ (or just serverA.py)
+
+            [ ] stockfish/api/py_stockfish/stockfish/test_stockfish.py
+
+
+        [ ] Merge with master
+
+
+    [ ] play with batchverify
+            
+        [x] fix kickout:  test_batch_check_schedule_match()
+        kickout is correct! it's a promotion error where he gets a knight, not queen
+        see details below under key *&%$*
+
+            [x] load_xpgn_data: b_sample
+            [ ] load_xpgn_data: random_seed (aligns different runs)
+            [ ] get the verify_XX() to use sampling+seed if we so desire
+
+    [ ] use perf_test in all its glory
+
+        [ ] does perf_db have data written to it?
+            check via jupyter
+
+        
+*&%$*
+        C:\Users\wsutt\Desktop\files\chess\basic_engine\tests>python3 batchverify.py
+        176 | GarryKasparov.pgn-2827
+
+        C:\Users\wsutt\Desktop\files\chess\basic_engine\tests>python3 batchverify.py
+        176 | GarryKasparov.pgn-2827
+        First Turn Check doesnt match (_i_turn format):  72
+        Player allegedly in check:  Black
+        play() check value:  False
+        schema check value:  True
+        Board State pre-move at i_turn:  74
+
+        A B C D E F G H
+
+        8  b ~ ~ ~ ~ Q ~ Q
+        7  p ~ ~ ~ ~ ~ p ~
+        6  ~ p ~ q n ~ k ~
+        5  ~ ~ ~ ~ ~ ~ ~ p
+        4  ~ P ~ ~ P R ~ ~
+        3  P ~ ~ ~ ~ ~ ~ ~
+        2  ~ ~ ~ ~ ~ ~ P P
+        1  ~ ~ ~ ~ ~ ~ K ~
+
+        PGN:
+
+        1. d4 Nf6 2. c4 e6 3. Nf3 Bb4+ 4. Nbd2 O-O 5. e3 b6 6. Bd3 Bb7 7. O-O d5 8. a3 Bxd2 9. Bxd2 Nbd7 10. cxd5 Bxd5 11. b4 c5 12. Rc1 cxd4 13. Nxd4 Ne5 14. Ba6 Ne4 15. Be1 Qg5 16. f4 Qg6 17. fxe5 Nc5 18. Bg3 Nxa6 19. Nf5 Rae8 20. Nd6 Re7 21. Rf4 h5 22. e4 Ba8 23. Bh4 Rd7 24. Rc3 Qh6 25. Qf1 Nc7 26. Rcf3 f5 27. exf6 Rxd6 28. f7+ Kh7 29. Be7 e5 30. Bxf8 exf4 31. Bxd6 Qxd6 32. Qd3 Qe7 33. Qc4 Kh6 34. Rxf4 Ne6 35. Qc8 Qd6 36. Qh8+ Kg6 37. f8=N+ Nxf8 38. Qxf8 Qd1+ 39. Kf2 Qd2+ 40. Kg3 Qe1+ 41. Kh3
+
+        Offending move:
+        37. f8=N+
 
 
 Non-dated Stuff --------------------------------------------------
