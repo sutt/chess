@@ -2539,7 +2539,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                    |
                    py_stockfish/      # a wrapper repo
                        |
-                       stockfish      # root Ilya's pypi repo / from github
+                       pystockfish      # root Ilya's pypi repo / from github
                            |
                            stockfish.py  # main program for wrapper-pkg
                            |
@@ -2568,7 +2568,13 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
 
         [x] delete un-needed files in stockfish
-        
+
+        [x] track the stockfish directory
+
+        [x] run all tests, see what tmp files get created
+
+            basic_engine/tests/test_tmp.txt
+            basic_engine/src/stderr.txt
 
         
 *&%$*

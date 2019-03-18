@@ -6,16 +6,16 @@
 .pytest_cache
 __pycache__/
 
+# these are directories we dont want to track
 basic_engine/data/
 basic_engine/docs/temp/
 stockfish/Stockfish/
 stockfish/uci.zip
+# stockfish/py_stockfish/pystockfish/  #this is borderline-trackable
 
-qstockfish/api/py_stockfish/stockfish/
-qbasic_engine/src/stderr.txt
-qbasic_engine/src/tmp.txt
-qbasic_engine/tests/run_pytest_script.bat
-qbasic_engine/tests/tmp.txt
+# these are files created by tests/runtests.py
+basic_engine/tests/test_tmp.txt
+basic_engine/src/stderr.txt
 
 
 
