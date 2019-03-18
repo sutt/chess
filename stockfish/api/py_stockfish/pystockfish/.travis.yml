@@ -1,0 +1,15 @@
+language:
+  - python
+python:
+  - "2.7"
+  - "3.5"
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq stockfish
+before_script:
+  - export PATH=$PATH:/usr/games/
+script:
+  - python test_stockfish.py
+notifications:
+  email:
+    - zhelyabuzhsky@icloud.com

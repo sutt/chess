@@ -4,7 +4,7 @@ import unittest
 # print(*sys.path, sep='\n')
 # print(os.getcwd())
 
-from stockfish.stockfish import Stockfish
+from pystockfish.stockfish import Stockfish
 from .utils import find_app_path_root
 
 
