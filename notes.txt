@@ -2358,14 +2358,14 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
     3/14
 
-        [ ] Clean up Remaining items
+        [x] Clean up Remaining items
 
             [x] fix tests for --2 --tools
                     test_errlog_msg_2 / _3
-            [ ] batchverify, alter BATCH_SAMPLING_N=
-                [ ] use this for timing
-            [ ] So how to debug tools/ tests
-                [ ] we still can't do it with datapaths
+            [x] batchverify, alter BATCH_SAMPLING_N=
+                [x] use this for timing
+            [~] So how to debug tools/ tests
+                [~] we still can't do it with datapaths
             [x] change default to --3 on tests
                 [x] add a little print-msg for this
             [x] move basic_engine.diff (in root/) 
@@ -2413,7 +2413,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                     -> already have it: 3.5.2
                     but can't find pip3
                     >sudo apt-get -y install python3-pip
-                [ ] which packages do i need?
+                [x] which packages do i need?
                     off the top of the head:
                         flask? stockfish? - only for stockfish-server!
                         pytest? - yes
@@ -2424,7 +2424,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                         in <d_params.get_test_data()> will cause test to sometimes
                         pass and sometimes fail!
                         -> the problem was in the test code itself, not src-code 
-            [ ] flask-server is still run with py2 in wsl
+            [x] flask-server is still run with py2 in wsl
             [x] Build diff of diffs
                  cleantests = 1c63eb
                  post2to3   = fb2173
@@ -2453,26 +2453,29 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
         [ ] So how to debug tools/ tests
             [ ] we still can't do it with datapaths
 
-        [ ] flask-server is still run with py2 in wsl
+        [x] flask-server is still run with py2 in wsl
 
-            [ ] which packages do i need?
+            [x] which packages do i need?
                 off the top of the head:
-                    flask? stockfish? - only for stockfish-server!
+                    flask? only for stockfish-server!
                     pytest? - yes
+                    stockfish? -no, dont pip install it, its already
+                                in the source tree of stockfish/
                 with a clean python install and no packages, we'll need to
                 activate venv prelaunch
 
-            [ ] since bash cmd is "flask run" how do i differentiate between py2 vs py3?
+            [x] since bash cmd is "flask run" how do i differentiate between py2 vs py3?
                 $ which flask 
                   >/home/user/.local/bin/flask
                 $ printenv
                   >FLASK_APP=/mnt/c/users/wsutt/desktop/files/chess/stockfish/api/serverA.py
+                -> currently you can't
 
             [x] add python version to variable check page in flask
 
             [~] FLASK_ENV=development?
 
-            [ ] flask --version prints out python 3.5.2
+            [x] flask --version prints out python 3.5.2
                 after pip3 install flask
 
             [x] 2to3 on stockfish/api/ (or just serverA.py)
@@ -2495,7 +2498,7 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
                         from .stockfish import Stockfish
                     SystemError: Parent module '' not loaded, cannot perform relative import
 
-            [ ] organize .bak's
+            [x] organize .bak's
 
 
         [ ] Merge with master
@@ -2515,6 +2518,57 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
 
         [ ] does perf_db have data written to it?
             check via jupyter
+
+    [ ] need a requirements.txt
+
+    3/18
+
+        [x] get unittest to run / organize correct structure
+
+        root
+           |
+           basic_engine [...]
+           |
+           stockfish
+                |
+                api/
+                   |
+                   serverA.py        # main command
+                   |
+                   lib_stockfish.py   # a copy of the stockfish class from Ilya's wrapper pypi-pkg
+                   |
+                   py_stockfish/      # a wrapper repo
+                       |
+                       stockfish      # root Ilya's pypi repo / from github
+                           |
+                           stockfish.py  # main program for wrapper-pkg
+                           |
+                           ...          # other random artifacts from pypi repo
+                           |
+                           __init__.py
+                        |
+                        tests
+                            |
+                            tests.py    # contains unittest's to be run
+                            |
+                            utils.py    # utility functions for tests.py
+                            |
+                            __init__.py
+
+                |
+                Stockfish/         # root of stockfish dev repo
+                    |
+                    bin/
+                        |
+                        stockfish[-32.exe]
+                    |
+                    tests/
+                    |
+                    src/
+
+
+        [x] delete un-needed files in stockfish
+        
 
         
 *&%$*
