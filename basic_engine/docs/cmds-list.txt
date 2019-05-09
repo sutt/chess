@@ -1,5 +1,17 @@
 List commands for this workspace here:
 
+Run an interactive game:
+
+    In ~/basic_engine/
+
+        >python[3] main.py 
+        
+            --1v1
+            --myplayer <black, white>
+            --network 
+
+    [allows you to play against computer; try "a2 a4" as input cmd (no quotes)]
+
 1-click Tests:
 
     In tests/
@@ -20,16 +32,6 @@ List commands for this workspace here:
         >python runtests.py --src --clearcache
 
         [erases files that get confused b/w the two os's]
-
-
-Run an interactive game:
-
-    In ~/basic_engine/
-
-        >python[3] main.py
-
-    [allows you to play against computer; try "a2 a4" as input cmd (no quotes)]
-
 
 Display profiling stats:
     

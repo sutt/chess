@@ -2576,6 +2576,45 @@ random thought: a mechanichal chess board is valuable to new variants of the rul
             basic_engine/tests/test_tmp.txt
             basic_engine/src/stderr.txt
 
+        [x] merge py3 to master:
+        
+            https://stackoverflow.com/questions/5601931/what-is-the-best-and-safest-way-to-merge-a-git-branch-into-master
+
+            git checkout master
+            git pull origin master
+            git merge py3
+            git push origin master  [note: no add/commit needed]
+
+            note: all commits in py3 branch are presevered as separate
+
+    3/19
+        
+        [ ] add the functionality from src/main.py to basic_Engine/main.py
+            [x] interactive
+            [x] color control
+            [ ] turn on networking
+
+        [ ] adding futher input commands
+            [ ] 'exit'
+
+        [ ] use src/main b_use_cli = False is buggy
+            [ ] noisy launch on flask server
+            [ ] cmd indentation bug
+
+        [x] note in readme.md how its python2/python3 + linux/windows compatible
+
+        [~] play with perf / start write-up
+
+    5/9
+
+        [x] stockfish-networking didn't work / tests failed,
+            -> needed to pip install `flask` on the wsl python[2]; now it works
+            -> note: this workspace still uses python2 for the flask server on wsl
+
+        [ ] i learned a new castling stipulation: all open spaces must be free of attack
+
+        
+
         
 *&%$*
         C:\Users\wsutt\Desktop\files\chess\basic_engine\tests>python3 batchverify.py

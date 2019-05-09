@@ -3,17 +3,32 @@ Chess
 
 From scratch chess engine & wsl+flask server pattern & profiling tools to examine perf-bottlenecks.
 
-Using WSL + Flask to integrate a linux-binary-cli-app into a windows-base app:
+Experimental feature: Using WSL + Flask to integrate a linux-binary-cli-app into a windows-base app:
     
-    - the rules/display/interface-engine ("basic_engine/") can
-    be run on windows, while
-    - the ai-engine ("stockfish/") is run in a server on wsl
+- the rules/display/interface-engine ("basic_engine/") can
+be run on windows, while...
 
-    this allows compuatational type workspaces to uses packages
-    which only build easily for linux
+- the ai-engine ("stockfish/") is run in a separate process on a  server in wsl. Call/response over http communicates between processes, and python-subprocess interfaces of stdin/stdout with the stockfish-app.
+
+This allows compuatational type workspaces to uses packages which only build easily for linux.
+
+Code and Tests runs on python2.7 / python3.6+, and on windows and linux (wsl). This is handled with several switch statements (sys.version_info.major / os.name) where neccessary. Default as of March 2019 is Python3.6 on Win10.
 
 
 Commands:
+
+Playing...
+
+    in basic_engine/
+
+        >python[3] main.py
+
+            runs interactive cli-game
+
+        --1v1      - to control other player as well
+        --myplayer <black, white>
+        --network  - use the experimental wsl-server feature
+
 
 Testing...
 
@@ -34,22 +49,19 @@ Testing...
 
         >python3 -m tests.tests
 
-Playing...
 
-    in basic_engine/
+Utilities / Perf Testing ...
 
-        >python[3] main.py
+    in ~basic_engine/tools/
+    
+        >python profile_test.py --classiccomparison
 
-            runs interactive cli-game
+            profile_test reports function calls per experiment, from cProfile
 
-            edit main.py code to change the type of game
+    in ~/basic_engine/
+    
+        > python -m tools.perf_test --demo
 
-            TODO - add cli args / input()-configuration instead of editing code
+        perf_test reports the elapsed time for the same game to run, under different different check-algo paths. Should take ~20 secs to complete for --demo.
 
-
-Utilities... (deprecated)
-
-    [from basic_engine/]
-    add pgn_to_xpgn() plus args to src/hack.py
-    >python hack.py
-    (this runs the conversion routine in the data/ directory)
+    see docs/cmds-list.txt for more options

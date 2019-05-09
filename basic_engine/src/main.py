@@ -19,13 +19,13 @@ from .TurnStage import filter_check_test_copy_apply_2
 from .TurnStage import filter_check_test_copy_apply_3
 from .TurnStage import filter_check_test_copy_opt
 
-b_use_clapi = True
-if os.name == 'nt' and not(b_use_clapi):
+from .StockfishCLApi import StockfishCLApi
+
+b_import_networking = True   # might want ton suppress for testing/dev;
+                             # this module requires `requests` package
+
+if b_import_networking:
     from .StockfishNetwork import StockfishNetworking
-if os.name == 'posix' or b_use_clapi:
-    from .StockfishCLApi import StockfishCLApi
-
-
 
 Move = moveHolder()
 
@@ -44,6 +44,7 @@ class Game():
         ,init_player = None
         ,init_pieces = None
         ,test_exit_moves = None
+        ,b_stockfish_cli = True
         ,b_display_show_opponent = False
         ,b_display_always_print = False
         ,b_display_never_print = False
@@ -58,9 +59,9 @@ class Game():
 
         self.stockfish_control = stockfish_control
         if len(self.stockfish_control) > 0:
-            if os.name == 'nt' and not(b_use_clapi):
+            if os.name == 'nt' and not(b_stockfish_cli):
                 self.stockfish_interface = StockfishNetworking(b_launch_server=True)
-            if os.name == 'posix' or b_use_clapi:
+            else:
                 self.stockfish_interface =StockfishCLApi()
             
 

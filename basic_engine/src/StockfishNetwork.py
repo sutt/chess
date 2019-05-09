@@ -92,7 +92,7 @@ class StockfishNetworking():
                     print('failed to validate the stockfish server is up.')
                 else:
                     self._del_tmp_file()
-                    print('server setup in secs: %s' % str(time.time() - t0)[:4])
+                    print('  server setup in secs: %s\n' % str(time.time() - t0)[:4])
 
             else:
                 print('Sleeping 4 seconds to launch stockfish server...')
@@ -305,7 +305,7 @@ def test_sn_launch_server_2():
     content = r.content
     if sys.version_info.major == 3:
         content = content.decode()
-    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api|python3"
+    assert content == "posix|/mnt/c/Users/wsutt/Desktop/files/chess/stockfish/api|python2"
     
     
 def test_sn_get_best_move_1():
@@ -340,7 +340,8 @@ def test_sn_best_move_2():
     sn = StockfishNetworking(b_launch_server=True)
     best_move = sn.get_move(list_log_moves, available_moves)
 
-    assert best_move == Move(pos0 = (6,4), pos1 = (4,4), code = 0)  # e4
-
+    assert best_move in [Move(pos0 = (6,4), pos1 = (4,4), code = 0),   # e4
+                         Move(pos0 = (6,3), pos1 = (4,3), code = 0),   # d4
+                        ]
 
 #TODO - a get position example
