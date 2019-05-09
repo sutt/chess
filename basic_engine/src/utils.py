@@ -228,6 +228,8 @@ def parse_player_input(raw, board, input_type = 'alphanum'):
         return 1, []
     if raw == 'out_log':
         return 2, []
+    if raw == 'exit':
+        return 3, []
     try:
         # if input_type == 'alphanum_legacy':
         #     out = alphamove_to_posmove(raw, b_legacy=True)
@@ -431,6 +433,9 @@ def player_control_input(board, moves_player, log, **kwargs):
             print(format_move_log(log.get_log_move()))
         if ret == -1:
             print('could not recognize move ', str(raw), ". Try again:")
+        if ret == 3:
+            print('exiting the game...\n')
+            sys.exit(0)
 
 
 def _find_blank(list_str, find_str):
